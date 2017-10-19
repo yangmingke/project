@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.SecurityBalance">
+
+
+	<insert id="addSecurityBalance" parameterType="securityBalance">
+		insert into tb_ucpaas_security_balance(security_id,sid,balance,status,relieve_type,create_date,update_date)
+		values(#{securityId},#{sid},#{balance},#{status},#{relieveType},#{createDate},#{updateDate});
+	</insert>
+	
+	<select id="getSecurityBalance" parameterType="map" resultType="securityBalance">
+		select security_id as securityId,sid,truncate(balance/1000000,2) as balance,status,relieve_type as relieveType,create_date as  createDate,update_date as updateDate from tb_ucpaas_security_balance where sid=#{sid} and security_id=#{securityId}
+	</select>
+	
+	<update id="updateSecurityBalance" parameterType="securityBalance">
+		update tb_ucpaas_security_balance 
+		<set>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="relieveType!=null">
+				relieve_type=#{relieveType},
+			</if>
+			<if test="updateDate!=null">
+				update_date=#{updateDate},
+			</if>
+		</set>
+		where sid=#{sid} and security_id=#{securityId}
+	</update>
+	
+	<update id="addSecurityMoney" parameterType="securityBalance">
+		update  tb_ucpaas_security_balance set balance=balance+#{balance},relieve_type=#{relieveType} where sid=#{sid} and security_id=#{securityId}
+	</update>
+	
+	<update id="unfreezeBalance" parameterType="map">
+		update tb_ucpaas_security_balance set balance=0,relieve_type='3',update_date=#{updateDate} where sid=#{sid} and security_id=#{securityId}
+	</update>
+	
+</mapper>

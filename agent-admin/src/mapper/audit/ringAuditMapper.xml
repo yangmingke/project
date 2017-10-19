@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 审核管理-铃声审核 -->
+<mapper namespace="ringAudit">
+
+	<!-- 分页查询 -->
+	<select id="query" resultType="map">
+		select 
+			t.id,
+			app.app_sid,
+			app.app_name,
+			t.sid,
+			u.email,
+			t.type,
+			t.file_name,
+			t.create_date,
+			t.update_date,
+			t.audit_status,
+			t.upload_status,
+			t.content_type,
+			t.content,
+			t.user_file_name,
+			(SELECT a.audit_desc FROM tb_srv_audit a WHERE a.audited_id = t.id AND a.audit_type = 7 LIMIT 1) AS audit_desc
+		FROM
+			tb_ucpaas_call_ring t,
+			tb_ucpaas_application app,
+			tb_ucpaas_user u
+		WHERE
+			t.app_sid = app.app_sid
+		AND t.sid = u.sid
+		AND t.audit_status != 4
+		
+		<if test="text != null">
+			AND (
+				app.app_sid LIKE concat('%', #{text}, '%')
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="audit_status != null">
+			AND t.`audit_status` = #{audit_status}
+		</if>
+		<if test="upload_status != null">
+			AND t.`upload_status` = #{upload_status}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_call_ring t,
+			tb_ucpaas_application app,
+			tb_ucpaas_user u
+		WHERE
+			t.app_sid = app.app_sid
+		AND t.sid = u.sid
+		AND t.audit_status != 4
+		
+		<if test="text != null">
+			AND (
+				app.app_sid LIKE concat('%', #{text}, '%')
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="audit_status != null">
+			AND t.`audit_status` = #{audit_status}
+		</if>
+		<if test="upload_status != null">
+			AND t.`upload_status` = #{upload_status}
+		</if>
+	</select>
+	<select id="getRing" resultType="map">
+		select t.sid,u.email,app_sid,type,file_name,content_type,content
+		from tb_ucpaas_call_ring t
+		join tb_ucpaas_user u on t.sid = u.sid
+		where id = #{id} limit 1 
+	</select>
+	
+	<!-- 审核 -->
+	<update id="audit">
+		UPDATE tb_ucpaas_call_ring t
+		SET t.`audit_status` = #{audit_status},
+		t.update_date = now()
+		WHERE
+			t.id = #{id}
+	</update>
+	
+	<select id="reloadCbIpList" resultType="map">
+		select cb_ip,cb_port from tb_ucpaas_cb_ip where state = 1 and type = 1
+	</select>
+	
+	<update id="saveUploadResult">
+		update tb_ucpaas_call_ring set update_date = now()
+		<if test="file_name != null">
+			,file_name = #{file_name}
+		</if>
+		<if test="upload_status != null">
+			,upload_status = #{upload_status}
+		</if>
+		where id = #{id}
+	</update>
+</mapper> 

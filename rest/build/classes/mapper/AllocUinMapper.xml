@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="AllocUinMapper" >
+
+
+<!-- uin分配存储过程 -->
+  <select id="call_distribute_uin" resultType="java.util.Map" parameterType="java.util.Map" statementType="CALLABLE" >
+     {call p_distribute_uin_by_section_id(#{sectionid,mode=IN,jdbcType=INTEGER},
+   										  #{po_uin,mode=OUT,jdbcType=INTEGER})
+     }
+  </select>
+ 
+
+ 
+</mapper>

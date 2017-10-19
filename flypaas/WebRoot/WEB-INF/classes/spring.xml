@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        ">
+	
+	<!-- 采用注释的方式配置bean -->
+	<context:annotation-config />
+	
+	<!-- 配置要扫描的包 -->
+	<context:component-scan base-package="com.flypaas"></context:component-scan>
+	
+	<!--proxy-target-class="true"强制使用cglib代理   如果为false则spring会自动选择-->
+	<aop:aspectj-autoproxy  proxy-target-class="false"/>
+		<!-- 配置dbcp数据源公共配置 -->
+	<bean id="dataSourcePre" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" abstract="true">
+		<property name="driverClassName" value="${jdbc.driverClassName}" />
+		<!-- 队列中的最小等待数 -->
+		<property name="minIdle" value="${jdbc.minIdle}"></property>
+		<!-- 队列中的最大等待数 -->
+		<property name="maxIdle" value="${jdbc.maxIdle}"></property>
+		<!-- 最长等待时间，单位毫秒 -->
+		<property name="maxWait" value="${jdbc.maxWait}"></property>
+		<!-- 最大活跃数个数 -->
+		<property name="maxActive" value="${jdbc.maxActive}"></property>
+		<!-- 初始化连接个数 -->
+		<property name="initialSize" value="${jdbc.initialSize}"></property>
+		<!-- 据库连接池中取得连接时，对其的有效性进行检查 -->
+		<property name="testOnBorrow" value="true"></property>
+		<!-- 请求到达时，连接池分配已有的连接，该项检测连接有效性  -->
+		<property name="validationQuery" value="select 1"></property>
+		<!--指明连接是否被空闲连接回收器(如果有)进行检验，如果检测失败，则连接将被从池中去除-->
+		<property name="testWhileIdle" value="true"></property>
+		<!--连接池中连接，在时间段内一直空闲，被逐出连接池的时间(1000*60*60)，以毫秒为单位-->
+		<property name="minEvictableIdleTimeMillis" value="3600000"></property>
+	</bean>
+	<!-- 配置dbcp数据源flypaas -->
+	<bean id="dataSource" parent="dataSourcePre" >
+		<property name="url" value="${jdbc.flypaas.url}" />
+		<property name="username" value="${jdbc.flypaas.username}" />
+		<property name="password" value="${jdbc.flypaas.password}" />
+	</bean>
+	
+	<!-- 配置dbcp数据源 statistics -->
+	<bean id="dataSourceStatistics" parent="dataSourcePre">
+		<property name="url" value="${jdbc.statistics.url}" />
+		<property name="username" value="${jdbc.statistics.username}" />
+		<property name="password" value="${jdbc.statistics.password}" />
+	</bean>
+
+	<!-- 配置dbcp数据源 cdr -->
+	<bean id="dataSourceCdr" parent="dataSourcePre">
+		<property name="url" value="${jdbc.cdr.url}" />
+		<property name="username" value="${jdbc.cdr.username}" />
+		<property name="password" value="${jdbc.cdr.password}" />
+	</bean>
+		
+	<!-- 配置mybitasSqlSessionFactoryBean flypaas-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml"></property>
+		<property name="mapperLocations" value="classpath:com/flypaas/entity/sqlMappers/*"></property>
+	</bean>
+	
+	<!-- 配置mybitasSqlSessionFactoryBean statistics -->
+	<bean id="sqlSessionFactoryStatistics" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSourceStatistics" />
+		<property name="configLocation" value="classpath:mybatis.xml"></property>
+		<property name="mapperLocations" value="classpath:com/flypaas/entity/sqlMappers/*"></property>
+	</bean>
+	
+	<!-- 配置mybitasSqlSessionFactoryBean cdr -->
+	<bean id="sqlSessionFactoryCdr" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSourceCdr" />
+		<property name="configLocation" value="classpath:mybatis.xml"></property>
+		<property name="mapperLocations" value="classpath:com/flypaas/entity/sqlMappers/*"></property>
+	</bean>
+	
+	
+	<!-- 配置SqlSessionTemplate flypaas -->
+	<bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+	    <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	
+	<!-- 配置SqlSessionTemplate statistics -->
+	<bean id="sqlSessionTemplateStatistics" class="org.mybatis.spring.SqlSessionTemplate">
+	    <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactoryStatistics" />
+	</bean>
+	
+	<!-- 配置SqlSessionTemplate cdr -->
+	<bean id="sqlSessionTemplateCdr" class="org.mybatis.spring.SqlSessionTemplate">
+	    <constructor-arg name="sqlSessionFactory" ref="sqlSessionFactoryCdr" />
+	</bean>
+	
+	<!-- 事务配置 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+		<bean id="freeMarkerConfiguration"
+		class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
+		<property name="templateLoaderPath" value="classpath:template" />
+	</bean>
+	<bean class="com.flypaas.utils.SpringKit"></bean>
+	
+	<!-- 邮件配置 -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+    	<property name="host">
+    		<value>${mail.host}</value>
+    	</property>
+    	<property name="username">
+    		<value>${mail.username}</value>
+    	</property>
+    	<property name="password">
+    		<value>${mail.password}</value>
+    	</property>
+    	<property name="port">
+    		<value>${mail.port}</value>
+    	</property>
+    	<property name="javaMailProperties">
+    		<props>
+    			<prop key="mail.smtp.auth">${mail.auth}</prop>
+    			<prop key="mail.smtp.timeout">${mail.timeout}</prop>
+    		</props>
+    	</property>
+    </bean> 
+	
+	<!-- 根据不同的运行环境加载配置文件 -->
+	<context:property-placeholder location="classpath:config/config_${spring.profiles.active}.properties" />
+</beans>

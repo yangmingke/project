@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsAccountInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsAccountInfo" >
+    <id column="net_sid" property="netSid" jdbcType="VARCHAR" />
+    <result column="net_name" property="netName" jdbcType="VARCHAR" />
+    <result column="is_private_net" property="isPrivateNet" jdbcType="CHAR" />
+    <result column="net_area" property="netArea" jdbcType="CHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="auth_status" property="authStatus" jdbcType="CHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="chat_type" property="chatType" jdbcType="INTEGER" />
+    <result column="chat_nbr" property="chatNbr" jdbcType="VARCHAR" />
+    <result column="realname" property="realname" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="developer_type" property="developerType" jdbcType="CHAR" />
+    <result column="national" property="national" jdbcType="INTEGER" />
+    <result column="id_type" property="idType" jdbcType="CHAR" />
+    <result column="id_nbr" property="idNbr" jdbcType="VARCHAR" />
+    <result column="org_id" property="orgId" jdbcType="BIGINT" />
+    <result column="o_con_type1" property="oConType1" jdbcType="CHAR" />
+    <result column="o_con_nbr1" property="oConNbr1" jdbcType="VARCHAR" />
+    <result column="o_con_type2" property="oConType2" jdbcType="CHAR" />
+    <result column="o_con_nbr2" property="oConNbr2" jdbcType="VARCHAR" />
+    <result column="point" property="point" jdbcType="BIGINT" />
+    <result column="rank" property="rank" jdbcType="VARCHAR" />
+    <result column="legal_person" property="legalPerson" jdbcType="VARCHAR" />
+    <result column="company_nbr" property="companyNbr" jdbcType="VARCHAR" />
+    <result column="web_site" property="webSite" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="login_times" property="loginTimes" jdbcType="INTEGER" />
+    <result column="province" property="province" jdbcType="INTEGER" />
+    <result column="city" property="city" jdbcType="INTEGER" />
+    <result column="guide" property="guide" jdbcType="INTEGER" />
+    <result column="random_nbr" property="randomNbr" jdbcType="VARCHAR" />
+    <result column="alipay_name" property="alipayName" jdbcType="VARCHAR" />
+    <result column="alipay_account" property="alipayAccount" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    net_sid, net_name, is_private_net, net_area, username, email, password, 
+    status, auth_status, mobile, chat_type, chat_nbr, realname, address, developer_type, 
+    national, id_type, id_nbr, org_id, o_con_type1, o_con_nbr1, o_con_type2, o_con_nbr2, 
+    point, rank, legal_person, company_nbr, web_site, create_date, update_date, login_times, 
+    province, city, guide, random_nbr, alipay_name, alipay_account
+  </sql>
+  
+  <select id="queryCount" resultType="java.lang.Integer" parameterType="Map" >
+    select 
+    count(0)
+    from tb_rs_account_info
+    where status is not NULL
+    and status != '0'
+    <!-- <if test="isPrivateNet != null" >
+        and is_private_net = #{isPrivateNet,jdbcType=CHAR}
+    </if> -->
+    <if test="isPrivateNet == 1" >
+        and is_private_net = #{isPrivateNet,jdbcType=CHAR}
+    </if>
+    <if test="isPrivateNet == 0" >
+        and (is_private_net = #{isPrivateNet,jdbcType=CHAR} or is_private_net is null)
+    </if>
+    <if test="status != null" >
+        and status = #{status,jdbcType=VARCHAR}
+    </if>
+    <if test="realname != null" >
+        and username like CONCAT('%',#{realname,jdbcType=VARCHAR},'%') 
+    </if>
+  </select>
+  
+  <select id="queryAccount" resultMap="BaseResultMap" parameterType="Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_account_info
+    where status is not NULL
+    and status != '0'
+    <if test="isPrivateNet == 1" >
+        and is_private_net = #{isPrivateNet,jdbcType=CHAR}
+    </if>
+    <if test="isPrivateNet == 0" >
+        and (is_private_net = #{isPrivateNet,jdbcType=CHAR} or is_private_net is null)
+    </if>
+    <if test="status != null" >
+        and status = #{status,jdbcType=VARCHAR}
+    </if>
+    <if test="realname != null" >
+        and username like CONCAT('%',#{realname,jdbcType=VARCHAR},'%') 
+    </if>
+    ORDER BY  create_date DESC
+    limit #{begin,jdbcType=INTEGER} , #{count,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryAllAccountName" resultMap="BaseResultMap">
+    select net_sid,username
+    from tb_rs_account_info
+    where `status`='1'
+  </select>
+  
+  <select id="queryAllAccountNameByName" resultMap="BaseResultMap">
+    select net_sid,username
+    from tb_rs_account_info
+    <if test="username != null" >
+    	where username like CONCAT('%',#{username,jdbcType=VARCHAR},'%') 
+    </if>
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_account_info
+    where net_sid = #{netSid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="findRsAccountBySids" resultType="Map" parameterType="List" >
+    select 
+	    net_sid,
+	    username
+    from tb_rs_account_info
+    where net_sid in
+    <foreach collection="list" item = "netSid" open="(" separator="," close=")">  
+            #{netSid}  
+    </foreach> 
+  </select>
+  
+  <select id="queryAccountByName" resultType="Map" parameterType="java.lang.String" >
+    select 
+	    net_sid,
+	    username
+    from tb_rs_account_info
+    <if test="username != null" >
+        where username like CONCAT('%',#{username,jdbcType=VARCHAR},'%') 
+    </if>
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_rs_account_info
+    where net_sid = #{netSid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsAccountInfo" >
+    insert into tb_rs_account_info (net_sid, net_name, 
+      is_private_net, net_area, username, 
+      email, password, status, 
+      auth_status, mobile, chat_type, 
+      chat_nbr, realname, address, 
+      developer_type, national, id_type, 
+      id_nbr, org_id, o_con_type1, 
+      o_con_nbr1, o_con_type2, o_con_nbr2, 
+      point, rank, legal_person, 
+      company_nbr, web_site, create_date, 
+      update_date, login_times, province, 
+      city, guide, random_nbr, alipay_name, alipay_account
+      )
+    values (#{netSid,jdbcType=VARCHAR}, #{netName,jdbcType=VARCHAR},
+      #{isPrivateNet,jdbcType=CHAR}, #{netArea,jdbcType=CHAR}, #{username,jdbcType=VARCHAR}, 
+      #{email,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{status,jdbcType=CHAR}, 
+      #{authStatus,jdbcType=CHAR}, #{mobile,jdbcType=VARCHAR}, #{chatType,jdbcType=INTEGER}, 
+      #{chatNbr,jdbcType=VARCHAR}, #{realname,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, 
+      #{developerType,jdbcType=CHAR}, #{national,jdbcType=INTEGER}, #{idType,jdbcType=CHAR}, 
+      #{idNbr,jdbcType=VARCHAR}, #{orgId,jdbcType=BIGINT}, #{oConType1,jdbcType=CHAR}, 
+      #{oConNbr1,jdbcType=VARCHAR}, #{oConType2,jdbcType=CHAR}, #{oConNbr2,jdbcType=VARCHAR}, 
+      #{point,jdbcType=BIGINT}, #{rank,jdbcType=VARCHAR}, #{legalPerson,jdbcType=VARCHAR}, 
+      #{companyNbr,jdbcType=VARCHAR}, #{webSite,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{loginTimes,jdbcType=INTEGER}, #{province,jdbcType=INTEGER}, 
+      #{city,jdbcType=INTEGER}, #{guide,jdbcType=INTEGER}, #{randomNbr,jdbcType=VARCHAR},
+      #{alipayName,jdbcType=INTEGER}, #{alipayAccount,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsAccountInfo" >
+    insert into tb_rs_account_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="netSid != null" >
+        net_sid,
+      </if>
+      <if test="netName != null" >
+        net_name,
+      </if>
+      <if test="isPrivateNet != null" >
+        is_private_net,
+      </if>
+      <if test="netArea != null" >
+        net_area,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="authStatus != null" >
+        auth_status,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="chatType != null" >
+        chat_type,
+      </if>
+      <if test="chatNbr != null" >
+        chat_nbr,
+      </if>
+      <if test="realname != null" >
+        realname,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="developerType != null" >
+        developer_type,
+      </if>
+      <if test="national != null" >
+        national,
+      </if>
+      <if test="idType != null" >
+        id_type,
+      </if>
+      <if test="idNbr != null" >
+        id_nbr,
+      </if>
+      <if test="orgId != null" >
+        org_id,
+      </if>
+      <if test="oConType1 != null" >
+        o_con_type1,
+      </if>
+      <if test="oConNbr1 != null" >
+        o_con_nbr1,
+      </if>
+      <if test="oConType2 != null" >
+        o_con_type2,
+      </if>
+      <if test="oConNbr2 != null" >
+        o_con_nbr2,
+      </if>
+      <if test="point != null" >
+        point,
+      </if>
+      <if test="rank != null" >
+        rank,
+      </if>
+      <if test="legalPerson != null" >
+        legal_person,
+      </if>
+      <if test="companyNbr != null" >
+        company_nbr,
+      </if>
+      <if test="webSite != null" >
+        web_site,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="loginTimes != null" >
+        login_times,
+      </if>
+      <if test="province != null" >
+        province,
+      </if>
+      <if test="city != null" >
+        city,
+      </if>
+      <if test="guide != null" >
+        guide,
+      </if>
+      <if test="randomNbr != null" >
+        random_nbr,
+      </if>
+      <if test="alipayName != null" >
+        alipay_name,
+      </if>
+      <if test="alipayAccount != null" >
+        alipay_account,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="netSid != null" >
+        #{netSid,jdbcType=VARCHAR},
+      </if>
+      <if test="netName != null" >
+        #{netName,jdbcType=VARCHAR},
+      </if>
+      <if test="isPrivateNet != null" >
+        #{isPrivateNet,jdbcType=CHAR},
+      </if>
+      <if test="netArea != null" >
+        #{netArea,jdbcType=CHAR},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="authStatus != null" >
+        #{authStatus,jdbcType=CHAR},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="chatType != null" >
+        #{chatType,jdbcType=INTEGER},
+      </if>
+      <if test="chatNbr != null" >
+        #{chatNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null" >
+        #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="developerType != null" >
+        #{developerType,jdbcType=CHAR},
+      </if>
+      <if test="national != null" >
+        #{national,jdbcType=INTEGER},
+      </if>
+      <if test="idType != null" >
+        #{idType,jdbcType=CHAR},
+      </if>
+      <if test="idNbr != null" >
+        #{idNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="orgId != null" >
+        #{orgId,jdbcType=BIGINT},
+      </if>
+      <if test="oConType1 != null" >
+        #{oConType1,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr1 != null" >
+        #{oConNbr1,jdbcType=VARCHAR},
+      </if>
+      <if test="oConType2 != null" >
+        #{oConType2,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr2 != null" >
+        #{oConNbr2,jdbcType=VARCHAR},
+      </if>
+      <if test="point != null" >
+        #{point,jdbcType=BIGINT},
+      </if>
+      <if test="rank != null" >
+        #{rank,jdbcType=VARCHAR},
+      </if>
+      <if test="legalPerson != null" >
+        #{legalPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="companyNbr != null" >
+        #{companyNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="webSite != null" >
+        #{webSite,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginTimes != null" >
+        #{loginTimes,jdbcType=INTEGER},
+      </if>
+      <if test="province != null" >
+        #{province,jdbcType=INTEGER},
+      </if>
+      <if test="city != null" >
+        #{city,jdbcType=INTEGER},
+      </if>
+      <if test="guide != null" >
+        #{guide,jdbcType=INTEGER},
+      </if>
+      <if test="randomNbr != null" >
+        #{randomNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="alipayName != null" >
+        #{alipayName,jdbcType=INTEGER},
+      </if>
+      <if test="alipayAccount != null" >
+        #{alipayAccount,jdbcType=VARCHAR},
+      </if>
+      
+       
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsAccountInfo" >
+    update tb_rs_account_info
+    <set >
+      <if test="netName != null" >
+        net_name = #{netName,jdbcType=VARCHAR},
+      </if>
+      <if test="isPrivateNet != null" >
+        is_private_net = #{isPrivateNet,jdbcType=CHAR},
+      </if>
+      <if test="netArea != null" >
+        net_area = #{netArea,jdbcType=CHAR},
+      </if>
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="authStatus != null" >
+        auth_status = #{authStatus,jdbcType=CHAR},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="chatType != null" >
+        chat_type = #{chatType,jdbcType=INTEGER},
+      </if>
+      <if test="chatNbr != null" >
+        chat_nbr = #{chatNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null" >
+        realname = #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="developerType != null" >
+        developer_type = #{developerType,jdbcType=CHAR},
+      </if>
+      <if test="national != null" >
+        national = #{national,jdbcType=INTEGER},
+      </if>
+      <if test="idType != null" >
+        id_type = #{idType,jdbcType=CHAR},
+      </if>
+      <if test="idNbr != null" >
+        id_nbr = #{idNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="orgId != null" >
+        org_id = #{orgId,jdbcType=BIGINT},
+      </if>
+      <if test="oConType1 != null" >
+        o_con_type1 = #{oConType1,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr1 != null" >
+        o_con_nbr1 = #{oConNbr1,jdbcType=VARCHAR},
+      </if>
+      <if test="oConType2 != null" >
+        o_con_type2 = #{oConType2,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr2 != null" >
+        o_con_nbr2 = #{oConNbr2,jdbcType=VARCHAR},
+      </if>
+      <if test="point != null" >
+        point = #{point,jdbcType=BIGINT},
+      </if>
+      <if test="rank != null" >
+        rank = #{rank,jdbcType=VARCHAR},
+      </if>
+      <if test="legalPerson != null" >
+        legal_person = #{legalPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="companyNbr != null" >
+        company_nbr = #{companyNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="webSite != null" >
+        web_site = #{webSite,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginTimes != null" >
+        login_times = #{loginTimes,jdbcType=INTEGER},
+      </if>
+      <if test="province != null" >
+        province = #{province,jdbcType=INTEGER},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=INTEGER},
+      </if>
+      <if test="guide != null" >
+        guide = #{guide,jdbcType=INTEGER},
+      </if>
+      <if test="randomNbr != null" >
+        random_nbr = #{randomNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="alipayName != null" >
+        alipay_name = #{alipayName,jdbcType=INTEGER},
+      </if>
+      <if test="alipayAccount != null" >
+        alipay_account = #{alipayAccount,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where net_sid = #{netSid,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsAccountInfo" >
+    update tb_rs_account_info
+    set net_name = #{netName,jdbcType=VARCHAR},
+      is_private_net = #{isPrivateNet,jdbcType=CHAR},
+      net_area = #{netArea,jdbcType=CHAR},
+      username = #{username,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      status = #{status,jdbcType=CHAR},
+      auth_status = #{authStatus,jdbcType=CHAR},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      chat_type = #{chatType,jdbcType=INTEGER},
+      chat_nbr = #{chatNbr,jdbcType=VARCHAR},
+      realname = #{realname,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      developer_type = #{developerType,jdbcType=CHAR},
+      national = #{national,jdbcType=INTEGER},
+      id_type = #{idType,jdbcType=CHAR},
+      id_nbr = #{idNbr,jdbcType=VARCHAR},
+      org_id = #{orgId,jdbcType=BIGINT},
+      o_con_type1 = #{oConType1,jdbcType=CHAR},
+      o_con_nbr1 = #{oConNbr1,jdbcType=VARCHAR},
+      o_con_type2 = #{oConType2,jdbcType=CHAR},
+      o_con_nbr2 = #{oConNbr2,jdbcType=VARCHAR},
+      point = #{point,jdbcType=BIGINT},
+      rank = #{rank,jdbcType=VARCHAR},
+      legal_person = #{legalPerson,jdbcType=VARCHAR},
+      company_nbr = #{companyNbr,jdbcType=VARCHAR},
+      web_site = #{webSite,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      login_times = #{loginTimes,jdbcType=INTEGER},
+      province = #{province,jdbcType=INTEGER},
+      city = #{city,jdbcType=INTEGER},
+      guide = #{guide,jdbcType=INTEGER},
+      random_nbr = #{randomNbr,jdbcType=VARCHAR},
+      alipay_name = #{alipayName,jdbcType=INTEGER},
+      alipay_account = #{alipayAccount,jdbcType=VARCHAR}
+    where net_sid = #{netSid,jdbcType=VARCHAR}
+  </update>
+</mapper>

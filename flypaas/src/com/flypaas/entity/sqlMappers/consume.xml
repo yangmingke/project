@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.Consume">
+
+	<select id="getTodayCsm" parameterType="map" resultType="map">
+		select hr,csm from ucpaas_statistics.tb_ucpaas_today_consume_${time} WHERE sid=#{sid} and type=#{type} and datetime=#{datetime}
+	</select>
+	
+	<select id="getTodayTrafficCsm" parameterType="map" resultType="map">
+		select datetime,(traffic_out+traffic_in) traffic_out from t_traffic_today_consume_${time} WHERE sid=#{sid}
+	</select>
+	
+	<select id="getapp45csmVoice" statementType="CALLABLE" parameterType="map" resultType="map">  
+	    <![CDATA[  
+	        {call statistics_app_45_csm_voice (#{beginDate,mode=IN,jdbcType=VARCHAR},#{endDate,mode=IN,jdbcType=VARCHAR},#{appSid,mode=IN,jdbcType=VARCHAR},#{pageIndex,mode=IN,jdbcType=INTEGER},#{pageCount,mode=IN,jdbcType=INTEGER},#{total,mode=OUT,jdbcType=BIGINT},#{totalCount,mode=OUT,jdbcType=INTEGER})}  
+	    ]]>  
+    </select>  
+    <select id="getApp45csmMid" statementType="CALLABLE" parameterType="map" resultType="map">  
+	    <![CDATA[  
+	        {call statistics_app_45_csm_mid (#{beginDate,mode=IN,jdbcType=VARCHAR},#{endDate,mode=IN,jdbcType=VARCHAR},#{appSid,mode=IN,jdbcType=VARCHAR},#{pageIndex,mode=IN,jdbcType=INTEGER},#{pageCount,mode=IN,jdbcType=INTEGER},#{total,mode=OUT,jdbcType=BIGINT},#{totalCount,mode=OUT,jdbcType=INTEGER})}  
+	    ]]>  
+    </select>  
+	<select id="getAppSmsLog" statementType="CALLABLE" parameterType="map" resultType="map">
+		 <![CDATA[  
+	        {call statistics_app_45_csm_sms (#{beginDate,mode=IN,jdbcType=VARCHAR},#{endDate,mode=IN,jdbcType=VARCHAR},#{appSid,mode=IN,jdbcType=VARCHAR},#{pageIndex,mode=IN,jdbcType=INTEGER},#{pageCount,mode=IN,jdbcType=INTEGER},#{total,mode=OUT,jdbcType=BIGINT},#{totalCount,mode=OUT,jdbcType=INTEGER})}  
+	    ]]> 
+	</select>
+	<select id="getAppCsmImLog" statementType="CALLABLE" parameterType="map" resultType="map">
+		<![CDATA[  
+	        {call statistics_app_45_csm_im (#{beginDate,mode=IN,jdbcType=VARCHAR},#{endDate,mode=IN,jdbcType=VARCHAR},#{appSid,mode=IN,jdbcType=VARCHAR},#{pageIndex,mode=IN,jdbcType=INTEGER},#{pageCount,mode=IN,jdbcType=INTEGER},#{total,mode=OUT,jdbcType=BIGINT},#{totalCount,mode=OUT,jdbcType=INTEGER})}  
+	    ]]> 
+	</select>
+	<select id="getAppVoiceCodeLog" statementType="CALLABLE"  parameterType="map" resultType="map">
+		<![CDATA[  
+		    {call statistics_app_45_csm_voice_code (#{beginDate,mode=IN,jdbcType=VARCHAR},#{endDate,mode=IN,jdbcType=VARCHAR},#{appSid,mode=IN,jdbcType=VARCHAR},#{pageIndex,mode=IN,jdbcType=INTEGER},#{pageCount,mode=IN,jdbcType=INTEGER},#{total,mode=OUT,jdbcType=BIGINT},#{totalCount,mode=OUT,jdbcType=INTEGER})}  
+		    ]]> 
+	</select>
+	<select id="getApp45csmVoiceNotify" statementType="CALLABLE"  parameterType="map" resultType="map">
+		<![CDATA[  
+		    {call statistics_app_45_csm_voice_notify (#{beginDate,mode=IN,jdbcType=VARCHAR},#{endDate,mode=IN,jdbcType=VARCHAR},#{appSid,mode=IN,jdbcType=VARCHAR},#{pageIndex,mode=IN,jdbcType=INTEGER},#{pageCount,mode=IN,jdbcType=INTEGER},#{total,mode=OUT,jdbcType=BIGINT},#{totalCount,mode=OUT,jdbcType=INTEGER})}  
+		    ]]> 
+	</select>
+	<select id="getApp45csmGjmy" statementType="CALLABLE"  parameterType="map" resultType="map">
+		<![CDATA[  
+		    {call statistics_app_45_csm_gjmy (#{beginDate,mode=IN,jdbcType=VARCHAR},#{endDate,mode=IN,jdbcType=VARCHAR},#{appSid,mode=IN,jdbcType=VARCHAR},#{pageIndex,mode=IN,jdbcType=INTEGER},#{pageCount,mode=IN,jdbcType=INTEGER},#{total,mode=OUT,jdbcType=BIGINT},#{totalCount,mode=OUT,jdbcType=INTEGER})}  
+		    ]]> 
+	</select>
+	
+	<select id="getAppClientLog" parameterType="map" resultType="map" >
+		select client_number,status,TRUNCATE(charge / 1000000, 4)  as fee,client_type,create_date as start_time from tb_ucpaas_client
+		where app_sid=#{appSid}
+		<if test="beginDate!=null">
+			and date(create_date)>=#{beginDate}
+		</if>
+		<if test="endDate!=null">
+			<![CDATA[
+			and date(create_date)<=#{endDate}
+			]]> 
+		</if>
+		order by create_date desc
+		${limit}
+	</select>
+	
+	<select id="getAppClientLogCount" parameterType="map" resultType="map" >
+		select count(0) as totalCount from tb_ucpaas_client
+		where app_sid=#{appSid}
+		<if test="beginDate!=null">
+			and date(create_date)>=#{beginDate}
+		</if>
+		<if test="endDate!=null">
+			<![CDATA[
+			and date(create_date)<=#{endDate}
+			]]> 
+		</if>
+	</select>
+	
+	<select id="getAppClientLogTotal" parameterType="map" resultType="map" >
+		select TRUNCATE(sum(charge) / 1000000, 4) as total from tb_ucpaas_client
+		where app_sid=#{appSid}
+		<if test="beginDate!=null">
+			and date(create_date)>=#{beginDate}
+		</if>
+		<if test="endDate!=null">
+			<![CDATA[
+			and date(create_date)<=#{endDate}
+			]]> 
+		</if>
+	</select>
+	<select id="getBillMonth" parameterType="map" resultType="map">
+		SELECT
+			IFNULL(TRUNCATE(SUM(fee) / 1000000, 4), 0) AS actual_fee,
+			event_name
+		FROM
+			tb_consume_item
+		WHERE
+		DATE_FORMAT(data_date, '%Y%m') =#{billing} 
+		AND sid =#{sid} 
+		AND event_id>=1000 
+		GROUP BY event_id;
+	</select>
+	
+	<select id="getBillCsmSum" parameterType="map" resultType="java.lang.String">
+		select IFNULL(TRUNCATE(SUM(fee)/1000000,4),0) as fee from tb_consume_item where sid=#{sid} and DATE_FORMAT(data_date,'%Y%m')=#{billing} and event_id=20 ;
+	</select>
+	
+	<select id="getClientMonthBill" parameterType="map" resultType="map">
+		select event_name,IFNULL(TRUNCATE(fee/1000000,4),0) as fee from statistics.tb_bill_client_acct_${billing}  where client_number=#{clientNumber} and billing=#{billing}
+	</select>
+	
+	<select id="isExistsTable" parameterType="java.lang.String" resultType="int" >
+		select count(*) from information_schema.tables where table_name=#{tableName}
+	</select>
+	
+	<select id="getFastDFS" resultType="map">
+		${_parameter}
+	</select>
+	<select id="getYstCsm"  parameterType="map" statementType="CALLABLE" resultType="map">
+		SELECT SUM(fee)/1000000 as fee FROM tb_consume_item where sid=#{sid} and data_date=#{time} and event_id=20;
+	</select>
+	<select id="getYstCsmNew"  parameterType="map" statementType="CALLABLE" resultType="map">
+		select ROUND(traffic_fee/100,4) as fee from t_traffic_user_day_consum_201708 where sid=#{sid} and datetime=#{time};
+	</select>
+	<select id="appCsmData" parameterType="java.lang.String" resultType="map">
+		SELECT
+			it.fee/1000000 as fee,cast(DATE_FORMAT(it.data_date, '%d') as unsigned ) as date
+		FROM
+			tb_consume_item it
+		WHERE
+			it.app_sid = #{appSid}
+			AND DATE_FORMAT(it.data_date, '%Y%m')=DATE_FORMAT(NOW(), '%Y%m')
+			AND it.event_id=20
+			ORDER BY it.data_date;
+	</select>
+	<select id="newAppCsmData" parameterType="map" resultType="map">
+		SELECT
+			ROUND(traffic_fee/100,4) as fee,
+			cast(DATE_FORMAT(datetime, '%d') AS UNSIGNED) AS date
+		FROM
+			t_traffic_app_day_consume_${month}
+		WHERE
+			appid = #{appSid};
+	</select>
+	<select id="lyDetail" parameterType="map" resultType="map">
+	<![CDATA[
+		select from_number,to_number,SUBSTRING_INDEX(remote_path,"/",-1) as file_name,remote_path,if(file_size/(1024*1024)<0.001,0.001,ROUND(file_size/(1024*1024),3)) as file_size from flypaas_statistics.tb_record_log_${date} where sid=#{sid} and app_sid=#{appSid} ${limit}
+		]]>
+	</select>
+	<select id="lyDetailCount" parameterType="map" resultType="map">
+		select count(0) as totalCount from flypaas_statistics.tb_record_log_${date} where sid=#{sid} and app_sid=#{appSid}
+	</select>
+</mapper>

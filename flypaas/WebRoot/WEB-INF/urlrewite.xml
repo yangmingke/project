@@ -1,0 +1,9 @@
+<urlrewrite>
+  <rule>
+      <name>seo redirect</name>
+      <condition name="host" operator="notequal">^www.example.com</condition>
+      <condition name="host" operator="notequal">^localhost</condition>
+      <from>^/(.*)</from>
+      <to type="permanent-redirect" last="true">http://www.example.com/$1</to>
+  </rule>
+</urlrewrite>

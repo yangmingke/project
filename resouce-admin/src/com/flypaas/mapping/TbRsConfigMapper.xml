@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsConfigMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsConfig" >
+    <id column="t_key" property="tKey" jdbcType="VARCHAR" />
+    <result column="id" property="id" jdbcType="INTEGER" />
+    <result column="t_value" property="tValue" jdbcType="VARCHAR" />
+    <result column="t_note" property="tNote" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    t_key, id,t_value, t_note
+  </sql>
+  
+  <select id="getSysConfigList" resultMap="BaseResultMap">
+    select <include refid="Base_Column_List" />
+    from tb_rs_config
+    ORDER BY id;
+  </select>
+  
+  <update id="updateConfig" parameterType="com.flypaas.model.TbRsConfig">
+  	update tb_rs_config
+    set t_key = #{tKey,jdbcType=VARCHAR},
+      t_value = #{tValue,jdbcType=VARCHAR},
+      t_note = #{tNote,jdbcType=VARCHAR}
+    where t_key = #{oldKey,jdbcType=VARCHAR}
+  </update>
+  
+  <insert id="addConfig" parameterType="com.flypaas.model.TbRsConfig">
+    insert into tb_rs_config (t_key, t_value, t_note)
+    values (#{tKey,jdbcType=VARCHAR}, #{tValue,jdbcType=VARCHAR}, #{tNote,jdbcType=VARCHAR})
+  </insert>
+  
+  <delete id="delConfigByKey" parameterType="com.flypaas.model.TbRsConfig">
+  	delete from tb_rs_config
+    where t_key = #{tKey,jdbcType=VARCHAR}
+  </delete>
+  
+</mapper>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.Invoice">
+	
+	<select id="getInvoiceList" resultType="map">
+		SELECT
+			i.id,
+			date_format(
+				i.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			TRUNCATE (
+				ifnull(i.money, 0) / 1000000,
+				0
+			) AS money,
+			i.type,
+			i.title,
+			i.`status`,
+			p.param_value AS logistics_company,
+			i.logistics_no
+		FROM
+			tb_srv_invoice i
+		LEFT JOIN tb_ucpaas_params p ON p.param_type = 'logistics_company_code'
+		AND p.param_key = i.logistics_company
+		WHERE
+			i.sid = #{sid}
+		AND i.`status` != 0
+		ORDER BY
+			i.create_date DESC
+		${limit}
+	</select>
+	
+	<select id="getInvoiceListCount" resultType="map">
+		SELECT
+			count(0) as totalCount
+		FROM
+			tb_srv_invoice i
+		LEFT JOIN tb_ucpaas_params p ON p.param_type = 'logistics_company_code'
+		AND p.param_key = i.logistics_company
+		WHERE
+			i.sid = #{sid}
+		AND i.`status` != 0
+	</select>
+	
+	<select id="getInvoiceMoney" parameterType="java.lang.String" resultType="int">
+		select TRUNCATE(ifnull(sum(money),0) / 1000000, 4) from tb_srv_invoice  where sid=#{sid} and status in('1','2','3')
+	</select>
+	
+	<select id="getInvoice" parameterType="java.lang.String" resultType="invoice">
+		select * from tb_srv_invoice where sid=#{sid} and (status='1' or status='2') limit 1
+	</select>
+	
+	<insert id="addInvoice" parameterType="invoice">
+		insert into tb_srv_invoice(sid,opentype,money,title,type,identificationnum,identificationimg,bankaccount,bankaddr,status,postaddr,create_date,update_date)
+		values(#{sid},#{opentype},#{money},#{title},#{type},#{identificationnum},#{identificationimg},#{bankaccount},#{bankaddr},#{status},#{postaddr},#{createDate},#{updateDate})
+	</insert>
+	
+	<update id="updateInvoice" parameterType="invoice">
+		update tb_srv_invoice
+		<set>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="opentype!=null">
+				opentype=#{opentype},
+			</if>
+			<if test="money>0">
+				money=#{money},
+			</if>
+			<if test="title!=null">
+				title=#{title},
+			</if>
+			<if test="type!=null">
+				type=#{type},
+			</if>
+			<if test="identificationnum!=null">
+				identificationnum=#{identificationnum},
+			</if>
+			<if test="identificationimg!=null">
+				identificationimg=#{identificationimg},
+			</if>
+			<if test="bankaccount>0">
+				bankaccount=#{bankaccount},
+			</if>
+			<if test="bankaddr!=null">
+				bankaddr=#{bankaddr},
+			</if>
+			<if test="updateDate!=null">
+				update_date=#{updateDate}
+			</if>
+		</set>
+		where id=#{id} and sid=#{sid}
+	</update>
+	<select id="getInvoiceBySidAndId" parameterType="invoice" resultType="invoice">
+		select id,sid,opentype,TRUNCATE(ifnull(money,0) / 1000000, 4) as money,title,type,identificationnum,identificationimg,bankaccount,bankaddr,status,postaddr,create_date as createDate,update_date as updateDate 
+		from tb_srv_invoice
+		where 1=1 
+		<if test="sid!=null">
+			and sid=#{sid}
+		</if>
+		<if test="id!=null">
+			and id=#{id}
+		</if>
+	</select>
+</mapper>

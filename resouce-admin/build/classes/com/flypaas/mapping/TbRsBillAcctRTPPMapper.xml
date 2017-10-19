@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsBillAcctRTPPMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsBillAcctRTPP" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="start_time" property="startTime" jdbcType="TIMESTAMP" />
+    <result column="end_time" property="endTime" jdbcType="TIMESTAMP" />
+    <result column="main_sid" property="mainSid" jdbcType="VARCHAR" />
+    <result column="traffic_in" property="trafficIn" jdbcType="INTEGER" />
+    <result column="traffic_out" property="trafficOut" jdbcType="INTEGER" />
+    <result column="traffic_total" property="trafficTotal" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="REAL" />
+    <result column="fee" property="fee" jdbcType="DOUBLE" />
+    <result column="create_time" property="createTime" jdbcType="DATE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, ip, start_time, end_time, main_sid, traffic_in, traffic_out, traffic_total, price, 
+    fee, create_time
+  </sql>
+  <!-- 此处有Bug,请注意!!!  未使用分区表 -->
+  
+  <select id="queryResourceFlowDay" resultType="java.util.Map" parameterType="Map">
+  	select 
+  	tb_rs_account_info.username,
+  	tb_bar.*
+  	from tb_rs_bill_acct_rtpp as tb_bar, tb_rs_account_info
+  	<!-- _#{monthTime,jdbcType=VARCHAR} -->
+  	where tb_bar.main_sid = tb_rs_account_info.net_sid 
+  		and   create_time = #{dateTime,jdbcType=VARCHAR}
+  	<if test="keyWord !=null">
+  		and ip = #{keyWord,jdbcType=VARCHAR} or net_name = #{keyWord,jdbcType=VARCHAR}
+  	</if>
+  	limit #{begin,jdbcType=INTEGER} , #{count,jdbcType=INTEGER};
+  </select>
+  
+  
+  <select id="statisticsFlowDay" resultType="java.util.Map" parameterType="Map">
+  	select 
+  	sum(tb_bar.fee) as totalFee,
+  	round(avg(tb_bar.price),2) as avgPrice,
+  	sum(tb_bar.traffic_total) as totalTraffic,
+  	sum(tb_bar.traffic_in) as totalTrafficIn,
+  	sum(tb_bar.traffic_out) as totalTrafficOut
+  	from tb_rs_bill_acct_rtpp as tb_bar, tb_rs_account_info
+  	<!-- _#{monthTime,jdbcType=VARCHAR} -->
+  	where tb_bar.main_sid = tb_rs_account_info.net_sid 
+  		and   create_time = #{dateTime,jdbcType=VARCHAR}
+  	<if test="keyWord !=null">
+  		and ip = #{keyWord,jdbcType=VARCHAR} or net_name = #{keyWord,jdbcType=VARCHAR}
+  	</if>
+  </select>
+  
+  <select id="queryResourceFlowMonth" resultType="java.util.Map" parameterType="Map">
+  	select 
+  	tb_rs_account_info.username,
+  	bar_monthTime.*
+  	from tb_rs_bill_acct_rtpp  as bar_monthTime, tb_rs_account_info
+  	<!-- _#{monthTime,jdbcType=VARCHAR} -->
+  	where bar_monthTime.main_sid = tb_rs_account_info.net_sid 
+  	<if test="dateTime !=null">
+  		and   create_time = #{dateTime,jdbcType=VARCHAR}
+  	</if>
+  	<if test="keyWord !=null">
+  		and ip = #{keyWord,jdbcType=VARCHAR} or net_name = #{keyWord,jdbcType=VARCHAR}
+  	</if>
+  	order by create_time desc 
+  	limit #{begin,jdbcType=INTEGER} , #{count,jdbcType=INTEGER};
+  </select>
+  
+  
+  <select id="queryCount" resultType="java.lang.Integer" parameterType="Map">
+  	select 
+  	count(*)
+  	from tb_rs_bill_acct_rtpp as tb_bar, tb_rs_account_info
+  	where tb_bar.main_sid = tb_rs_account_info.net_sid 
+  	<if test="dateTime !=null">
+  		and   create_time = #{dateTime,jdbcType=VARCHAR}
+  	</if>
+  	<if test="keyWord !=null">
+  		and ip = #{keyWord,jdbcType=VARCHAR} or net_name = #{keyWord,jdbcType=VARCHAR}
+  	</if>
+  </select> 
+  
+  
+  
+  <select id="queryResourceTMC" resultMap="BaseResultMap">
+  	select 
+  	<include refid="Base_Column_List"/>
+  	from tb_rs_bill_acct_rtpp
+  	where main_sid = #{0}
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_bill_acct_rtpp
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tb_rs_bill_acct_rtpp
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsBillAcctRTPP" >
+    insert into tb_rs_bill_acct_rtpp (id, ip, start_time, 
+      end_time, main_sid, traffic_in, 
+      traffic_out, traffic_total, price, 
+      fee, create_time)
+    values (#{id,jdbcType=BIGINT}, #{ip,jdbcType=VARCHAR}, #{startTime,jdbcType=TIMESTAMP}, 
+      #{endTime,jdbcType=TIMESTAMP}, #{mainSid,jdbcType=VARCHAR}, #{trafficIn,jdbcType=INTEGER}, 
+      #{trafficOut,jdbcType=INTEGER}, #{trafficTotal,jdbcType=INTEGER}, #{price,jdbcType=REAL}, 
+      #{fee,jdbcType=DOUBLE}, #{createTime,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsBillAcctRTPP" >
+    insert into tb_rs_bill_acct_rtpp
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="startTime != null" >
+        start_time,
+      </if>
+      <if test="endTime != null" >
+        end_time,
+      </if>
+      <if test="mainSid != null" >
+        main_sid,
+      </if>
+      <if test="trafficIn != null" >
+        traffic_in,
+      </if>
+      <if test="trafficOut != null" >
+        traffic_out,
+      </if>
+      <if test="trafficTotal != null" >
+        traffic_total,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="fee != null" >
+        fee,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mainSid != null" >
+        #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="trafficIn != null" >
+        #{trafficIn,jdbcType=INTEGER},
+      </if>
+      <if test="trafficOut != null" >
+        #{trafficOut,jdbcType=INTEGER},
+      </if>
+      <if test="trafficTotal != null" >
+        #{trafficTotal,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=REAL},
+      </if>
+      <if test="fee != null" >
+        #{fee,jdbcType=DOUBLE},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsBillAcctRTPP" >
+    update tb_rs_bill_acct_rtpp
+    <set >
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="startTime != null" >
+        start_time = #{startTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="endTime != null" >
+        end_time = #{endTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mainSid != null" >
+        main_sid = #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="trafficIn != null" >
+        traffic_in = #{trafficIn,jdbcType=INTEGER},
+      </if>
+      <if test="trafficOut != null" >
+        traffic_out = #{trafficOut,jdbcType=INTEGER},
+      </if>
+      <if test="trafficTotal != null" >
+        traffic_total = #{trafficTotal,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=REAL},
+      </if>
+      <if test="fee != null" >
+        fee = #{fee,jdbcType=DOUBLE},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=DATE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsBillAcctRTPP" >
+    update tb_rs_bill_acct_rtpp
+    set ip = #{ip,jdbcType=VARCHAR},
+      start_time = #{startTime,jdbcType=TIMESTAMP},
+      end_time = #{endTime,jdbcType=TIMESTAMP},
+      main_sid = #{mainSid,jdbcType=VARCHAR},
+      traffic_in = #{trafficIn,jdbcType=INTEGER},
+      traffic_out = #{trafficOut,jdbcType=INTEGER},
+      traffic_total = #{trafficTotal,jdbcType=INTEGER},
+      price = #{price,jdbcType=REAL},
+      fee = #{fee,jdbcType=DOUBLE},
+      create_time = #{createTime,jdbcType=DATE}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

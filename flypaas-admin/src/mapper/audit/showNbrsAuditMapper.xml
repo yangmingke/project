@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 审核管理-号码白名单 -->
+<mapper namespace="showNbrsAudit">
+	<!-- 分页查询应用 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.id,
+			t.sid,
+			app.app_sid,
+			app.app_name,
+			u.email,
+			date_format(
+				t.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			t.`status`,
+			(SELECT a.audit_desc FROM tb_srv_audit a WHERE a.audited_id = t.id AND a.audit_type = 9 LIMIT 1) AS audit_desc,
+			date_format(
+				t.exp_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS exp_date,
+			t.nbr
+		FROM
+			tb_ucpaas_application_shownbrs t,
+			tb_ucpaas_user u,
+			tb_ucpaas_application app
+		WHERE
+			t.sid = u.sid
+		AND t.app_sid = app.app_sid
+		AND t.`status` IN (2, 3, 4)
+		
+		<if test="text != null">
+			AND (
+				t.nbr = #{text}
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND app.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND app.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.`status` = #{status}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询应用 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_application_shownbrs t,
+			tb_ucpaas_user u,
+			tb_ucpaas_application app
+		WHERE
+			t.sid = u.sid
+		AND t.app_sid = app.app_sid
+		AND t.`status` IN (2, 3, 4)
+		
+		<if test="text != null">
+			AND (
+				t.nbr = #{text}
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND app.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND app.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.`status` = #{status}
+		</if>
+	</select>
+	
+	<!-- 审核 -->
+	<update id="audit">
+		UPDATE tb_ucpaas_application_shownbrs t
+		SET t.`status` = #{status}
+		,t.exp_date = #{exp_date}
+		,t.update_date = now()
+		WHERE
+			t.id = #{id}
+	</update>
+</mapper> 

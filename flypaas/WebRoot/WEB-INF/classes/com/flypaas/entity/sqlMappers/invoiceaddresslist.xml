@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.InvoiceAddresslist">
+
+	<insert id="addInvoiceAddr" useGeneratedKeys="true" keyProperty="id" parameterType="invoiceAddr">
+		insert into tb_srv_invoice_addresslist(sid,province,city,street,postnum,contacts,contactmobile,status,create_date,update_date)
+		values(#{sid},#{province},#{city},#{street},#{postnum},#{contacts},#{contactmobile},#{status},#{createDate},#{updateDate});
+	</insert>
+	<select id="getInvoiceAddrById" parameterType="java.lang.Long" resultType="invoiceAddr">
+		select sid,p.name as provinceName,city.name as cityName,street,postnum,contacts,contactmobile,status,province,city 
+		 from tb_srv_invoice_addresslist addr ,tb_ucpaas_province p,tb_ucpaas_city city
+		 where addr.province=p.id and addr.city=city.id and addr.id=#{id}
+	</select>
+	<update id="updateInvoiceAddr" parameterType="invoiceAddr">
+		update tb_srv_invoice_addresslist
+		<set>
+			<if test="province>0">
+				province=#{province},
+			</if>
+			<if test="city>0">
+				city=#{city},
+			</if>
+			<if test="street!=null">
+				street=#{street},
+			</if>
+			<if test="postnum!=null">
+				postnum=#{postnum},
+			</if>
+			<if test="contacts!=null">
+				contacts=#{contacts},
+			</if>
+			<if test="contactmobile!=null">
+				contactmobile=#{contactmobile},
+			</if>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="updateDate!=null">
+				update_date=#{updateDate}
+			</if>
+		</set>
+		where id=#{id} and sid=#{sid}
+	</update>
+</mapper>

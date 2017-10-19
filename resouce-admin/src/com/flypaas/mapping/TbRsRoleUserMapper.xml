@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsRoleUserMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsRoleUser" >
+    <id column="ru_id" property="ruId" jdbcType="INTEGER" />
+    <result column="role_id" property="roleId" jdbcType="INTEGER" />
+    <result column="sid" property="sid" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ru_id, role_id, sid
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_role_user
+    where ru_id = #{ruId,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_rs_role_user
+    where ru_id = #{ruId,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsRoleUser" >
+    insert into tb_rs_role_user (ru_id, role_id, sid
+      )
+    values (#{ruId,jdbcType=INTEGER}, #{roleId,jdbcType=INTEGER}, #{sid,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsRoleUser" >
+    insert into tb_rs_role_user
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ruId != null" >
+        ru_id,
+      </if>
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="sid != null" >
+        sid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="ruId != null" >
+        #{ruId,jdbcType=INTEGER},
+      </if>
+      <if test="roleId != null" >
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="sid != null" >
+        #{sid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsRoleUser" >
+    update tb_rs_role_user
+    <set >
+      <if test="roleId != null" >
+        role_id = #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="sid != null" >
+        sid = #{sid,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ru_id = #{ruId,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsRoleUser" >
+    update tb_rs_role_user
+    set role_id = #{roleId,jdbcType=INTEGER},
+      sid = #{sid,jdbcType=VARCHAR}
+    where ru_id = #{ruId,jdbcType=INTEGER}
+  </update>
+  
+  <insert id="assignRole" parameterType="com.flypaas.model.TbRsRoleUser" >
+  	insert into tb_rs_role_user
+  	<trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="ruId != null" >
+        ru_id,
+      </if>
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="sid != null" >
+        sid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="ruId != null" >
+        #{ruId,jdbcType=INTEGER},
+      </if>
+      <if test="roleId != null" >
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="sid != null" >
+        #{sid,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  
+</mapper>

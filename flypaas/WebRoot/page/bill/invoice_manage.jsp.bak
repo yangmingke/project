@@ -1,0 +1,164 @@
+<%@ page language="java" import="java.util.*" pageEncoding="utf-8"%>
+<%@ taglib prefix="s"  uri="/struts-tags"%>
+<%@ taglib prefix="u"  uri="/flypaas-tags"%>
+<%
+String path = request.getContextPath();
+request.setAttribute("path", path);
+String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+%>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>发票管理</title>
+<link rel="stylesheet" type="text/css" href="<%=path%>/js/jquery-ui/css/theme/all.css" />
+<link rel="stylesheet" type="text/css" href="<%=path%>/js/jquery-ui/css/demos.css" />
+<%@include file="/page/resource.jsp"%>
+<script type="text/javascript" src="<%=path%>/js/jquery-ui/js/core.js"></script>
+<script type="text/javascript" src="<%=path%>/js/jquery-ui/js/datepicker.js"></script>
+<script type="text/javascript" src="<%=path%>/js/jquery-ui/js/widget.js"></script>
+<script type="text/javascript" src="<%=path%>/js/datepicker.js"></script>
+</head>
+
+<body>
+<!--公共头部header bof-->
+<%@include file="/page/head.jsp"%>
+<!--公共头部header eof--> 
+
+<!--公共导航菜单 bof-->
+<%@include file="/page/menu.jsp"%>
+<!--公共导航菜单 eof--> 
+
+<!--主体部分content bof-->
+<div class="content">
+  <div class="content_wrapper">
+    <div class="content_box">
+      <div class="main_tit">
+        <h1>发票管理</h1>
+      </div>
+      <div class="main_ctn">
+        <div class="main_top invoice_search">
+          <form action="<%=path %>/bill/invoice"  method="post" name="form">
+              <ul>
+              <li class="time">
+	              <label>时间范围</label>
+	              <input type="text"  id="beginDate" name="invoice.beginDate" placeholder="开始时间"/>
+	              <span>至</span>
+	              <input type="text"  id="endDate" name="invoice.endDate"  placeholder="结束时间"/>
+              </li>
+              <li class="txt"><input type="text" placeholder="关键字：发票抬头，发票金额" name="title" /></li>
+              <li><input type="submit" class="org_btn" value="查 询" /></li>
+          	  </ul>
+          </form>
+          <a href="<%=path %>/bill/addInvoicePage" class="invoice_link"><span>开具发票</span></a> </div>
+        <div class="table_ctn">
+          <table cellpadding="0" cellspacing="0" border="0" width="100%">
+            <tbody>
+              <tr>
+                <th>发票金额</th>
+                <th>发票抬头</th>
+                <th>收取方式</th>
+                <th>状态</th>
+                <th>操作</th>
+              </tr>
+              <s:if test="invoiceList!=null&&invoiceList.size()>0">
+              	<s:iterator value="invoiceList" var="inl">
+	              <tr>
+	                <td>￥${inl.money }</td>
+	                <td>${inl.title }</td>
+	                <td>快递</td>
+	                <td>
+	                	<s:if test="#inl.status==0">
+	                		已取消
+	                	</s:if>
+	                	<s:elseif test="#inl.status==1">
+	                		待审核
+	                	</s:elseif>
+	                	<s:elseif test="#inl.status==2">
+	                		开票中
+	                	</s:elseif>
+	                	<s:elseif test="#inl.status==3">
+	                		已邮寄
+	                	</s:elseif>
+	                	<s:elseif  test="#inl.status==4">
+	                		审核不通过
+	                	</s:elseif>
+	                </td>
+	                <td>
+	                <a href="<%=path %>/bill/invoiceInfo?invoiceId=<u:des3 value='${inl.id }'/>">详情</a>
+	                <s:if test="#inl.status==4">
+	                	| <a href="<%=path %>/bill/modifyInvoicePage?invoiceId=<u:des3 value='${inl.id }'/>">修改</a>
+	                	| <a href="<%=path %>/bill/cacelInvoice?invoiceId=<u:des3 value='${inl.id }'/>">取消</a>
+	                </s:if> 
+	                <s:if test="#inl.status==1">
+	                	| <a href="<%=path %>/bill/cacelInvoice?invoiceId=<u:des3 value='${inl.id }'/>">取消</a>
+	                </s:if>
+	                </td>
+	              </tr>
+	              </s:iterator>
+              </s:if>
+              <s:else>
+              	 <tr> <td>暂无数据！</td><td></td><td></td><td></td><td></td></tr>
+              </s:else>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--弹层(删除操作) bof-->
+<div class="float_box float_box1 app_box" id="delete_box" style="display:none;">
+  <div class="float_tit">
+    <h3>删除应用</h3>
+  </div>
+  <div class="float_ctn">
+    <p>是否删除应用？</p>
+    <p class="btn">
+      <input type="submit" value="确 定" class="blue_btn" />
+      <input type="button" value="取 消" class="grey_btn cancel" />
+    </p>
+  </div>
+</div>
+<script type="text/javascript">
+          $(function(){
+   			$(".child p").eq(2).show().siblings("p").hide();
+   			$("#menu_3_4").addClass("active");
+            //删除操作
+            $("a.delete").click(function(){
+              $("#delete_box").show();
+            })
+            
+            //取消
+            $(".cancel").click(function(){
+              $(".float_box").hide();
+            })
+           	
+//             $(".invoice_link").click(function(){
+//             	$.ajax({
+<%--         			url:"<%=path%>/bill/hasInvoiceing", --%>
+//         			type:"post",
+//         			dataType: "text",
+//         			success: function (data) {
+//         	           if(data=="1"){
+//         	        	   popupBox("提示", "你有发票正在进行中", null, 2);
+//         	           }else{
+<%--         	        	   location.href="<%=path %>/bill/addInvoicePage" ; --%>
+//         	           }
+//         	        }
+//         		});
+//             });
+
+          })
+          </script> 
+<!--弹层(删除操作) eof--> 
+
+<!--主体部分content eof--> 
+
+<!--公共底部footer bof-->
+<%@include file="/page/foot.jsp"%>
+<!--公共底部footer bof-->
+
+</body>
+</html>

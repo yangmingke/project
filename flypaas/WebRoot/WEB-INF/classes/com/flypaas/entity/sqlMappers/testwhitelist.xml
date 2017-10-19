@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.TestWhiteList">
+	
+	<insert id="addTestWhilte" parameterType="testWhiteList">
+		insert into tb_ucpaas_test_whitelist(sid,mobile,type,status,create_date)
+		values(#{sid},#{mobile},#{type},#{status},#{createDate})
+	</insert>
+	
+	<select id="listTestWhilte" parameterType="java.lang.String" resultType="testWhiteList">
+		select * from tb_ucpaas_test_whitelist where sid=#{sid} and status=1
+	</select>
+	
+	<update id="deleteTestWhilte" parameterType="testWhiteList">
+		update tb_ucpaas_test_whitelist set status=2,update_date=#{updateDate} where sid=#{sid} and mobile=#{mobile}
+	</update>
+	
+	<select id="getBindModel" parameterType="java.lang.String" resultType="testWhiteList">
+		select * from tb_ucpaas_test_whitelist where sid=#{sid} and status=1 and type=1 limit 1
+	</select>
+	
+	<select id="oneTestWhilte" parameterType="testWhiteList" resultType="testWhiteList">
+		select * from tb_ucpaas_test_whitelist where sid=#{sid} and mobile=#{mobile} and status=1
+	</select>
+	
+	<update id="updateBindMobile" parameterType="testWhiteList">
+		update tb_ucpaas_test_whitelist set type=1,update_date=#{updateDate},mobile=#{mobile} where sid=#{sid} and id=#{id}
+	</update>
+	
+	<update id="deleteBindMobile" parameterType="testWhiteList">
+		update tb_ucpaas_test_whitelist set status=2,update_date=#{updateDate} where sid=#{sid} and mobile=#{mobile} and type=1
+	</update>
+	
+	<update id="updateAddMobileToBind" parameterType="testWhiteList">
+		update tb_ucpaas_test_whitelist set type=1,update_date=#{updateDate} where sid=#{sid} and mobile=#{mobile}
+	</update>
+</mapper>

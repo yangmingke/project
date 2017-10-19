@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.SmsTemplate">
+	
+	 
+	 <resultMap id="smsTemplateResult" type="com.flypaas.entity.SmsTemplate">
+		<id property="templateId" column="template_id" />
+		<result property="appSid" column="app_sid" />
+		<result property="name" column="name" />
+		<result property="content" column="content" />
+		<result property="status" column="status" />
+		<result property="createDate" column="create_date" />
+		<result property="updateDate" column="update_date" />
+		<association property="app" column="app_sid" select="getAppByidInSms">
+		</association>
+	</resultMap>
+	<resultMap id="appResultInSms" type="com.flypaas.entity.Application">
+		<id property="appSid" column="app_sid" />
+		<id property="appName" column="app_name" />
+	</resultMap>
+	<select id="getAppByidInSms" resultMap="appResultInSms" parameterType="java.lang.String">
+		select * from tb_flypaas_application where app_sid=#{appSid} 
+	</select>
+	
+	<select id="getSmsTemplateList_count" resultType="map">
+		select count(*) as totalCount from tb_srv_sms_template t,tb_flypaas_application b 
+		where t.app_sid = b.app_sid and t.status != 4 and b.sid = #{sid}
+		<if test="null != text">
+			and (  b.app_name LIKE concat('%',#{text}, '%') 
+			or t.name like concat('%',#{text}, '%') )
+		</if>
+	</select>
+	<select id="getSmsTemplateList_query" resultType="map">
+		select b.app_name,t.template_id,t.name,CAST(t.type AS SIGNED) as type,t.status,t.create_date from tb_srv_sms_template t,tb_flypaas_application b 
+		where t.app_sid = b.app_sid and t.status != 4 and b.sid = #{sid}
+		<if test="null != text">
+			and (  b.app_name LIKE concat('%',#{text}, '%') 
+			or t.name like concat('%',#{text}, '%') )
+		</if>
+		order by t.update_date desc
+		${limit}
+	</select>
+	
+	<update id="delSmsTemplate" parameterType="java.lang.String">
+		update tb_srv_sms_template set status=4 where template_id=#{id}
+	</update>
+	<update id="delSmsTemplateByAppsid" parameterType="java.lang.String">
+		update tb_srv_sms_template set status=4 where app_sid=#{appSid}
+	</update>
+	<insert id="addSmsTemplate" parameterType="smsTemplate">
+		insert into tb_srv_sms_template(app_sid,name,content,status,create_date,update_date,type,rule,len,sign)
+		values(#{appSid},#{name},#{content},#{status},#{createDate},#{updateDate},#{type},#{rule},#{len},#{sign})
+	</insert>
+	<select id="getSmsTemplate" parameterType="java.lang.String" resultMap="smsTemplateResult">
+		select * from tb_srv_sms_template where template_id=#{id}
+	</select>
+	<update id="modifySmsTemplate" parameterType="smsTemplate">
+		update tb_srv_sms_template
+		<set>
+			<if test="appSid!=null">
+				app_sid=#{appSid},
+			</if>
+			<if test="name!=null">
+			    name=#{name},
+			</if>
+			<if test="content!=null">
+				content=#{content},
+			</if>
+			<if test="updateDate!=null">
+				update_date = #{updateDate},
+			</if>
+			<if test="rule!=null">
+				rule = #{rule},
+			</if>
+			<if test="len!=null">
+				len = #{len},
+			</if>
+			<if test="type!=null">
+				type = #{type},
+			</if>
+			<if test="sign!=null">
+				sign = #{sign},
+			</if>
+			 status='1' 
+		</set>
+		where template_id=#{templateId}
+	</update>
+</mapper>

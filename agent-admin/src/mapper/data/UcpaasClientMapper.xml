@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- /clientBill/query -->
+<!-- 信息管理-测试号码 -->
+<mapper namespace="clientTestNum">
+	<!-- 分页查询client -->
+
+
+
+
+
+	<select id="findallorder" resultType="map">
+
+		SELECT o.* ,o.status as status, date_format(
+		o.create_date,
+		'%Y-%m-%d
+		%H:%i:%S'
+		) AS create_date
+		,o.pay_id as pay_id
+		from
+		tb_srv_payment_order o
+		LEFT JOIN tb_ucpaas_user u ON o.sid=u.sid
+		LEFT JOIN tb_ucpaas_client c
+		on c.sid=o.sid
+		WHERE u.super_sid=#{superSid}
+		<if test="text != null">
+			AND (
+			o.charge_type LIKE concat(#{text}, '%')
+			or o.order_id
+			LIKE concat(#{text}, '%')
+			or o.charge like concat(#{text}, '%')
+			or
+			o.status like concat(#{text}, '%')
+			or o.sid like concat(#{text}, '%')
+			)
+		</if>
+		<if test="charge_type != null">
+			AND o.charge_type = #{charge_type}
+		</if>
+		<if test="order_id != null">
+			AND o.order_id = #{order_id}
+		</if>
+		<if test="charge != null">
+			AND o.charge = #{charge}
+		</if>
+		<if test="status != null">
+			AND o.status = #{status}
+		</if>
+
+		ORDER BY
+		o.order_id DESC
+		${limit}
+	</select>
+
+
+
+	<select id="findorderbyid" resultType="map">
+
+		SELECT c.*,
+		DATE_FORMAT(
+		c.create_date,
+		'%Y-%m-%d %H:%i:%S'
+		) AS create_date
+
+		FROM
+		tb_srv_payment_order c
+		WHERE c.order_id=#{order_id} limit 1
+	</select>
+
+
+
+
+	<select id="findorder" resultType="map">
+
+		SELECT o.*,u.* ,o.status as status, date_format(
+		o.create_date,
+		'%Y-%m-%d %H:%i:%S'
+		) AS create_date
+		from
+		tb_srv_payment_order o,
+		tb_ucpaas_user u
+		WHERE o.sid=u.sid
+		AND u.super_sid=#{superSid}
+		<if test="text != null">
+			
+		AND (	o.charge_type LIKE concat(#{text}, '%')
+			OR o.order_id
+			LIKE concat(#{text}, '%')
+			OR u.email LIKE concat(#{text}, '%')
+			OR
+			u.username LIKE concat(#{text}, '%')
+			OR u.mobile LIKE concat(#{text},
+			'%')
+			)
+
+		</if>
+
+		<if test="charge_type != null">
+			AND o.order_type = #{order_type}
+		</if>
+
+		<if test="username != null">
+			AND u.username = #{username}
+		</if>
+		<if test="order_id != null">
+			AND o.order_id = #{order_id}
+		</if>
+		<if test="start_date != null">
+			AND o.create_date >= #{start_date}
+		</if>
+
+		<if test="mobile != null">
+			AND u.mobile = #{mobile}
+		</if>
+
+		<if test="email != null">
+			AND u.email = #{email}
+		</if>
+
+		<if test="status != null">
+			AND IF (o.`status` = 2, 1, 3, o.`status`) = #{status}
+		</if>
+
+		ORDER BY
+		o.order_id ASC
+		${limit}
+	</select>
+
+
+
+	<select id="findclientBill" resultType="map">
+		SELECT
+
+		a.mobile,
+		t.acct_id,
+		t.client_number,
+		b.app_sid,
+		c.app_name,
+		a.email,
+		t.balance AS balance,
+		e.package_name,
+		date_format(
+		t.create_time,
+		'%Y-%m-%d %H:%i:%S'
+		) AS create_time,
+		c.industry,
+		t.enable_flag
+		FROM
+		tb_ucpaas_user a,
+		tb_ucpaas_client b ,
+		tb_ucpaas_application c ,
+		tb_bill_acct_package_rel d ,
+		tb_bill_package e
+		,
+		tb_bill_client_balance t
+		WHERE
+		c.sid = a.sid
+		and a.super_sid = #{superSid}
+		and d.package_id = e.package_id
+		and d.sid = a.sid
+		and b.app_sid = c.app_sid
+		and
+		t.client_number = b.client_number
+		<if test="text != null">
+			AND (
+			   t.acct_id  LIKE concat(#{text}, '%')
+	   OR b.client_number LIKE concat(#{text}, '%')
+			OR b.mobile   LIKE concat(#{text}, '%')
+			OR t.sid      LIKE concat(#{text},'%')
+			OR c.app_name LIKE concat(#{text}, '%')
+			
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.create_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND u.create_date<= #{end_date} ]]>
+		</if>
+
+		<if test="mobile != null">
+			AND b.mobile = #{mobile}
+		</if>
+		<if test="email !=null">
+			and t.sid = (select sid from tb_ucpaas_user where email =
+			#{email} limit 1)
+		</if>
+		<if test="app_name != null">
+			AND c.app_name = #{app_name}
+		</if>
+		<if test="wallet_status != null">
+			AND t.enable_flag = #{wallet_status}
+		</if>
+		<if test="industry != null">
+			AND c.industry = #{industry}
+		</if>
+		ORDER BY
+		t.create_time DESC
+		${limit}
+	</select>
+
+	<select id="findClients" resultType="map">
+		SELECT
+		u.sid,
+		c.client_number,
+		app.app_name,
+		u.email AS developer_email,
+		app.industry,
+		c.`status`,
+		c.mobile,
+		date_format(
+		u.create_date,
+		'%Y-%m-%d
+		%H:%i:%S'
+		) AS create_date
+		FROM
+		tb_ucpaas_user u,tb_ucpaas_application
+		app,tb_ucpaas_client c
+		WHERE
+		u.sid = app.sid and app.app_sid = c.app_sid
+		AND u.super_sid = #{superSid}
+
+		<if test="text != null">
+			AND (
+			c.client_number LIKE concat(#{text}, '%')
+			OR
+			app.app_name LIKE concat(#{text}, '%')
+			OR u.email LIKE concat(#{text},
+			'%')
+			OR app.industry LIKE concat('%',#{text}, '%')
+			OR c.`status` LIKE
+			concat('%',#{text}, '%')
+			Or c.mobile LIKE concat('%',#{text}, '%')
+
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.create_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND u.create_date<= #{end_date} ]]>
+		</if>
+		<if test="client_number != null">
+			AND c.client_number = #{client_number}
+		</if>
+		<if test="app_name != null">
+			AND app.app_name = #{app_name}
+		</if>
+		<if test="mobile != null">
+			AND c.mobile = #{mobile}
+		</if>
+
+		<if test="email !=null">
+			and c.sid = (select sid from tb_ucpaas_user where email =
+			#{email} limit 1)
+		</if>
+		<if test="status != null">
+			AND IF (c.`status` = 2, 1, c.`status`) = #{status}
+		</if>
+		<if test="industry != null">
+			and app.industry = #{industry}
+		</if>
+		ORDER BY
+		u.create_date DESC
+		${limit}
+	</select>
+	<!--查询分页 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+		tb_ucpaas_user u,tb_ucpaas_application
+		app,tb_ucpaas_client c
+		WHERE
+		u.sid = app.sid and app.app_sid = c.app_sid
+		AND u.super_sid = #{superSid}
+
+		<if test="text != null">
+			AND (
+			c.client_number LIKE concat(#{text}, '%')
+			OR
+			app.app_name LIKE concat(#{text}, '%')
+			OR u.email LIKE concat(#{text},
+			'%')
+			OR app.industry LIKE concat('%',#{text}, '%')
+			OR c.`status` LIKE
+			concat('%',#{text}, '%')
+			Or c.mobile LIKE concat('%',#{text}, '%')
+
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.create_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND u.create_date<= #{end_date} ]]>
+		</if>
+		<if test="client_number != null">
+			AND c.client_number = #{client_number}
+		</if>
+		<if test="app_name != null">
+			AND app.app_name = #{app_name}
+		</if>
+		<if test="mobile != null">
+			AND c.mobile = #{mobile}
+		</if>
+
+		<if test="email !=null">
+			and c.sid = (select sid from tb_ucpaas_user where email =
+			#{email} limit 1)
+		</if>
+		<if test="status != null">
+			AND IF (c.`status` = 2, 1, c.`status`) = #{status}
+		</if>
+		<if test="industry != null">
+			and app.industry = #{industry}
+		</if>
+		
+	</select>
+
+	<select id="queryCount1" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+		tb_ucpaas_user a,
+		tb_ucpaas_client b ,
+		tb_ucpaas_application c ,
+		tb_bill_acct_package_rel d ,
+		tb_bill_package e,
+		tb_bill_client_balance t
+		WHERE
+		c.sid = a.sid
+		and a.super_sid = #{superSid}
+		and d.package_id = e.package_id
+		and d.sid = a.sid
+		and b.app_sid = c.app_sid
+		and
+		t.client_number = b.client_number
+		<if test="text != null">
+			AND (
+			   t.acct_id  LIKE concat(#{text}, '%')
+	   OR b.client_number LIKE concat(#{text}, '%')
+			OR b.mobile   LIKE concat(#{text}, '%')
+			OR t.sid      LIKE concat(#{text},'%')
+			OR c.app_name LIKE concat(#{text}, '%')
+			
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.create_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND u.create_date<= #{end_date} ]]>
+		</if>
+
+		<if test="mobile != null">
+			AND b.mobile = #{mobile}
+		</if>
+		<if test="email !=null">
+			and t.sid = (select sid from tb_ucpaas_user where email =
+			#{email} limit 1)
+		</if>
+		<if test="app_name != null">
+			AND c.app_name = #{app_name}
+		</if>
+		<if test="wallet_status != null">
+			AND t.enable_flag = #{wallet_status}
+		</if>
+		<if test="industry != null">
+			AND c.industry = #{industry}
+		</if>
+	</select>
+	<select id="queryCount2" resultType="map">
+		SELECT count(0) AS totalCount
+		from
+		tb_srv_payment_order o,
+		tb_ucpaas_user u
+		WHERE o.sid=u.sid
+		AND u.super_sid=#{superSid}
+		<if test="text != null">
+			
+		AND (	o.charge_type LIKE concat(#{text}, '%')
+			OR o.order_id
+			LIKE concat(#{text}, '%')
+			OR u.email LIKE concat(#{text}, '%')
+			OR
+			u.username LIKE concat(#{text}, '%')
+			OR u.mobile LIKE concat(#{text},
+			'%')
+			)
+
+		</if>
+
+		<if test="charge_type != null">
+			AND o.order_type = #{order_type}
+		</if>
+
+		<if test="username != null">
+			AND u.username = #{username}
+		</if>
+		<if test="order_id != null">
+			AND o.order_id = #{order_id}
+		</if>
+		<if test="start_date != null">
+			AND o.create_date >= #{start_date}
+		</if>
+
+		<if test="mobile != null">
+			AND u.mobile = #{mobile}
+		</if>
+
+		<if test="email != null">
+			AND u.email = #{email}
+		</if>
+
+		<if test="status != null">
+			AND IF (o.`status` = 2, 1, 3, o.`status`) = #{status}
+		</if>
+	</select>
+
+
+
+
+	<select id="queryCount3" resultType="map">
+		SELECT count(0) AS totalCount
+		from tb_srv_payment_order o
+		LEFT JOIN tb_ucpaas_user u ON o.sid=u.sid
+		LEFT JOIN tb_ucpaas_client c
+		on c.sid=o.sid
+		WHERE u.super_sid=#{superSid}
+		<if test="text != null">
+			AND (
+			o.charge_type LIKE concat(#{text}, '%')
+			or o.order_id
+			LIKE concat(#{text}, '%')
+			or o.charge like concat(#{text}, '%')
+			or
+			o.status like concat(#{text}, '%')
+			or o.sid like concat(#{text}, '%')
+			)
+		</if>
+		<if test="charge_type != null">
+			AND o.charge_type = #{charge_type}
+		</if>
+		<if test="order_id != null">
+			AND o.order_id = #{order_id}
+		</if>
+		<if test="charge != null">
+			AND o.charge = #{charge}
+		</if>
+		<if test="status != null">
+			AND o.status = #{status}
+		</if>
+	</select>
+
+	<select id="findById" resultType="map">
+		SELECT c.*,
+		DATE_FORMAT(
+		c.create_date,
+		'%Y-%m-%d %H:%i:%S'
+		) AS create_date
+
+		FROM
+		tb_ucpaas_client
+		c
+		WHERE c.client_number=#{client_number} limit 1
+	</select>
+
+	<select id="findBillById" resultType="map">
+		SELECT c.*,b.*,
+		DATE_FORMAT(
+		c.create_date,
+		'%Y-%m-%d %H:%i:%S'
+		) AS create_date
+
+		FROM
+		tb_ucpaas_client c ,tb_bill_client_balance b
+		WHERE
+		c.client_number=#{client_number}
+		limit 1
+	</select>
+
+
+	<select id="getUserBySid" resultType="map">
+		select sid,token from tb_ucpaas_user where 1=1
+		<if test="null != email">
+			and email = #{email}
+		</if>
+		<if test="null !=sid">
+			and sid = #{sid}
+		</if>
+		and user_type != 3 limit 1
+	</select>
+
+	<select id="getTestAppBySid" resultType="map">
+		select app_sid from
+		tb_ucpaas_application where sid=#{sid} and app_type='0'
+		limit 1
+	</select>
+
+	<select id="findBindMobiles" resultType="map">
+		select
+		clientnum,test_id,nbr_id from tb_ucpaas_test_number where sid=#{sid}
+	</select>
+
+	<!-- 分页查询client -->
+	<select id="findTestAppClients" resultType="map">
+		select
+		client_sid,client_number
+		from tb_ucpaas_client
+		where app_sid=#{app_sid}
+		and status!='0'
+	</select>
+
+	<insert id="insertTestNum">
+		insert into
+		tb_ucpaas_test_number(sid,test_id,isdefault,clientnum)
+		values(#{sid},#{test_id},1,#{client_number})
+	</insert>
+	<update id="updateTestNum">
+		update tb_ucpaas_test_number set test_id = #{test_id}
+		where nbr_id = #{nbr_id}
+	</update>
+</mapper> 

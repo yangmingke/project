@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsMailPropMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsMailProp" >
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="frm" property="frm" jdbcType="VARCHAR" />
+    <result column="fromnickname" property="fromnickname" jdbcType="VARCHAR" />
+    <result column="tonbr" property="tonbr" jdbcType="VARCHAR" />
+    <result column="cc" property="cc" jdbcType="VARCHAR" />
+    <result column="bcc" property="bcc" jdbcType="VARCHAR" />
+    <result column="subject" property="subject" jdbcType="VARCHAR" />
+    <result column="atturl" property="atturl" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="createtime" property="createtime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.flypaas.model.TbRsMailProp" extends="BaseResultMap" >
+    <result column="text" property="text" jdbcType="LONGVARBINARY" />
+  </resultMap>
+  <sql id="Blob_Column_List" >
+    text
+  </sql>
+  
+  <select id="getMailByType"  parameterType="java.lang.String"  resultMap="BaseResultMap">
+		select *
+		from tb_rs_mailprop m where m.type=#{type}
+  </select>
+  
+  <insert id="insert" parameterType="com.flypaas.model.TbRsMailProp" >
+    insert into tb_rs_mailprop (id, frm, fromnickname, 
+      tonbr, cc, bcc, subject, 
+      atturl, type, createtime, 
+      text)
+    values (#{id,jdbcType=BIGINT}, #{frm,jdbcType=VARCHAR}, #{fromnickname,jdbcType=VARCHAR}, 
+      #{tonbr,jdbcType=VARCHAR}, #{cc,jdbcType=VARCHAR}, #{bcc,jdbcType=VARCHAR}, #{subject,jdbcType=VARCHAR}, 
+      #{atturl,jdbcType=VARCHAR}, #{type,jdbcType=CHAR}, #{createtime,jdbcType=TIMESTAMP}, 
+      #{text,jdbcType=LONGVARBINARY})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsMailProp" >
+    insert into tb_rs_mailprop
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="frm != null" >
+        frm,
+      </if>
+      <if test="fromnickname != null" >
+        fromnickname,
+      </if>
+      <if test="tonbr != null" >
+        tonbr,
+      </if>
+      <if test="cc != null" >
+        cc,
+      </if>
+      <if test="bcc != null" >
+        bcc,
+      </if>
+      <if test="subject != null" >
+        subject,
+      </if>
+      <if test="atturl != null" >
+        atturl,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="createtime != null" >
+        createtime,
+      </if>
+      <if test="text != null" >
+        text,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="frm != null" >
+        #{frm,jdbcType=VARCHAR},
+      </if>
+      <if test="fromnickname != null" >
+        #{fromnickname,jdbcType=VARCHAR},
+      </if>
+      <if test="tonbr != null" >
+        #{tonbr,jdbcType=VARCHAR},
+      </if>
+      <if test="cc != null" >
+        #{cc,jdbcType=VARCHAR},
+      </if>
+      <if test="bcc != null" >
+        #{bcc,jdbcType=VARCHAR},
+      </if>
+      <if test="subject != null" >
+        #{subject,jdbcType=VARCHAR},
+      </if>
+      <if test="atturl != null" >
+        #{atturl,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=CHAR},
+      </if>
+      <if test="createtime != null" >
+        #{createtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="text != null" >
+        #{text,jdbcType=LONGVARBINARY},
+      </if>
+    </trim>
+  </insert>
+</mapper>

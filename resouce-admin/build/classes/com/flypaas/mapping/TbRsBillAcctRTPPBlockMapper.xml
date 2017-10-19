@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsBillAcctRTPPBlockMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsBillAcctRTPPBlock" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="time_block" property="timeBlock" jdbcType="TIMESTAMP" />
+    <result column="main_sid" property="mainSid" jdbcType="VARCHAR" />
+    <result column="traffic_in" property="trafficIn" jdbcType="INTEGER" />
+    <result column="traffic_out" property="trafficOut" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="REAL" />
+    <result column="balance" property="balance" jdbcType="DOUBLE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, ip, time_block, main_sid, traffic_in, traffic_out, price, balance
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_bill_acct_rtpp_block
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tb_rs_bill_acct_rtpp_block
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsBillAcctRTPPBlock" >
+    insert into tb_rs_bill_acct_rtpp_block (id, ip, time_block, 
+      main_sid, traffic_in, traffic_out, 
+      price, balance)
+    values (#{id,jdbcType=BIGINT}, #{ip,jdbcType=VARCHAR}, #{timeBlock,jdbcType=TIMESTAMP}, 
+      #{mainSid,jdbcType=VARCHAR}, #{trafficIn,jdbcType=INTEGER}, #{trafficOut,jdbcType=INTEGER}, 
+      #{price,jdbcType=REAL}, #{balance,jdbcType=DOUBLE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsBillAcctRTPPBlock" >
+    insert into tb_rs_bill_acct_rtpp_block
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="timeBlock != null" >
+        time_block,
+      </if>
+      <if test="mainSid != null" >
+        main_sid,
+      </if>
+      <if test="trafficIn != null" >
+        traffic_in,
+      </if>
+      <if test="trafficOut != null" >
+        traffic_out,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="balance != null" >
+        balance,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="timeBlock != null" >
+        #{timeBlock,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mainSid != null" >
+        #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="trafficIn != null" >
+        #{trafficIn,jdbcType=INTEGER},
+      </if>
+      <if test="trafficOut != null" >
+        #{trafficOut,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=REAL},
+      </if>
+      <if test="balance != null" >
+        #{balance,jdbcType=DOUBLE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsBillAcctRTPPBlock" >
+    update tb_rs_bill_acct_rtpp_block
+    <set >
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="timeBlock != null" >
+        time_block = #{timeBlock,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mainSid != null" >
+        main_sid = #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="trafficIn != null" >
+        traffic_in = #{trafficIn,jdbcType=INTEGER},
+      </if>
+      <if test="trafficOut != null" >
+        traffic_out = #{trafficOut,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=REAL},
+      </if>
+      <if test="balance != null" >
+        balance = #{balance,jdbcType=DOUBLE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsBillAcctRTPPBlock" >
+    update tb_rs_bill_acct_rtpp_block
+    set ip = #{ip,jdbcType=VARCHAR},
+      time_block = #{timeBlock,jdbcType=TIMESTAMP},
+      main_sid = #{mainSid,jdbcType=VARCHAR},
+      traffic_in = #{trafficIn,jdbcType=INTEGER},
+      traffic_out = #{trafficOut,jdbcType=INTEGER},
+      price = #{price,jdbcType=REAL},
+      balance = #{balance,jdbcType=DOUBLE}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

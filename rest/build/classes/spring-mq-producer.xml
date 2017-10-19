@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:rabbit="http://www.springframework.org/schema/rabbit"
+       xsi:schemaLocation="http://www.springframework.org/schema/rabbit
+           http://www.springframework.org/schema/rabbit/spring-rabbit-1.5.xsd
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+           
+    <!--配置connection-factory，指定连接rabbit server参数 -->  
+    <rabbit:connection-factory id="connectionFactory" publisher-confirms="true"
+        username="${ucpaas.rabbitMQ.username}" password="${ucpaas.rabbitMQ.password}" addresses="${ucpaas.rabbitMQ.addresses}" />  
+     
+    <!--定义rabbit template用于数据的接收和发送 -->  
+    <rabbit:template id="queueTemplate"  connection-factory="connectionFactory"   
+        exchange="messageExchange"  />  
+        
+    <!--通过指定下面的admin信息，当前producer中的exchange和queue会在rabbitmq服务器上自动生成 -->  
+    <rabbit:admin connection-factory="connectionFactory" />  
+  
+    <!--定义queue -->  
+    <rabbit:queue   name="${ucpaas.rabbitMQ.queueName}" durable="true" auto-delete="false" exclusive="false" />  
+    
+    <rabbit:fanout-exchange name="messageExchange" auto-declare="true" durable="true" auto-delete="false">
+    
+    	<rabbit:bindings>
+    		<rabbit:binding queue="${ucpaas.rabbitMQ.queueName}"></rabbit:binding>
+    	</rabbit:bindings>
+    
+    </rabbit:fanout-exchange>
+    
+   
+    
+   
+      
+</beans>  

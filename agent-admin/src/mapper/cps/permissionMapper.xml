@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 策略管理-策略权限配置-策略权限 -->
+<mapper namespace="permission">
+	
+	<!-- 查询策略权限 -->
+	<select id="query" resultType="map">
+		SELECT
+			l.id,
+			l.pv,
+			l.ver,
+			l.iceenable,
+			l.audiofec,
+			l.logreport,
+			l.autoadapter,
+			l.vqmenable,
+			date_format(
+				l.updatetime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS updatetime
+		FROM
+			t_permission_list l
+		WHERE
+			1 = 1
+		<if test="pv != null">
+			AND l.pv = #{pv}
+		</if>
+		<if test="text != null">
+			AND l.ver LIKE concat('%', #{text}, '%')
+		</if>
+		ORDER BY
+			l.updatetime DESC
+		${limit}
+	</select>
+	
+	<!-- 查询策略权限：记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			t_permission_list l
+		WHERE
+			1 = 1
+		<if test="pv != null">
+			AND l.pv = #{pv}
+		</if>
+		<if test="text != null">
+			AND l.ver LIKE concat('%', #{text}, '%')
+		</if>
+	</select>
+	
+	<!-- 查看策略权限 -->
+	<select id="view" resultType="map">
+		SELECT
+			l.id,
+			l.pv,
+			l.ver,
+			l.iceenable,
+			l.audiofec,
+			l.logreport,
+			l.autoadapter,
+			l.vqmenable,
+			l.prtpenable,
+			date_format(
+				l.createtime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS createtime,
+			date_format(
+				l.updatetime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS updatetime,
+			l.nettype,
+			l.vp8enable,
+			l.h264enable,
+			l.startbitrate,
+			l.minbitrate,
+			l.maxbitrate,
+			l.firstpt
+		FROM
+			t_permission_list l
+		WHERE
+			l.id = #{id}
+	</select>
+	
+	<!-- 添加策略权限 -->
+	<insert id="insert">
+		INSERT INTO t_permission_list (
+			pv,
+			ver,
+			iceenable,
+			audiofec,
+			logreport,
+			autoadapter,
+			vqmenable,
+			prtpenable,
+			createtime,
+			nettype,
+			vp8enable,
+			h264enable,
+			startbitrate,
+			minbitrate,
+			maxbitrate,
+			firstpt
+		)
+		VALUES
+			(
+				#{pv},
+				#{ver},
+				#{iceenable},
+				#{audiofec},
+				#{logreport},
+				#{autoadapter},
+				#{vqmenable},
+				#{prtpenable},
+				now(),
+				#{nettype},
+				#{vp8enable},
+				#{h264enable},
+				#{startbitrate},
+				#{minbitrate},
+				#{maxbitrate},
+				#{firstpt}
+			)
+	</insert>
+	
+	<!-- 修改策略权限 -->
+	<update id="update">
+		UPDATE t_permission_list l
+		SET l.pv = #{pv},
+		l.ver = #{ver},
+		l.iceenable = #{iceenable},
+		l.audiofec = #{audiofec},
+		l.logreport = #{logreport},
+		l.autoadapter = #{autoadapter},
+		l.vqmenable = #{vqmenable},
+		l.prtpenable = #{prtpenable},
+		l.nettype = #{nettype},
+		l.vp8enable = #{vp8enable},
+		l.h264enable = #{h264enable},
+		l.startbitrate = #{startbitrate},
+		l.minbitrate = #{minbitrate},
+		l.maxbitrate = #{maxbitrate},
+		l.firstpt = #{firstpt}
+		WHERE
+			l.id = #{id}
+	</update>
+	
+	<!-- 删除策略权限 -->
+	<delete id="delete">
+		DELETE l
+		FROM
+			t_permission_list l
+		WHERE
+			l.id = #{id}
+	</delete>
+	
+</mapper> 

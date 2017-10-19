@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.Remind">
+	
+	<resultMap  id="remindResult" type="com.flypaas.entity.Remind">
+		<id property="remindId" column="remind_id" />
+		<result property="method" column="method" />
+		<result property="duration" column="duration" />
+		<result property="sid" column="sid" />
+		<result property="money" column="money" />
+		<result property="rate" column="rate"/>
+		<result property="status" column="status"/>
+	</resultMap>
+	
+	<insert id="addBalanceRemind" parameterType="remind">
+		insert into tb_srv_remind(sid,money,rate,method) values(#{sid},#{money},#{rate},#{method})
+	</insert>
+	<select id="getCountBySid" parameterType="java.lang.String" resultType="int">
+		select count(0) from tb_srv_remind where sid=#{sid} and remind_type=1
+	</select>
+	<select id="getRemindBySid" parameterType="java.lang.String" resultType="remind">
+		select * from tb_srv_remind where sid=#{sid} and remind_type=1
+	</select>
+	<update id="updateRemindBySid" parameterType="remind">
+		update tb_srv_remind
+		<set>
+			<if test="money!=0">
+				money = #{money},
+			</if>
+			<if test="rate!=null">
+				rate = #{rate},
+			</if>
+			<if test="method!=null">
+				method = #{method},
+			</if>
+			<if test="status!=null">
+				status = #{status}
+			</if>
+	   </set>
+	   where sid=#{sid} and remind_type=1
+	</update>
+</mapper>

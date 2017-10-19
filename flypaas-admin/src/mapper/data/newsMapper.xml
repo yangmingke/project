@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心-新闻管理 -->
+<mapper namespace="news">
+	
+	<!-- 分页查询新闻 -->
+	<select id="query" resultType="map">
+		SELECT
+			n.news_id,
+			n.title,
+			n.subtitle,
+			n.summary,
+			date_format(
+				n.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			n.`status`,
+			p.param_value AS status_name
+		FROM
+			tb_ucpaas_news n,
+			tb_ucpaas_params p
+		WHERE
+			n.`status` = p.param_key
+		AND p.param_type = 'news_status'
+		
+		<if test="text != null">
+			AND (
+				n.news_id LIKE concat('%', #{text}, '%')
+				OR n.title LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND n.update_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND n.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND n.`status` = #{status}
+		</if>
+		ORDER BY
+			n.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询新闻 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_news n
+		WHERE
+			1 = 1
+		
+		<if test="text != null">
+			AND (
+				n.news_id LIKE concat('%', #{text}, '%')
+				OR n.title LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND n.update_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND n.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND n.`status` = #{status}
+		</if>
+	</select>
+	
+	<!-- 查看新闻 -->
+	<select id="view" resultType="map">
+		SELECT
+			n.news_id,
+			n.title,
+			n.subtitle,
+			n.summary,
+			n.content,
+			date_format(
+				n.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			n.`status`,
+			p.param_value AS status_name
+		FROM
+			tb_ucpaas_news n,
+			tb_ucpaas_params p
+		WHERE
+			n.`status` = p.param_key
+		AND p.param_type = 'news_status'
+		AND n.news_id = #{news_id}
+	</select>
+	
+	<!-- 添加、修改新闻之前查重 -->
+	<select id="check" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_news n
+		WHERE
+			n.title = #{title}
+		<if test="news_id != null">
+			AND n.news_id != #{news_id}
+		</if>
+	</select>
+	
+	<!-- 添加新闻 -->
+	<insert id="insert">
+		INSERT INTO tb_ucpaas_news (
+			title,
+			subtitle,
+			summary,
+			content,
+			STATUS,
+			create_date,
+			update_date
+		)
+		VALUES
+			(#{title}, #{subtitle}, #{summary}, #{content}, 0, now(), now())
+	</insert>
+	
+	<!-- 修改新闻 -->
+	<update id="update">
+		UPDATE tb_ucpaas_news n
+		SET n.title = #{title},
+		 n.subtitle = #{subtitle},
+		 n.summary = #{summary},
+		 n.content = #{content},
+		 n.update_date = now()
+		WHERE
+			n.news_id = #{news_id}
+	</update>
+	
+	<!-- 修改新闻状态 -->
+	<update id="updateStatus">
+		UPDATE tb_ucpaas_news n
+		SET n.`status` = #{status}
+		WHERE
+			n.news_id = #{news_id}
+	</update>
+	
+</mapper> 

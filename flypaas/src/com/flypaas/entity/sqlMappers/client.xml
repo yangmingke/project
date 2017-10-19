@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.Client">
+	
+	 <resultMap id="clientResult" type="com.flypaas.entity.Client">
+		<id property="clientSid" column="client_sid" />
+		<result property="clientToken" column="client_token" />
+		<result property="friendlyName" column="friendly_name" />
+		<result property="clientNumber" column="client_number" />
+		<result property="clientPwd" column="client_pwd" />
+		<result property="status" column="status" />
+		<result property="appSid" column="app_sid" />
+		<result property="sid" column="sid" />
+		<result property="charge" column="charge" />
+		<result property="chargeType" column="charge_type" />
+		<result property="clientType" column="client_type" />
+		<result property="createDate" column="create_date" />
+		<result property="updateDate" column="update_date" />
+		<result property="mobile" column="mobile"/>
+	 </resultMap>
+	
+	<select id="getTestClientBySid" parameterType="java.lang.String" resultMap="clientResult">
+		SELECT * FROM tb_ucpaas_client
+		WHERE sid=#{sid} AND client_number like '7%' AND client_type='0' AND status='1' ORDER BY client_number
+	</select>
+	
+	<select id="getClientByAppSid" parameterType="map" resultType="map">
+		SELECT * 
+		FROM tb_ucpaas_client
+		WHERE app_sid=#{app_sid} AND client_type='1' AND status='1'
+		ORDER BY client_number ${limit}
+	</select>
+	
+	<select id="getClientByAppSidCount" parameterType="map" resultType="map">
+		SELECT count(0) as totalCount 
+		FROM tb_ucpaas_client
+		WHERE app_sid=#{app_sid} AND client_type='1' AND status='1'
+	</select>
+	
+	
+	<update id="bindMobile" parameterType="client">
+		update tb_ucpaas_client set mobile=#{mobile},update_date=now() WHERE client_number=#{clientNumber} and sid=#{sid} and app_sid=#{appSid}
+	</update>
+	
+	<select id="getNotMobileClientNum" parameterType="client" resultMap="clientResult">
+		SELECT
+			*
+		FROM
+			tb_ucpaas_client
+		WHERE
+			client_number LIKE '7%'
+		AND sid = #{sid}
+		AND app_sid = #{appSid}
+		AND (mobile ='' or mobile is NULL)
+		ORDER BY client_number LIMIT 1;
+	</select>
+	
+	<select id="getTestClientByMobile" parameterType="client" resultMap="clientResult">
+		select * from tb_ucpaas_client where client_number LIKE '7%' and sid=#{sid} and app_sid = #{appSid} and mobile=#{mobile}
+	</select>
+	
+	<update id="unBindClientMobile" parameterType="java.lang.String">
+		update tb_ucpaas_client set mobile='',update_date=now() where client_number=#{clientNumber}
+	</update>
+	
+	<update id="updateClientMobile" parameterType="client">
+		update tb_ucpaas_client set mobile=#{mobile},update_date=now() where sid=#{sid} and app_sid = #{appSid} and client_number=#{clientNumber}
+	</update>
+	
+	<select id="getClient" parameterType="client" resultType="map">
+		select client_number from tb_ucpaas_client where client_number LIKE '7%' and sid=#{sid} and app_sid=#{appSid} and mobile=#{mobile} order by client_number limit 1
+	</select>
+</mapper>

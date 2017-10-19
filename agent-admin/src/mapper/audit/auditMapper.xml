@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 公共的审核业务 -->
+<mapper namespace="audit">
+
+	<!-- 是否已经存在审核记录 -->
+	<select id="isAudit" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_srv_audit a
+		WHERE
+			a.audit_type = #{audit_type}
+		AND a.audited_id = #{audited_id}
+	</select>
+	
+	<!-- 添加审核记录 -->
+	<insert id="insertAudit">
+		INSERT INTO tb_srv_audit (
+			audit_type,
+			user_id,
+			STATUS,
+			audit_desc,
+			create_date,
+			audited_id
+		)
+		VALUES
+			( #{audit_type}, #{user_id}, #{status}, #{audit_desc}, now(), #{audited_id} )
+	</insert>
+	
+	<!-- 修改审核记录 -->
+	<update id="updateAudit">
+		UPDATE tb_srv_audit a
+		SET a.user_id = #{user_id},
+		 a. STATUS = #{status},
+		 a.audit_desc = #{audit_desc},
+		 a.create_date = now()
+		WHERE
+			a.audit_type = #{audit_type}
+		AND a.audited_id = #{audited_id}
+	</update>
+	
+	<!-- 保存补充原因 -->
+	<update id="saveReason">
+		UPDATE tb_srv_audit a
+		SET a.audit_desc = #{audit_desc}
+		WHERE
+			a.audit_type = #{audit_type}
+		AND a.audited_id = #{audited_id}
+	</update>
+	
+	<!-- 获取代理商的通知类业务回调地址：语音验证码的语音文件 -->
+	<select id="getCallAddressForCallRing" resultType="map">
+		SELECT
+			a.sid,
+			a.app_sid,
+			c.call_address
+		FROM
+			tb_ucpaas_call_ring a,
+			tb_ucpaas_user u,
+			tb_srv_callback c
+		WHERE
+			a.sid = u.sid
+		AND a.app_sid = c.app_sid
+		AND a.id = #{audited_id}
+		AND u.is_proxy = 1
+		AND c.call_type = 7
+		LIMIT 1
+	</select>
+	
+	<!-- 获取代理商的通知类业务回调地址：语音通知的语音文件 -->
+	<select id="getCallAddressForCallFile" resultType="map">
+		SELECT
+			a.sid,
+			a.app_sid,
+			c.call_address
+		FROM
+			tb_notify_call_file a,
+			tb_ucpaas_user u,
+			tb_srv_callback c
+		WHERE
+			a.sid = u.sid
+		AND a.app_sid = c.app_sid
+		AND a.id = #{audited_id}
+		AND u.is_proxy = 1
+		AND c.call_type = 7
+		LIMIT 1
+	</select>
+	
+	<!-- 获取代理商的通知类业务回调地址：显示的号码 -->
+	<select id="getCallAddressForShownbrs" resultType="map">
+		SELECT
+			a.nbr,
+			a.sid,
+			a.app_sid,
+			c.call_address
+		FROM
+			tb_ucpaas_application_shownbrs a,
+			tb_ucpaas_user u,
+			tb_srv_callback c
+		WHERE
+			a.sid = u.sid
+		AND a.app_sid = c.app_sid
+		AND a.id = #{audited_id}
+		AND u.is_proxy = 1
+		AND c.call_type = 7
+		LIMIT 1
+	</select>
+	
+	<!-- 获取代理商的通知类业务回调地址：短信模板 -->
+	<select id="getCallAddressForSmsTemplate" resultType="map">
+		SELECT
+			app.sid,
+			app.app_sid,
+			c.call_address
+		FROM
+			tb_srv_sms_template a,
+			tb_ucpaas_application app,
+			tb_ucpaas_user u,
+			tb_srv_callback c
+		WHERE
+			a.app_sid = app.app_sid
+		AND app.sid = u.sid
+		AND a.app_sid = c.app_sid
+		AND a.template_id = #{audited_id}
+		AND u.is_proxy = 1
+		AND c.call_type = 7
+		LIMIT 1
+	</select>
+	
+</mapper> 

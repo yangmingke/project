@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.Other">
+	<select id="getExperienceCountByMobile" parameterType="map" resultType="int">
+		select count(0) from tb_flypaas_expre where mobile=#{mobile} and type=#{type}
+	</select>
+	
+	<select id="getExperienceCountByIp" parameterType="map" resultType="int">
+		select count(0) from tb_flypaas_expre where ip=#{ip} and type=#{type}
+	</select>
+	
+	<insert id="addExperience" parameterType="map">
+		insert into tb_flypaas_expre(mobile,ip,create_date,type) values(#{mobile},#{ip},#{create_date},#{type})
+	</insert>
+	
+	<select id="getRodamCuctomerManager" resultType="map">
+		SELECT *
+		FROM tb_ucpaas_customer_manager AS r1 JOIN
+		(SELECT ROUND(RAND() *
+		(SELECT MAX(id)
+		FROM tb_ucpaas_customer_manager)) AS id)
+		AS r2
+		WHERE r1.id >= r2.id
+		ORDER BY r1.id ASC
+		LIMIT 1;
+	</select>
+	
+	<select id="getResetPwdCount" parameterType="java.lang.String" resultType="int">
+		select count(0) from tb_ucpaas_resetpwd_log where sid=#{sid}
+	</select>
+	
+	<insert id="addResetPwdLog" parameterType="map">
+		insert into tb_ucpaas_resetpwd_log(sid,email,ip,create_date) values(#{sid},#{email},#{ip},#{createDate});
+	</insert>
+	<!-- 添加语音通知 -->
+	<insert id="insertCloudNotifyCall" parameterType="map">
+		insert into tb_notify_call_file(sid,app_sid,content,`to`,audit_status,upload_status,create_date,update_date,type,send_status,is_contract,user_file_name)
+		values(#{sid},#{app_sid},#{content},#{to},1,1,now(),now(),0,1,1,'体验');
+	</insert>
+	<select id="getFeeConfig" resultType="map">
+		select * from tb_page_config where page_key='fee_config' and config_status=1
+	</select>
+	<insert id="getId" useGeneratedKeys="true" keyProperty="id" parameterType="FlypaasId">
+		insert into tb_flypaas_id() VALUES()
+	</insert>
+	<insert id="addAuthFile" parameterType="map">
+		insert into tb_ucpaas_user_authfile(sid,vcode,timestamp) 
+		values(#{sid},#{vcode},#{timestamp})
+	</insert>
+	<update id="updateAuthFile" parameterType="map">
+		update tb_ucpaas_user_authfile 
+		set vcode=#{vcode},timestamp=#{timestamp}
+		where sid=#{sid}
+	</update>
+	<select id="getAuthFile" parameterType="java.lang.String" resultType="map">
+		select * from tb_ucpaas_user_authfile where sid=#{sid}
+	</select>
+	<select id="lyList" parameterType="map" resultType="map">
+		 <![CDATA[
+		SELECT id,stat_date,if(file_size/(1024*1024*1024)<0.001,0.001,ROUND(file_size/(1024*1024*1024),3)) as file_size,create_date,
+		DATE_ADD(create_date,INTERVAL (SELECT file_timeout FROM flypaas.tb_flypaas_application where sid=#{sid} and app_sid=#{appSid}) DAY) as exp_date 
+		FROM statistics.tb_record_stat WHERE sid=#{sid} and app_sid=#{appSid} and status=1 ${limit}
+		]]>
+	</select>
+	
+	<select id="lyListCount" parameterType="map" resultType="map">
+		SELECT count(0) as totalCount
+		FROM statistics.tb_record_stat WHERE sid=#{sid} and app_sid=#{appSid}  and status=1
+	</select>
+	
+	<select id="lyFileSize" parameterType="map" resultType="map">
+		<![CDATA[
+		SELECT sum(if(file_size/(1024*1024*1024)<0.001,0.001,ROUND(file_size/(1024*1024*1024),3))) as lyFileSize
+		FROM statistics.tb_record_stat WHERE sid=#{sid} and app_sid=#{appSid} and status=1 ${limit}
+		]]>
+	</select>
+	<delete id="lyDel" parameterType="map">
+		update statistics.tb_record_stat set status=0 where sid=#{sid} and app_sid=#{appSid} and id=#{statId}
+	</delete>
+	<select id="ly" parameterType="map" resultType="map">
+		SELECT * FROM statistics.tb_record_stat WHERE sid=#{sid} and id=#{id}
+	</select>
+</mapper>

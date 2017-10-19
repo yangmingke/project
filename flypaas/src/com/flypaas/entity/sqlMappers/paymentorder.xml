@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.PaymentOrder">
+	
+	 
+	 <resultMap id="payOrderResult" type="com.flypaas.entity.PaymentOrder">
+		<id property="orderId" column="order_id" />
+		<result property="payId" column="pay_id"/>
+		<result property="sid" column="sid" />
+		<result property="charge" column="charge" />
+		<result property="chargeType" column="charge_type" />
+		<result property="status" column="status" />
+		<result property="createDate" column="create_date" />
+		<result property="payDate" column="pay_date" />
+		<result property="payResultDate" column="pay_result_date" />
+		<result property="accountType" column="account_type" />
+		<result property="appSid" column="app_sid" />
+	</resultMap>
+	
+	<insert id="addPayOrder" useGeneratedKeys="true" keyProperty="orderId" parameterType="payOrder">
+		insert tb_srv_payment_order(sid,pay_id,charge,charge_type,status,create_date,pay_date,account_type,app_sid) values(#{sid},#{payId},#{charge},#{chargeType},#{status},#{createDate},#{payDate},#{accountType},#{appSid})
+	</insert>
+
+	<select id="getPayOrderById" parameterType="java.lang.Long" resultMap="payOrderResult">
+		select order_id,sid,pay_id,TRUNCATE (charge / 1000000, 4) as charge,charge_type,status,create_date,pay_date from tb_srv_payment_order where order_id=#{id}
+	</select>
+	
+	<update id="updatePayOrder" parameterType="payOrder">
+		update tb_srv_payment_order
+		<set>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="charge!=0">
+				charge=#{charge},
+			</if>
+			<if test="payResultDate!=null">
+				pay_result_date=#{payResultDate},
+			</if>
+			<if test="chargeType!=null">
+				charge_type=#{chargeType},
+			</if>
+			<if test="payDate!=null">
+				pay_date=#{payDate}
+			</if>
+		</set>
+		where order_id=#{orderId} and sid=#{sid}
+	</update>
+	<select id="getPayMentList" parameterType="payOrder" resultType="map">
+		select order_id,sid,TRUNCATE (charge / 1000000, 4) as charge,charge_type,status,create_date,pay_date from tb_srv_payment_order where sid=#{sid} and (charge_type REGEXP '^[0-9]' or charge_type='B2' or charge_type='B3') 
+		<if test="orderId!=0">
+			and order_id LIKE concat('%', #{orderId}, '%')
+		</if>
+		<if test="appSid!=null">
+			and app_sid=#{appSid} 
+		</if>
+		<if test="beginDate!=null and beginDate!='' ">
+			and DATE_FORMAT(create_date,'%Y-%m-%d') >= #{beginDate}
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			<![CDATA[ and DATE_FORMAT(create_date,'%Y-%m-%d') <= #{endDate}  ]]>
+		</if>
+		order by order_id desc 
+		${limit}
+	</select>
+	<update id="updateOrderid" parameterType="map">
+		update tb_srv_payment_order set pay_id=#{payId},status=#{status} where order_id=#{orderId} and sid=#{sid}
+	</update>
+	<select id="getOrderByPayId" parameterType="payOrder" resultMap="payOrderResult">
+		select * from tb_srv_payment_order where order_id=#{orderId} and sid=#{sid}
+	</select>
+	<select id="getAllPayMoneyLastYear" parameterType="java.lang.String" resultType="java.lang.Long">
+		SELECT
+			TRUNCATE (
+				ifnull(
+					sum(
+		
+						IF (charge_type != 'A3', charge, 0)
+					) - sum(
+		
+						IF (charge_type = 'A3', charge, 0)
+					),
+					0
+				) / 1000000,
+				4
+			)
+		FROM
+			tb_srv_payment_order
+		WHERE
+			sid = #{sid}
+		AND STATUS = '3'
+		AND account_type = '0'
+		AND (
+			charge_type IN ('A1', 'A3', 'B2')
+			OR charge_type REGEXP '^[0-9]'
+		)
+	</select>
+	
+	<select id="getChargeCount" parameterType="map" resultType="map">
+		select count(0) as totalCount from tb_srv_payment_order where sid=#{sid} and (charge_type REGEXP '^[0-9]' or charge_type='B2' or charge_type='B3') 
+		<if test="orderId!=0">
+			and order_id LIKE concat('%', #{orderId}, '%')
+		</if>
+		<if test="appSid!=null">
+			and app_sid=#{appSid}
+		</if>
+		<if test="beginDate!=null and beginDate!='' ">
+			and DATE_FORMAT(create_date,'%Y-%m-%d') >= #{beginDate}
+		</if>
+		<if test="endDate!=null and endDate!=''">
+			<![CDATA[ and DATE_FORMAT(create_date,'%Y-%m-%d') <= #{endDate}  ]]>
+		</if>
+	</select>
+	
+</mapper>

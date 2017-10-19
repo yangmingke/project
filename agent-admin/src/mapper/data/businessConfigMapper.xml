@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心-业务配置 -->
+<mapper namespace="businessConfig">
+	
+	<!-- 分页查询 -->
+	<select id="query" resultType="map">
+		SELECT
+			id,n.sid,u.email,cast(n.stype as signed) as stype,cast(n.status as signed) as status,
+			n.create_date,n.update_date,n.money / ${money_rate} as money_fmt,n.ext
+		FROM
+			tb_user_dsp n,
+			tb_ucpaas_user u
+		WHERE
+			n.status=1 and n.sid =u.sid
+		<if test="text != null">
+			AND (
+				n.id LIKE concat('%', #{text}, '%')
+				OR n.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND n.update_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND n.update_date <= #{end_date} ]]>
+		</if>
+		<if test="stype != null">
+			AND n.stype = #{stype}
+		</if>
+		ORDER BY
+			n.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_user_dsp n,
+			tb_ucpaas_user u
+		WHERE
+			n.status=1 and n.sid =u.sid
+		<if test="text != null">
+			AND (
+				n.id LIKE concat('%', #{text}, '%')
+				OR n.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND n.update_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND n.update_date <= #{end_date} ]]>
+		</if>
+		<if test="stype != null">
+			AND n.stype = #{stype}
+		</if>
+	</select>
+	
+	<!-- 添加、修改之前查重 -->
+	<select id="check" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_user_dsp n
+		WHERE
+			n.sid = #{sid}
+			AND n.stype = #{stype}
+			AND n.status = 1
+		<if test="news_id != null">
+			AND n.id != #{id}
+		</if>
+	</select>
+
+	<select id="findSid" resultType="string">
+		SELECT	sid
+		FROM	tb_ucpaas_user n
+		WHERE 1 = 1
+		<if test="sid != null">
+			AND n.sid = #{sid}
+		</if>
+		<if test="email != null">
+			AND n.email = #{email}
+		</if>
+		limit 1
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="insert">
+		INSERT INTO tb_user_dsp (sid,stype,status,create_date,update_date,money,ext)
+		VALUES(#{sid}, #{stype}, #{status}, now(), now(),#{money} * ${money_rate},#{ext})
+	</insert>
+	
+	<!-- 修改 -->
+	<update id="update">
+		UPDATE tb_user_dsp n
+		SET n.sid = #{sid},
+		 n.stype = #{stype},
+		 n.status = #{status},
+		 n.update_date = now()
+		WHERE
+			n.id = #{id}
+	</update>
+	
+	<!-- 修改状态 -->
+	<update id="updateStatus">
+		UPDATE tb_user_dsp n
+		SET n.`status` = #{status},update_date=now()
+		WHERE
+			n.id = #{id}
+	</update>
+	
+</mapper> 

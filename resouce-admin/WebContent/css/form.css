@@ -1,0 +1,14 @@
+@charset "utf-8";
+/* CSS Document */
+
+/*错误提示*/
+form span.error { color: #e64141; font-size: 12px; display: inline-block; margin-left: 5px;}
+form span.tips { color: #a3a3a3; font-size: 12px;}
+form span.notice { color: #fe9500; font-size: 12px;}
+form i.star { background: url("../images/star.png") 0 0 no-repeat; width: 5px; height: 6px; display: inline-block; margin-right: 5px; position: relative; top: 15px;}
+
+/*按钮*/
+input[type='button'],input[type='submit'] { font-family: 微软雅黑; cursor: pointer;}
+.confirm_btn { border: 1px #76b343 solid; background: /* #76b343 */rgb(92, 192, 237); width: 120px; height: 32px; line-height: 16px; text-align: center; color: #fff; cursor: pointer;}
+.confirm_btn:hover { background: /* #8bc55a */rgb(92, 192, 237); border-color: #8bc55a;}
+

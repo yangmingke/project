@@ -1,0 +1,28 @@
+.menu1{
+	font-size:16px;
+	color: white; 
+	padding-left:15%;
+	font:oblique;
+	
+}
+
+.menu2{
+	font-size: 14px;
+	color: white; 
+	margin-left: 40%;
+	line-height: 30px;
+}
+
+/* .message{
+	background: url("../../images/user.png") no-repeat;
+	background-size:10.5%;
+}
+
+.resource{
+	background: url("../../images/resource.jpg") no-repeat;
+	background-size:10.5%;
+}
+.bill{
+	background: url("../../images/bill.jpg") no-repeat;
+	background-size:10.5%;
+} */

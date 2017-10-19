@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.TbSrvCallback">
+	
+	 
+	 <resultMap id="cbResult" type="com.flypaas.entity.TbSrvCallback">
+		<id property="cbId" column="cb_id" />
+		<result property="callAddress" column="call_address" />
+		<result property="callType" column="call_type" />
+		<result property="appSid" column="app_sid" />
+		<result property="method" column="method" />
+	</resultMap>
+	
+	<insert id="addCb" parameterType="callback">
+		<![CDATA[
+		insert into
+		tb_srv_callback(call_address,call_type,app_sid,method) values(#{callAddress},#{callType},#{appSid},#{method})
+		]]>
+	</insert>
+	
+	<delete id="deleteCbByAppSid" parameterType="java.lang.String">
+		delete from tb_srv_callback where app_sid=#{appSid}
+	</delete>
+	
+	<select id="getCbByAppSid" parameterType="java.lang.String" resultMap="cbResult">
+		select * from tb_srv_callback where app_sid=#{appSid}
+	</select>
+</mapper>

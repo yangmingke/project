@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.SecurityRelieveApplyfor">
+	
+	 <resultMap id="ApplyforResult" type="com.flypaas.entity.SecurityRelieveApplyfor">
+	 	<id property="id" column="id"/>
+		<id property="sid" column="sid" />
+		<id property="securityId" column="security_id" />
+		<id property="banknum" column="banknum" />
+		<id property="bankaddr" column="bankaddr" />
+		<id property="company" column="company" />
+		<id property="status" column="status" />
+		<id property="createDate" column="create_date" />
+		<id property="updateDate" column="update_date" />
+		<id property="money" column="money" />
+	</resultMap>
+	
+	<insert id="addSecurityRelieveApplyfor" parameterType="securityRelieveApplyfor" >
+		 insert into tb_ucpaas_security_relieve_applyfor(sid,security_id,banknum,bankaddr,company,status,create_date,update_date,money)
+		 values(#{sid},#{securityId},#{banknum},#{bankaddr},#{company},#{status},#{createDate},#{updateDate},#{money})
+	</insert>
+	
+	<select id="getSecurityRelieveApplyfor" parameterType="java.lang.Long" resultMap="ApplyforResult">
+		select * from tb_ucpaas_security_relieve_applyfor where security_id=#{securityId} and status='1'
+	</select>
+	
+	<select id="getSecurityRelieveApplyforBySid" parameterType="java.lang.String" resultMap="ApplyforResult">
+		select * from tb_ucpaas_security_relieve_applyfor where sid=#{sid} and status='1' limit 1
+	</select>
+</mapper>

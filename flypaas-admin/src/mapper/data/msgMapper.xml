@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心-消息通知 -->
+<mapper namespace="msg">
+	
+	<!-- 添加消息 -->
+	<insert id="insertMsg">
+		INSERT INTO tb_ucpaas_user_msg (
+			sid,
+			msg_type,
+			msg_title,
+			msg_desc,
+			create_date,
+			hasread
+		)
+		VALUES
+		<foreach collection="sid" item="item" separator=",">
+			(#{item}, #{msg_type}, #{msg_title}, #{msg_desc}, now(), 0)
+		</foreach>
+	</insert>
+	
+	<!-- 获取消息模板 -->
+	<select id="getMsgTemplate" resultType="map">
+		SELECT
+			t.template_title,
+			t.template_desc
+		FROM
+			tb_ucpaas_user_msg_template t
+		WHERE
+			t.template_id = #{template_id}
+	</select>
+	
+	<!-- 获取未读的消息个数 -->
+	<select id="getUnreadCount" resultType="_int">
+		SELECT
+			count(0)
+		FROM
+			tb_ucpaas_user_msg m
+		WHERE
+			m.sid = #{sid}
+		AND m.hasread = 0
+	</select>
+	
+	<!-- 获取登录用户的email -->
+	<select id="getLoginEmail" resultType="string">
+		SELECT
+			u.email
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.sid = #{sid}
+	</select>
+	
+	<!-- 查询消息通知 -->
+	<select id="query" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			m.msg_id,
+			m.msg_type,
+			m.msg_title,
+			m.msg_desc,
+			date_format(
+				m.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			m.hasread
+		FROM
+			tb_ucpaas_user_msg m,
+			tb_ucpaas_user u
+		WHERE
+			u.sid = m.sid
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR m.msg_title LIKE concat('%', #{text}, '%')
+				OR m.msg_desc LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND m.create_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND m.create_date <= #{end_date} ]]>
+		</if>
+		<if test="msg_type != null">
+			AND m.msg_type = #{msg_type}
+		</if>
+		<if test="hasread != null">
+			AND m.hasread = #{hasread}
+		</if>
+		ORDER BY
+			m.create_date DESC
+		${limit}
+	</select>
+	
+	<!-- 查询消息通知：记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_user_msg m,
+			tb_ucpaas_user u
+		WHERE
+			u.sid = m.sid
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR m.msg_title LIKE concat('%', #{text}, '%')
+				OR m.msg_desc LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND m.create_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND m.create_date <= #{end_date} ]]>
+		</if>
+		<if test="msg_type != null">
+			AND m.msg_type = #{msg_type}
+		</if>
+		<if test="hasread != null">
+			AND m.hasread = #{hasread}
+		</if>
+	</select>
+	
+	<!-- 修改消息通知 -->
+	<update id="updateMsg">
+		UPDATE tb_ucpaas_user_msg m
+		SET m.hasread = 1
+		WHERE
+			m.sid = #{sid}
+		AND m.msg_id = #{msg_id}
+	</update>
+	
+	<!-- 查看消息通知 -->
+	<select id="view" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			m.msg_id,
+			m.msg_type,
+			m.msg_title,
+			m.msg_desc,
+			date_format(
+				m.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			m.hasread
+		FROM
+			tb_ucpaas_user_msg m,
+			tb_ucpaas_user u
+		WHERE
+			u.sid = m.sid
+		AND m.msg_id = #{msg_id}
+	</select>
+	
+	<!-- 查询开发者 -->
+	<select id="queryDeveloper" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.mobile,
+			u.username,
+			u.realname,
+			u.`status`,
+			u.oauth_status,
+			p.package_id,
+			date_format(
+				u.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date
+		FROM
+			tb_ucpaas_user u
+		LEFT JOIN tb_bill_acct_package_rel p ON p.sid = u.sid
+		WHERE
+			u.user_type IN (1, 2)
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat('%',#{text}, '%')
+				OR u.email LIKE concat('%',#{text}, '%')
+				OR u.mobile LIKE concat('%',#{text}, '%')
+				OR u.username LIKE concat('%',#{text}, '%')
+				OR u.realname LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.create_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND u.create_date <= #{end_date} ]]>
+		</if>
+		<if test="user_status != null">
+			AND u.`status` = #{user_status}
+		</if>
+		<if test="oauth_status != null">
+			AND u.oauth_status = #{oauth_status}
+		</if>
+		<if test="package_id != null">
+			AND p.package_id = #{package_id}
+		</if>
+		ORDER BY
+			u.create_date DESC
+		${limit}
+	</select>
+	
+	<!-- 查询开发者：记录总数 -->
+	<select id="queryDeveloperCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_user u
+		LEFT JOIN tb_bill_acct_package_rel p ON p.sid = u.sid
+		WHERE
+			u.user_type IN (1, 2)
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat('%',#{text}, '%')
+				OR u.email LIKE concat('%',#{text}, '%')
+				OR u.mobile LIKE concat('%',#{text}, '%')
+				OR u.username LIKE concat('%',#{text}, '%')
+				OR u.realname LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.create_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND u.create_date <= #{end_date} ]]>
+		</if>
+		<if test="user_status != null">
+			AND u.`status` = #{user_status}
+		</if>
+		<if test="oauth_status != null">
+			AND u.oauth_status = #{oauth_status}
+		</if>
+		<if test="package_id != null">
+			AND p.package_id = #{package_id}
+		</if>
+	</select>
+	
+	<!-- 给所有开发者添加消息 -->
+	<insert id="insertMsgToAll">
+		INSERT INTO tb_ucpaas_user_msg (
+			sid,
+			msg_type,
+			msg_title,
+			msg_desc,
+			create_date,
+			hasread
+		) SELECT
+			u.sid,
+			#{msg_type}, #{msg_title}, #{msg_desc}, now(), 0
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type IN (1, 2)
+	</insert>
+	
+</mapper> 

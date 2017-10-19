@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 策略管理-音频驱动适配-音频驱动适配异常 -->
+<mapper namespace="voiceDeviceException">
+	
+	<!-- 查询音频驱动适配异常 -->
+	<select id="query" resultType="map">
+		SELECT
+			l.id,
+			l.pv,
+			l.app_ver,
+			l.ver,
+			l.system_ver,
+			l.api_level,
+			l.phonebrand,
+			l.phonemodel,
+			l.imei,
+			l.mac,
+			date_format(
+				l.updatetime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS updatetime
+		FROM
+			t_voice_device_exception_list l
+		WHERE
+			1 = 1
+		<if test="phonebrand != null">
+			AND l.phonebrand LIKE concat('%', #{phonebrand}, '%')
+		</if>
+		ORDER BY
+			l.updatetime DESC
+		${limit}
+	</select>
+	
+	<!-- 查询音频驱动适配异常：记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			t_voice_device_exception_list l
+		WHERE
+			1 = 1
+		<if test="phonebrand != null">
+			AND l.phonebrand LIKE concat('%', #{phonebrand}, '%')
+		</if>
+	</select>
+	
+	<!-- 查看音频驱动适配异常 -->
+	<select id="view" resultType="map">
+		SELECT
+			l.id,
+			l.pv,
+			l.app_ver,
+			l.ver,
+			l.system_ver,
+			l.api_level,
+			l.phonebrand,
+			l.phonemodel,
+			l.imei,
+			l.mac,
+			date_format(
+				l.createtime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS createtime,
+			date_format(
+				l.updatetime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS updatetime
+		FROM
+			t_voice_device_exception_list l
+		WHERE
+			l.id = #{id}
+	</select>
+	
+	<!-- 删除音频驱动适配异常 -->
+	<delete id="delete">
+		DELETE l
+		FROM
+			t_voice_device_exception_list l
+		WHERE
+			l.id = #{id}
+	</delete>
+	
+</mapper> 

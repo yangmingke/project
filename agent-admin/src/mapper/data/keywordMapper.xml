@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心-敏感字管理 -->
+<mapper namespace="keyword">
+	
+	<!-- 分页查询敏感字 -->
+	<select id="query" resultType="map">
+		SELECT
+			k.word_id,
+			k.word,
+			date_format(
+				k.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date
+		FROM
+			tb_ucpaas_filter_keyword k
+		WHERE
+			1 = 1
+		
+		<if test="text != null">
+			AND (
+				k.word_id LIKE concat('%', #{text}, '%')
+				OR k.word LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND k.update_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND k.update_date <= #{end_date} ]]>
+		</if>
+		ORDER BY
+			k.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询敏感字 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_filter_keyword k
+		WHERE
+			1 = 1
+		
+		<if test="text != null">
+			AND (
+				k.word_id LIKE concat('%', #{text}, '%')
+				OR k.word LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND k.update_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND k.update_date <= #{end_date} ]]>
+		</if>
+	</select>
+	
+	<!-- 查看敏感字 -->
+	<select id="view" resultType="map">
+		SELECT
+			k.word_id,
+			k.word
+		FROM
+			tb_ucpaas_filter_keyword k
+		WHERE
+			k.word_id = #{word_id}
+	</select>
+	
+	<!-- 添加、修改敏感字之前查重 -->
+	<select id="check" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_filter_keyword k
+		WHERE
+			k.word = #{word}
+		<if test="word_id != null">
+			AND k.word_id != #{word_id}
+		</if>
+	</select>
+	
+	<!-- 添加敏感字 -->
+	<insert id="insert">
+		INSERT INTO tb_ucpaas_filter_keyword (
+			word,
+			create_date,
+			update_date
+		)
+		VALUES
+			(
+				#{word}, now(), now())
+	</insert>
+	
+	<!-- 修改敏感字 -->
+	<update id="update">
+		UPDATE tb_ucpaas_filter_keyword k
+		SET k.word = #{word},
+			k.update_date = now()
+		WHERE
+			k.word_id = #{word_id}
+	</update>
+	
+	<!-- 删除敏感字 -->
+	<delete id="delete">
+		DELETE k
+		FROM
+			tb_ucpaas_filter_keyword k
+		WHERE
+			k.word_id = #{word_id}
+	</delete>
+	
+</mapper> 

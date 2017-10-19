@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsAccountBalanceMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsAccountBalance" >
+    <result column="id" property="id" jdbcType="BIGINT" />
+    <result column="net_sid" property="netSid" jdbcType="BIGINT" />
+    <result column="balance" property="balance" jdbcType="DOUBLE" />
+    <result column="enable_flag" property="enableFlag" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="vip_valid_date" property="vipValidDate" jdbcType="TIMESTAMP" />
+    <result column="credit_balance" property="creditBalance" jdbcType="BIGINT" />
+  </resultMap>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsAccountBalance" >
+    insert into tb_rs_account_balance (id, net_sid, balance, 
+      enable_flag, create_time, update_date, 
+      vip_valid_date)
+    values (#{id,jdbcType=BIGINT}, #{netSid,jdbcType=BIGINT}, #{balance,jdbcType=DOUBLE}, 
+      #{enableFlag,jdbcType=CHAR}, #{createTime,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{creditBalance,jdbcType=BIGINT}, 
+      #{vipValidDate,jdbcType=TIMESTAMP})
+  </insert>
+  
+  <select id="queryAccountBalanceBynetSid" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select * from tb_rs_account_balance where net_sid = #{netSid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryAccountBalance" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select * from tb_rs_account_balance where net_sid = #{netSid,jdbcType=VARCHAR} for update
+  </select>
+  
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsAccountBalance" >
+    insert into tb_rs_account_balance
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="netSid != null" >
+        net_sid,
+      </if>
+      <if test="balance != null" >
+        balance,
+      </if>
+      <if test="enableFlag != null" >
+        enable_flag,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="vipValidDate != null" >
+        vip_valid_date,
+      </if>
+      <if test="creditBalance != null" >
+        credit_balance,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="netSid != null" >
+        #{netSid,jdbcType=BIGINT},
+      </if>
+      <if test="balance != null" >
+        #{balance,jdbcType=DOUBLE},
+      </if>
+      <if test="enableFlag != null" >
+        #{enableFlag,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="vipValidDate != null" >
+        #{vipValidDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creditBalance != null" >
+        #{creditBalance,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsAccountBalance" >
+    update tb_rs_account_balance
+    <set >
+     <if test="id != null" >
+        id = #{id,jdbcType=BIGINT},
+      </if>
+      <if test="netSid != null" >
+        net_sid = #{netSid,jdbcType=BIGINT},
+      </if>
+      <if test="balance != null" >
+        balance = #{balance,jdbcType=DOUBLE},
+      </if>
+      <if test="enableFlag != null" >
+        enable_flag = #{enableFlag,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="vipValidDate != null" >
+        vip_valid_date = #{vipValidDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creditBalance != null" >
+        credit_balance =  #{creditBalance,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

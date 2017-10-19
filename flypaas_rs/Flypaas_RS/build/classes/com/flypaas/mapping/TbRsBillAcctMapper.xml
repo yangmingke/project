@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsBillAcctMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsBillAcct" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="main_sid" property="mainSid" jdbcType="VARCHAR" />
+    <result column="traffic_in" property="trafficIn" jdbcType="INTEGER" />
+    <result column="traffic_out" property="trafficOut" jdbcType="INTEGER" />
+    <result column="traffic_total" property="trafficTotal" jdbcType="INTEGER" />
+    <result column="price" property="price" jdbcType="REAL" />
+    <result column="fee" property="fee" jdbcType="DOUBLE" />
+    <result column="create_time" property="createTime" jdbcType="DATE" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, main_sid, traffic_in, traffic_out, traffic_total, price, fee, create_time
+  </sql>
+  
+  <select id="queryResourceSideTMC" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from tb_rs_bill_acct
+    where main_sid = #{0}
+  </select>
+  <select id="queryResourceSideTDC" resultMap="BaseResultMap">
+  	select 
+    <include refid="Base_Column_List" />
+    from tb_rs_bill_acct
+    where main_sid = #{0} and create_time = #{1}
+  </select>
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_bill_acct
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tb_rs_bill_acct
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsBillAcct" >
+    insert into tb_rs_bill_acct (id, main_sid, traffic_in, 
+      traffic_out, traffic_total, price, 
+      fee, create_time)
+    values (#{id,jdbcType=BIGINT}, #{mainSid,jdbcType=VARCHAR}, #{trafficIn,jdbcType=INTEGER}, 
+      #{trafficOut,jdbcType=INTEGER}, #{trafficTotal,jdbcType=INTEGER}, #{price,jdbcType=REAL}, 
+      #{fee,jdbcType=DOUBLE}, #{createTime,jdbcType=DATE})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsBillAcct" >
+    insert into tb_rs_bill_acct
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="mainSid != null" >
+        main_sid,
+      </if>
+      <if test="trafficIn != null" >
+        traffic_in,
+      </if>
+      <if test="trafficOut != null" >
+        traffic_out,
+      </if>
+      <if test="trafficTotal != null" >
+        traffic_total,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="fee != null" >
+        fee,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="mainSid != null" >
+        #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="trafficIn != null" >
+        #{trafficIn,jdbcType=INTEGER},
+      </if>
+      <if test="trafficOut != null" >
+        #{trafficOut,jdbcType=INTEGER},
+      </if>
+      <if test="trafficTotal != null" >
+        #{trafficTotal,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=REAL},
+      </if>
+      <if test="fee != null" >
+        #{fee,jdbcType=DOUBLE},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsBillAcct" >
+    update tb_rs_bill_acct
+    <set >
+      <if test="mainSid != null" >
+        main_sid = #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="trafficIn != null" >
+        traffic_in = #{trafficIn,jdbcType=INTEGER},
+      </if>
+      <if test="trafficOut != null" >
+        traffic_out = #{trafficOut,jdbcType=INTEGER},
+      </if>
+      <if test="trafficTotal != null" >
+        traffic_total = #{trafficTotal,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=REAL},
+      </if>
+      <if test="fee != null" >
+        fee = #{fee,jdbcType=DOUBLE},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=DATE},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsBillAcct" >
+    update tb_rs_bill_acct
+    set main_sid = #{mainSid,jdbcType=VARCHAR},
+      traffic_in = #{trafficIn,jdbcType=INTEGER},
+      traffic_out = #{trafficOut,jdbcType=INTEGER},
+      traffic_total = #{trafficTotal,jdbcType=INTEGER},
+      price = #{price,jdbcType=REAL},
+      fee = #{fee,jdbcType=DOUBLE},
+      create_time = #{createTime,jdbcType=DATE}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

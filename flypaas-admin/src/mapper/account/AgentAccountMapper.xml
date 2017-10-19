@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 账务管理-代理商账务 -->
+<mapper namespace="agentAccount">
+
+	<!-- 分页查询代理商账务 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.*
+		FROM
+			(
+				SELECT
+					b.acct_id,
+					b.sid,
+					u.email,
+					u.realname,
+					u.mobile,
+					b.balance / ${money_rate} AS balance,
+					b.credit_balance /${money_rate} AS credit_balance_fmt,
+					p.package_name,
+					b.enable_flag AS wallet_status,
+					date_format(
+						(
+							SELECT
+								max(p.pay_date)
+							FROM
+								tb_srv_payment_order p
+							WHERE
+								p.sid = b.sid
+							AND p.`status` = 2
+						),
+						'%Y-%m-%d %H:%i:%S'
+					) AS last_recharge_date
+				FROM
+					tb_bill_acct_balance b
+				LEFT JOIN tb_ucpaas_user u ON u.sid = b.sid
+				LEFT JOIN tb_bill_acct_package_rel pr ON pr.sid = b.sid
+				LEFT JOIN tb_bill_package p ON p.package_id = pr.package_id
+				WHERE
+					u.is_proxy = 1
+				And u.user_type = 3		
+		<if test="text != null">
+			AND (
+				b.acct_id LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+				OR u.realname LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		<if test="start_balance != null">
+			AND b.balance >= #{start_balance} * ${money_rate}
+		</if>
+		<if test="end_balance != null">
+			<![CDATA[ AND b.balance <= #{end_balance} * ${money_rate} ]]>
+		</if>
+		<if test="wallet_status != null">
+			AND b.enable_flag = #{wallet_status}
+		</if>
+		) t
+		WHERE
+			1 = 1
+		<if test="start_date != null">
+			AND t.last_recharge_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.last_recharge_date <= #{end_date} ]]>
+		</if>
+		ORDER BY
+			t.last_recharge_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询代理商账务 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			(
+				SELECT
+					b.acct_id,
+					b.sid,
+					u.email,
+					u.realname,
+					u.mobile,
+					b.balance / ${money_rate} AS balance,
+					b.credit_balance /${money_rate} AS credit_balance_fmt,
+					p.package_name,
+					b.enable_flag AS wallet_status,
+					date_format(
+						(
+							SELECT
+								max(p.pay_date)
+							FROM
+								tb_srv_payment_order p
+							WHERE
+								p.sid = b.sid
+							AND p.`status` = 2
+						),
+						'%Y-%m-%d %H:%i:%S'
+					) AS last_recharge_date
+				FROM
+					tb_bill_acct_balance b
+				LEFT JOIN tb_ucpaas_user u ON u.sid = b.sid
+				LEFT JOIN tb_bill_acct_package_rel pr ON pr.sid = b.sid
+				LEFT JOIN tb_bill_package p ON p.package_id = pr.package_id
+				WHERE
+					u.is_proxy = 1
+				And u.user_type = 3		
+		<if test="text != null">
+			AND (
+				b.acct_id LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+				OR u.realname LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		<if test="start_balance != null">
+			AND b.balance >= #{start_balance} * ${money_rate}
+		</if>
+		<if test="end_balance != null">
+			<![CDATA[ AND b.balance <= #{end_balance} * ${money_rate} ]]>
+		</if>
+		<if test="wallet_status != null">
+			AND b.enable_flag = #{wallet_status}
+		</if>
+		) t
+		WHERE
+			1 = 1
+		<if test="start_date != null">
+			AND t.last_recharge_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.last_recharge_date <= #{end_date} ]]>
+		</if>
+	</select>
+	
+	<!-- 获取代理商账务 -->
+	<select id="getAccount" resultType="map">
+		SELECT
+			b.acct_id,
+			b.sid,
+			u.email,
+			u.mobile,
+			date_format(
+				b.create_time,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_time,
+			b.enable_flag AS wallet_status,
+			b.balance / ${money_rate} AS balance,
+			b.credit_balance /${money_rate} AS credit_balance_fmt,
+			p.package_name,
+			p.package_id
+		FROM
+			tb_bill_acct_balance b
+		LEFT JOIN tb_ucpaas_user u ON u.sid = b.sid
+		LEFT JOIN tb_bill_acct_package_rel pr ON pr.sid = b.sid
+		LEFT JOIN tb_bill_package p ON p.package_id = pr.package_id
+		WHERE
+			b.sid = #{sid}
+	</select>
+	
+	<!-- 分页查询充值记录 -->
+	<select id="queryRecharge" resultType="map">
+		SELECT
+			p.order_id,
+			date_format(
+				p.pay_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS pay_date,
+			p.charge / ${money_rate} AS charge,
+			p.charge_type
+		FROM
+			tb_srv_payment_order p
+		WHERE account_type = 0 
+		and p.`status` = #{payStatus}
+		AND p.sid = #{sid}
+		ORDER BY
+			p.pay_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询充值记录 记录总数 -->
+	<select id="queryRechargeCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_srv_payment_order p
+		WHERE account_type = 0
+		and p.`status` =#{payStatus}
+		AND p.sid = #{sid}
+	</select>
+	
+	<update id="updateEnableFlag">
+		update tb_bill_acct_balance t set enable_flag=#{enableFlag} 
+		where sid=#{sid} and enable_flag=#{enableFlagOld}
+	</update>
+	
+	<!-- 设置信用额度 -->
+	<update id="saveCreditBalance">
+		update tb_bill_acct_balance t set credit_balance=#{cv} 
+		where sid=#{sid} 
+	</update>
+
+</mapper> 

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 审核管理-应用审核 -->
+<mapper namespace="appAudit">
+
+	<!-- 分页查询应用 -->
+	<select id="query" resultType="map">
+		SELECT
+			app.app_sid,
+			app.app_name,
+			app.route_area,
+			su.username agentName,
+			u.email,
+			date_format(
+				app.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			app.`status`,
+			(SELECT a.audit_desc FROM tb_srv_audit a WHERE a.audited_id = app.app_sid AND a.audit_type = 2 LIMIT 1) AS audit_desc,
+			app.app_kind,
+			app.industry
+		FROM
+			tb_ucpaas_application app,
+			tb_ucpaas_user u
+		LEFT JOIN 
+			tb_ucpaas_user su 
+		ON 
+			u.super_sid = su.sid
+		WHERE
+			u.sid = app.sid
+		AND app.`status` IN (1, 2, 4, 6)
+		AND app.industry != 0
+		
+		<if test="text != null">
+			AND (
+				app.app_sid LIKE concat('%', #{text}, '%')
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND app.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND app.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND app.`status` = #{status}
+		</if>
+		ORDER BY
+			app.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询应用 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_application app,
+			tb_ucpaas_user u
+		WHERE
+			u.sid = app.sid
+		AND app.`status` IN (1, 2, 4, 6)
+		AND app.industry != 0
+		
+		<if test="text != null">
+			AND (
+				app.app_sid LIKE concat('%', #{text}, '%')
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND app.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND app.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND app.`status` = #{status}
+		</if>
+	</select>
+	
+	<!-- 获取应用 -->
+	<select id="getAppAudit" resultType="map">
+		SELECT
+			app.app_sid,
+			app.app_name,
+			u.sid,
+			u.email,
+			date_format(
+				app.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			audit_date,
+			app.`status`,
+			w.white_address,
+			app.is_ivr,
+			app.is_tts,
+			app.is_show_nbr,
+			app.industry,
+			app.sms_msg_nbr,
+			app.app_kind,
+			app.industry,
+			app.update_date,
+			app.is_voicecodenbr_status,
+			app.is_officernbr_status,
+			app.call_fr,
+			app.ck_key,
+			app.ck_callback_url,
+			app.ck_enddate,
+			app.ck_way,
+			app.ck_num,
+			app.route_area,
+			su.username
+		FROM
+			tb_ucpaas_application app
+		JOIN 
+			tb_ucpaas_user u 
+		ON 
+			u.sid = app.sid
+		LEFT JOIN
+			tb_srv_white_list w 
+		ON 
+			w.app_sid = app.app_sid
+		left join
+			tb_ucpaas_user su
+		on
+			su.sid = u.super_sid 
+		WHERE
+			app.app_sid = #{app_sid}
+		LIMIT 1
+	</select>
+	
+	<!-- 获取回调地址 -->
+	<select id="getCallback" resultType="map">
+		SELECT
+			p.param_value AS call_type_name,
+			c.call_address
+		FROM
+			tb_srv_callback c
+		LEFT JOIN tb_ucpaas_params p ON p.param_key = c.call_type
+		AND p.param_type = 'callbackfun'
+		WHERE
+			c.app_sid = #{app_sid}
+	</select>
+	
+	<!-- 审核 -->
+	<update id="audit">
+		UPDATE tb_ucpaas_application app
+		SET app.`status` = #{status}
+		,app.update_date = #{update_date}
+		,app.route_area = #{route_area}
+		<if test="sms_msg_nbr != null">
+			, app.sms_msg_nbr = #{sms_msg_nbr}
+		</if>
+		<!-- 设置审核时间 -->
+		<if test="audit_date != null">
+			,audit_date = #{audit_date}
+		</if>
+		WHERE
+			app.app_sid = #{app_sid}
+	</update>
+	
+</mapper> 

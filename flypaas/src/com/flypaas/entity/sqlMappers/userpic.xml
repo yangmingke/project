@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.UserPic">
+	
+	 
+	 <resultMap id="userPicResult" type="com.flypaas.entity.UserPic">
+		<id property="sid" column="sid" />
+		<result property="idNbr" column="id_nbr" />
+		<result property="imgUrl" column="img_url" />
+		<result property="idType" column="id_type" />
+		<result property="idOrder" column="id_order" />
+		<result property="idDesc" column="id_desc" />
+		<result property="createDate" column="create_date" />
+		<result property="updateDate" column="update_date" />
+		<result property="status" column="status" />
+	</resultMap>
+	
+	<select id="isExist" parameterType="java.lang.String" resultType="int">
+		select count(sid) from tb_ucpaas_user_pic where sid = #{sid} and status='1'
+	</select>
+	
+	<insert id="addUserPic" parameterType="userPic">
+		insert into tb_ucpaas_user_pic(sid,id_nbr,img_url,id_type,id_desc,create_date,update_date) values(#{sid},#{idNbr},#{imgUrl},#{idType},#{idDesc},#{createDate},#{updateDate})
+	</insert>
+	
+	<select id="getUserPic" parameterType="java.lang.String" resultMap="userPicResult">
+		select * from tb_ucpaas_user_pic where sid=#{sid} <!-- and status='1' -->
+	</select>
+	
+	<update id="updateUserPic" parameterType="userPic">
+		update tb_ucpaas_user_pic 
+		<set>
+			<if test="idNbr!=null">
+			id_nbr = #{idNbr},
+			</if>
+			<if test="imgUrl!=null">
+			img_url = #{imgUrl},
+			</if>
+			<if test="idType!=null">
+			id_type = #{idType},
+			</if>
+			<if test="idDesc!=null">
+			id_desc = #{idDesc},
+			</if>
+			<if test="updateDate!=null">
+			update_date = #{updateDate}
+			</if>
+		</set>
+		where sid=#{sid} 
+		<if test="idType>2">
+		 and id_type=#{idType}
+		</if>
+	</update>
+	
+	<delete id="deleteUserPic" parameterType="java.lang.String">
+		delete from tb_ucpaas_user_pic where sid=#{sid}
+	</delete>
+	<select id="idNbrEnable" parameterType="java.lang.String" resultType="int">
+		select count(0) from tb_ucpaas_user_pic where id_nbr=#{idNbr}
+	</select>
+	
+	<select id="idNbrAndSidEnable" parameterType="userPic" resultType="int">
+		select count(0) from tb_ucpaas_user_pic where id_nbr=#{idNbr} and sid!=#{sid}
+	</select>
+	
+	<select id="getUserPicBySidAndType" parameterType="map" resultMap="userPicResult">
+		select * from tb_ucpaas_user_pic where sid=#{sid} and id_type=#{type}
+	</select>
+</mapper>

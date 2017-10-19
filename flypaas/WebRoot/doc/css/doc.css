@@ -1,0 +1,173 @@
+@charset "utf-8";
+/* CSS Document */
+
+/*中间文档主体部分*/
+.middle { padding-bottom: 30px; width: 100%;}
+.mid_box { background: #f8f8f8; }
+.display_wrapper { width: 980px; margin: 0 auto;/* overflow: hidden;*/}
+.display_tit { width: 978px; border-bottom:1px #EEEEEE solid; height: 53px; }
+.display_tit h1 { color: #000; font-size: 24px; height: 23px; width: 175px; border-bottom: 1px #53B231 solid; margin-bottom: -1px; padding: 15px 0px 15px 20px;}
+.display_tit h1 span { background: url("../images/icon_bg.png") 0px -34px no-repeat; padding-left: 45px; height: 26px;line-height: 26px; display: inline-block;}
+.display_tit h1 span.net_voice { background: url("../images/icon_bg.png") 0px -245px no-repeat; height: 31px;}
+.display_tit h1 span.unit_adv { background: url("../images/icon_bg.png") 0px -389px no-repeat; height: 28px;}
+.display_tit h1 span.doc,.mid_tit h1 span.doc { background: url("../images/icon_bg.png") 0px -132px no-repeat; padding-left: 45px; height: 28px;line-height: 28px; display: inline-block;}
+.display_tit h1 span.platform { background: url("../images/icon_bg.png") 0px -389px no-repeat; height: 27px;}
+
+/*文档中心*/
+.middle .doc_banner { background: url("../images/doc_bg2.png") center center repeat; height: 378px; width: 100%;}
+.document_index { padding: 30px 0px 0px 0px;}
+.index_ctn h3 { font-size: 16px; color: #585858; margin-bottom: 15px; padding-left: 30px;}
+.index_ctn ul { margin-bottom: 15px; border-bottom: 1px #efefef solid; overflow: hidden; padding: 0px 30px 10px 30px;}
+.index_ctn ul li { float: left; display: inline; width: 220px; margin-bottom: 10px; background: url("../images/dot.gif") 0px 10px no-repeat; padding-left: 8px; font-size: 14px;}
+/*.index_ctn ul li.sub_index_link { width: 100%;}
+.index_ctn ul li.sub_index { border-top: 1px #eaeaea dashed; background: none; width: 100%; color: #585858; font-size: 14px; padding-top: 10px; margin-top: 10px;}*/
+.index_ctn ul li a { color: #53b231;}
+.index_ctn ul li a:hover { text-decoration: underline;}
+.banner_wrapper { width: 980px; margin: 0 auto; position:relative; }
+.banner_wrapper img { position:absolute; left:0px; top:0px;}
+.display_box { width: 978px; border: 1px #eeeeee solid; background: #fff; overflow: hidden; margin: 20px auto 30px auto;}
+
+
+/*表格样式*/
+table { border-bottom: 1px #e0eefe solid;}
+table th { height:40px; line-height:40px; color:#fff; background:#90b6e1; border-bottom:1px #fff solid; text-align:center; font-weight: normal;}
+table td { text-align:center; height:40px; line-height:40px; color:#595959;}
+table tr.even { background:#eef6ff}
+table tr.odd { background:#fff;}
+table td.table_tit { background: #90b6e1; border-bottom: 2px #d3e2f3 solid; color: #fff;}
+
+/*文档*/
+.pathbox { /*background: url("../images/path.gif") left center no-repeat; padding-left: 18px;*/ width: 738px; margin: 5px 0px 20px 0px;}
+.pathbox p { color: #666;}
+.pathbox p a { color: #53b231;}
+
+.doc_box { background: url("../images/doc_bg.png") center center repeat; border-top: 1px #e8e8e8 solid; }
+.doc_box a { color: #666;}
+.doc_box a:hover { text-decoration: underline; color: #53B231;}
+.doc_box .display_wrapper { padding: 30px 0px;}
+
+.doc_menu { width: 192px; float: left; display: inline; padding-right: 20px;}
+.doc_menu .menu_tit {  background: none; border: none; height: 25px; line-height: 25px; margin-bottom: 10px;}
+.doc_menu .menu_tit h1 { padding-left: 8px;}
+.menu_tit h1 span.home {  background: url("../images/icon_bg.png") 0 -572px no-repeat; height: 18px; padding-left: 30px; font-size: 15px;}
+.doc_menu ul li {font-size: 14px; color: #666; height: auto; background:none; border-bottom: 1px dashed #E1E1E1; line-height: 41px; font-family: "微软雅黑","Microsoft Yahei","Hiragino Sans GB",tahoma,arial,"宋体" !important;}
+.doc_menu ul li.active,.doc_menu ul li:hover { }
+.doc_menu ul li span { padding-left: 10px; width: 192px; display:inline-block; cursor: pointer;}
+.doc_menu ul li span:hover { text-decoration: underline; color: #53B231;}
+.doc_menu ul li span i { float: right; display: inline; background: url("../images/arrow_toggle1.png") 0px 0px no-repeat; width: 7px; height: 5px; margin-top: 20px; margin-right: 15px;}
+.doc_menu ul li.active span i,.doc_menu ul li:hover span i{ float: right; display: inline; background: url("../images/arrow_toggle1.png") 0px -31px no-repeat; width: 7px; height: 5px;}
+.doc_menu ul li dl { width: 175px; padding-left: 25px; border-top: none; }
+.doc_menu ul li dl dd { line-height: 27px; padding-left: 5px;}
+.doc_menu ul li dl dd.parent { margin-left: -20px;}
+.doc_menu ul li dl dd a.active { margin-left: -30px; padding-left: 30px; background: #fff; display: inline-block;}
+.doc_menu ul li dl dd.parent a em { font-style: normal; background: url("../images/arrow_toggle1.png") -8px 3px no-repeat; padding-left: 20px;}
+.doc_menu ul li dl dd.parent a.active em { background: url("../images/arrow_toggle1.png") -8px -15px #fff no-repeat; width: 183px; display: inline-block; }
+.doc_menu ul li dl dd a { height: auto; width: 183px;}
+.doc_menu ul li dl dd a:hover { text-decoration: underline;}
+.doc_menu ul li dl.child { border:none; width: 193px; line-height: 30px; padding-left: 5px; display:none;}
+.doc_menu ul li dl.child dd a { background:none; padding-left: 10px;}
+.doc_menu ul li dl.child dd { background: url("../images/dot_line1.gif") left -5px no-repeat;}
+.doc_menu ul li dl.child dd.last { background:url("../images/dot_line2.gif") left -5px no-repeat;}
+.doc_menu ul li dl dd.parent dl dd a.active { margin-left: 0px;}
+.doc_menu ul li dl dd dl.child dd a.active { font-weight: bold;}
+
+.doc_txt { font-size: 13px; float: right; display: inline; width: 743px; border: none; background: none; margin-left: 25px;}
+.doc_txt a { color:#53B231; padding: 0px 2px;text-decoration: underline; }
+/*.doc_txt a:hover { text-decoration: underline;}*/
+.doc_txt .display_tit {width: 748px; height: 38px;}
+.doc_txt .display_tit h1 { font-size: 20px; color: #666; width: 230px; padding: 0 0 15px 0px;}
+.display_tit h1 span.intro { background: url("../images/icon_bg.png") 0 -598px no-repeat; height: 28px;}
+
+.doc_txt .display_ctn { padding: 30px 0 30px 5px; color: #585858}
+.doc_txt .display_ctn p { line-height: 25px; margin-bottom: 15px;}
+.doc_txt h2 { font-weight: bold; font-size: 15px; margin-bottom: 15px; color:#585858; background:#f3f3f3; padding:5px; margin-left:-5px; }
+/*.doc_home h2 { color:#53B231 }*/
+.doc_home p.link { margin: 20px 0px 40px 0px;}
+.doc_home p.link a { display: inline-block; /*width: 75px;*/ height: 75px; text-align: center; color:#53B231; margin-right: 50px; }
+
+.doc_txt strong { font-size: 16px; font-weight: bold; margin-bottom: 10px; display: block;}
+.doc_txt h3 { font-size: 15px; font-weight: bold; border-bottom: 1px dotted #d8d8d8; /*padding-left: 5px;*/ padding-bottom: 5px; margin-bottom: 10px; }
+.doc_txt h3 a { float: right; display: inline; font-size: 13px; font-weight: normal; margin-left: 25px;}
+.doc_txt b { font-weight: bold; font-size: 14px; margin-bottom: 10px; display: inline-block;}
+.doc_txt p.code { font-size: 13px; background:#FFF5B3; border-bottom: 4px #f4f4f4 solid; padding: 5px 5px 5px 0px; font-family: Times New Roman;}
+.doc_txt p.code1 { font-size: 13px;  background:#fff; border: 1px #eee solid; border-bottom: 4px #f4f4f4 solid; padding: 5px 5px 5px 0px; font-family: Times New Roman;}
+.doc_txt p.code span,.doc_txt p.code1 span { display: block; text-indent: 0em; margin-left: 10px;word-wrap:normal;word-break:break-all; }
+.doc_txt p.explain { color: #777; font-size: 13px; margin-bottom: 5px; font-family: arial;}
+.doc_txt p span.key_label { /*color: #D30000;*/ padding-right: 5px;}
+.doc_txt .display_ctn .span_img { float:left; display:inline; width: 80px; height: 120px; margin-top: 5px;}
+.doc_txt ol { margin:0px 10px 15px 10px; }
+.doc_txt ol li { margin-bottom:5px;}
+
+.doc_txt table { border:1px #d8d8d8 solid; margin-bottom: 10px;}
+.doc_txt table tr.even { background: #FCFCFC;}
+.doc_txt table tr.odd { background: #F8F8F8;}
+.doc_txt table th { background: #EDEDED; color: #585858; border-top: 1px #fff solid; border-bottom: 1px #d8d8d8 solid; border-right: 1px #d8d8d8 solid}
+.doc_txt table td { border-bottom: 1px #d8d8d8 solid; border-right: 1px #d8d8d8 solid; padding: 10px 0px; height: auto; line-height: 20px;}
+.doc_txt table span { display: block; line-height: 25px; text-align: left;}
+.doc_txt .hr { margin-bottom: 20px;}
+.doc_txt pre { background: #f3f3f3; border: 1px #e8e8e8 solid; padding: 0px 20px; margin-bottom: 20px; padding: 20px\0; word-break:break-all; white-space: pre-wrap;}
+.doc_txt pre code,.doc_txt pre code.code_fn span.fn_cmt { font-style: italic; color: #aaa; }
+.doc_txt pre code.code_fn { font-style: normal; color: #585858;}
+.doc_txt pre code .key_label { color: #333; font-style: normal; font-family:微软雅黑; display: inline-block; margin-top: 10px; }
+
+/*文档新手引导*/
+.doc_guide img { width:80%; border:10px #f2f2f2 solid; padding:20px 20px; margin:20px 0px 20px 30px; display:inline-block; text-align:center;}
+.doc_guide img.step_img { border:none; width:auto; margin:20px 0px 20px 0px; padding:0px;}
+
+/*文档右侧目录样式*/
+.doc_aside { border:1px #d8d8d8 solid; padding:10px 0px 10px 20px; width:200px; /*position:fixed; top:20%; z-index:9;*/ background:#fff; line-height:25px; font-size:13px;}
+.doc_aside h4 { font-size:15px;}
+.doc_aside h4 a { font-size:13px; color:#53b231; padding:0px 3px; }
+.doc_aside ul,.doc_aside ul ul { margin:8px 0px;}
+.doc_aside ul li a { color:#53b231; font-weight:bold;}
+.doc_aside ul li a:hover { text-decoration:underline; }
+.doc_aside ul li ul li a { font-weight:normal; padding-left:18px;} 
+.doc_aside ul li ul li ul li a { padding-left:42px;}
+
+.aside_fold { border:1px #d8d8d8 solid; background:#fff; padding:3px; width:20px; word-wrap:normal; word-break:break-all; text-align:center;position:fixed; top:20%; z-index:9; cursor:pointer; right:0px;}
+
+#go_top { display:inline-block; background:url("../images/go_top.png") center center no-repeat; width:41px; height:41px; position:fixed; bottom:20px; right:190px; }
+
+/*文档中心*/
+.download_box { background:#fff;}
+
+/*常见问题*/
+.doc_txt h2.question { cursor:pointer;}
+.doc_faq strong { color:#53b231; font-size:18px; background:url("../images/faq_icon.png") 0 -26px no-repeat; padding-left:30px;}
+.doc_faq strong.faq2 { background:url("../images/faq_icon.png") 0 3px no-repeat; margin:30px 0px 15px 0px;}
+.doc_faq li img { width:80%; border:10px #f2f2f2 solid; padding:20px 20px; margin:20px 0px 20px 0px; display:inline-block; text-align:center;}
+.doc_faq h2.question { cursor:pointer; font-size:14px;}
+.doc_faq p.answer { margin-bottom:30px; display:none;}
+.doc_faq b { margin-bottom:0px;}
+.doc_faq ol { margin-left:0px; display:none;}
+.doc_faq ol li { line-height:25px; margin-left:25px;}
+
+
+/*文档——开发者引导*/
+.doc_tab { width:736px; border:1px #dfdfdf solid; overflow:hidden; background:#f6f6f6; margin-bottom: 40px;}
+.doc_tab .tab_tit { margin-bottom:0px;}
+.doc_tab .tab_tit li { width:183px; float:left; display:inline; border-top:3px #f6f6f6 solid; border-bottom:1px #eee solid; border-right:1px #eee solid; height:40px; line-height:40px; text-align:center; cursor:pointer;}
+.doc_tab .tab_tit li.active { border-top:3px #53B231 solid; background:#fff; margin-bottom:-1px; height:41px;}
+.doc_tab .tab_ctn { background:#fff; overflow:hidden; padding:60px 20px 80px 20px;}
+.doc_tab .tab_ctn ul li { float: left; display:inline; width:100px; height:100px; text-align:center; margin:0px 15px;}
+.doc_tab .tab_ctn ul li a { text-decoration:none; display:block; width:80px; margin:0px 10px 0px 10px; color: #666;}
+.doc_tab .tab_ctn ul li img { height: 80px; margin-bottom: 10px; }
+.doc_tab .tab_ctn ul li a:hover { color: #53b231; text-decoration: underline;}
+.doc_txt .display_ctn .step { position: relative; background:#f6f6f6;}
+.doc_txt .display_ctn .step img { margin: 20px 10px;}
+.doc_txt .display_ctn .step ul { position: absolute; top: 40px;}
+.doc_txt .display_ctn .step ul li { margin-bottom: 68px; color: #999; overflow: hidden; font-style: italic;}
+.doc_txt .display_ctn .step ul li a { color: #222;}
+.doc_txt .display_ctn .step ul li a:hover { color: #53b231}
+.doc_txt .display_ctn .step ul li dl { padding: 0px; float: left; display: inline; margin-left: 10px; width: 170px;}
+.doc_txt .display_ctn .step ul li dl dd { font-size: 13px; margin-bottom: 12px;}
+.doc_txt .display_ctn .rest_step ul { top: 35px;}
+.doc_txt .display_ctn .rest_step ul li { margin-bottom: 26px;}
+.doc_txt .display_ctn .service_step { padding: 20px;}
+.doc_txt .display_ctn .service_step ul { position: static;}
+.doc_txt .display_ctn .service_step ul li { margin-bottom: 0px;}
+
+/*显号规则说明*/
+.doc_txt .shownb_ctn table { margin-bottom:40px;}
+.doc_txt .shownb_ctn ol li { margin-bottom:10px;}
+.doc_txt .shownb_ctn img { width:90%; border:10px #f2f2f2 solid; padding:20px 20px; margin:20px 0px 20px 5px; display:inline-block; text-align:center;}

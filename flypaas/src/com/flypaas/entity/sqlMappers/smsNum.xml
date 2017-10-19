@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="smsNum">
+	<select id="smsNumServiceImpl_count" resultType="map">
+		select  count(*) as totalCount from tb_flypaas_application 
+		where sid=#{sid} and sms_msg_nbr IS NOT NULL and app_type='1' and status!='3'
+		<if test="null != text">
+			and app_name LIKE concat('%',#{text}, '%')
+		</if>
+	</select>
+	<select id="smsNumServiceImpl_query" resultType="map">
+		select app_sid,app_name,CONCAT(sms_msg_nbr,'') as sms_msg_nbr ,status,create_date from tb_flypaas_application 
+		where sid=#{sid} and sms_msg_nbr IS NOT NULL and app_type='1' and status!='3'
+		<if test="null != text">
+			and app_name LIKE concat('%',#{text}, '%')
+		</if>
+		order by update_date desc
+		${limit}
+	</select>
+</mapper>

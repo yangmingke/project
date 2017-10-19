@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.AcctPackageRel">
+	
+	 
+	 <resultMap id="acctPackageRelResult" type="com.flypaas.entity.AcctPackageRel">
+		<id property="id" column="id" />
+		<result property="sid" column="sid" />
+		<result property="packageId" column="package_id" />
+		<result property="createDate" column="create_date" />
+		<result property="updateDate" column="update_date" />
+	</resultMap>
+	
+	<select id="getAcctPackageRel"  parameterType="java.lang.String"  resultMap="acctPackageRelResult">
+		select * from tb_bill_acct_package_rel where sid=#{sid}
+	</select>
+	<update id="updateAcctPackage" parameterType="acctpackagerel">
+		update tb_bill_acct_package_rel set package_id=#{packageId} ,update_date=#{updateDate} where sid=#{sid}
+	</update>
+	<insert id="addDefaultPck" parameterType="acctpackagerel">
+		insert into tb_bill_acct_package_rel(sid,package_id,create_date,update_date) values(#{sid},#{packageId},#{createDate},#{updateDate});
+	</insert>
+	<insert id="insertTempPck" parameterType="map">
+		insert into tb_bill_acct_temp_package_rel(sid,old_package_id,package_id,create_date,update_date,status,type) values(#{sid},#{oldPckId},#{packageId},#{createDate},#{updateDate},#{status},#{type});
+	</insert>
+	<update id="updateTempPck" parameterType="map">
+		update tb_bill_acct_temp_package_rel
+		<set>
+			<if test="packageId!=null">
+				package_id=#{packageId},
+			</if>
+			<if test="updateDate!=null">
+				update_date=#{updateDate},
+			</if>
+			<if test="oldPckId!=0">
+				old_package_id=#{oldPckId}
+			</if>
+		</set>
+		where id=#{id} and sid=#{sid}
+	</update>
+	<select id="getTempPckBySid" parameterType="map" resultType="map">
+		select * from tb_bill_acct_temp_package_rel 
+		where sid=#{sid} and status=#{status} and type=#{type} limit 1
+	</select>
+</mapper>

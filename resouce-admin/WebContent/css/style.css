@@ -1,0 +1,78 @@
+@charset "utf-8";
+/* CSS Document */
+
+* { margin: 0px; padding: 0px; outline:none;}
+body { font-family: 微软雅黑; font-size: 12px; line-height: 1.5; background: url("../images/body_bg.png") 0 0 #fbfbfb repeat-y;}
+h1,h2,h3,h4,h5,h6,b{ font-weight: normal;}
+ul,ol,li { list-style: none;}
+a { color: #333; text-decoration: none; outline: none; cursor: pointer;}
+img { border: none; vertical-align: middle;}
+input { vertical-align: middle; outline: none;}
+.hr { height:1px; border:none; border-top:1px #c7c7c7 solid;}
+.clear { clear: both;}
+.blue { color: #2b8fff;}
+.green { color: #67b83d;}
+.green1 { color: #76b343;}
+.orange { color: #ef920c;}
+.red { color: #ce1414;}
+.money { color: #f49500}
+span.tips { color: #a3a3a3; font-size: 12px;}
+
+
+/*消息页面*/
+.msg_box { /*padding:10px 0px;*/ border:1px #ccc solid; margin-bottom: 20px; overflow: hidden;}
+.msg_list { padding: 10px 20px; background: #f3f4f5; overflow:hidden;}
+.msg_list.read{ background: #fff; color: #888 }
+/*.msg_list:nth-child(2n) { background: #f9f9f9;}*/
+.msg_box h1 { font-size: 14px; font-weight: bold; color: #333; border-bottom: 1px #67b83d solid; padding-bottom: 5px; margin-bottom:10px;}
+.msg_box p { margin-bottom: 10px; line-height: 24px;}
+.msg_box p.txt { font-size: 12px; color: #333;}
+.msg_box p.date { font-size: 14px; color: #888; margin-bottom: 0px;}
+.msg_box p a.del { float: right; display: inline; background: url("../images/icon.png") 0 0 no-repeat; width: 16px; height: 18px;}
+.msg_list.read h1,.msg_list.read p,.msg_list.read p a { color: #888 }
+
+/*分页*/
+.page_box { float: right; display: inline;}
+.page_box ul li { font-size: 14px; float: left; display: inline; margin: 0px 5px;}
+.page_box ul li a { color: #333;}
+.page_box ul li.active a { color: #60abff}
+
+/*说明内容*/
+.state_box { padding: 20px; margin-bottom: 20px; border: 1px #ccc solid; background: #f3f4f5; font-size: 12px; color: #666;}
+.state_box h1 { font-weight: bold; font-size: 12px; margin-bottom: 10px;}
+.state_box p { line-height: 25px;}
+
+
+/*弹层*/
+.float_body { overflow: hidden;}
+.background_box { background: #000; opacity: 0.4; filter:alpha(opacity=40); height: 100%; width: 100%; position: fixed; top: 0px; left: 0px; z-index: 11; display: none;}
+.float_box { border: 6px #6b6b6b solid; border-radius: 6px;-moz-border-radius:6px;-webkit-border-radius:6px;-o-borer-radius:6px; z-index: 111; position: absolute; background: #fff; display: none;}
+.float_box1 { border: 6px #6b6b6b solid; border-radius: 6px;-moz-border-radius:6px;-webkit-border-radius:6px;-o-borer-radius:6px; z-index: 111; position: absolute; background: #fff; display: none;}
+.float_box0 { border: 6px #6b6b6b solid; border-radius: 6px;-moz-border-radius:6px;-webkit-border-radius:6px;-o-borer-radius:6px; z-index: 111; position: absolute; background: #fff; display: none;}
+.float_tit { height: 40px; line-height: 40px; background: #f3f4f5; font-weight: bold;}
+.float_tit h1 { margin-left: 20px; font-size: 14px; color: #4c4c4c; font-weight: bold;}
+.float_ctn { margin: 30px 20px 10px 20px;}
+.float_ctn p { line-height: 44px; margin-bottom: 12px; font-size: 14px; color: #4c4c4c;}
+.float_ctn input[type='checkbox'] { vertical-align: middle; margin-right: 5px;}
+.float_btn { border-top: 1px #e8e8e8 solid; padding-top: 10px; text-align: right; width: 100%;} 
+.confirm_btn { margin-left: 15px;}
+.float_btn .disabled_btn { border: 1px #ccc solid; background: #fff; width: 120px; height: 32px; line-height: 16px; text-align: center; color: #383838; margin-left: 15px; cursor: default;}
+
+.float_field { margin-bottom: 20px;}
+.float_field dl dt { float: left; display: inline; margin-right: 17px; font-size: 14px; color: #4c4c4c;}
+.float_field dl dd { margin-bottom: 10px; font-size: 14px; color: #4c4c4c; }
+.float_field dl dd span.error { color: #ff0000; font-size: 13px; display: inline-block; margin-left: 5px;}
+.float_field dl dd span.success { color: #76b343; font-size: 13px; display: inline-block; margin-left: 5px;}
+.float_field dl dd span.tips { color: #a3a3a3; font-size: 12px;}
+.float_field dl dd span.txt { color: #76b343; font-weight: bold;}
+.float_field dl dd textarea { min-width: 367px;}
+
+/*测试号码-添加号码*/
+.addnum_box { width: 600px;}
+
+/*tab标题*/
+.main_tab_tit { border-bottom: 1px #e8e8e8 solid; overflow: hidden; margin-bottom: 20px;}
+.main_tab_tit ul li { cursor: pointer;font-size: 14px; font-weight: bold; color: #4c4c4c; float: left; display: inline; height: 31px; line-height: 31px; border: 1px #e8e8e8 solid; border-bottom: none; margin-right: 10px; padding: 0px 17px;}
+.main_tab_tit ul li.active { border-top: 2px #76b343 solid; height: 30px; color: #262626;}
+
+

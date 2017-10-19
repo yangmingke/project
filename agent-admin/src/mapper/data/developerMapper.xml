@@ -1,0 +1,353 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-开发者管理 -->
+<mapper namespace="developer">
+
+	<!-- 分页查询开发者 -->
+	<select id="query" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.mobile,
+			u.username,
+			u.realname,
+			date_format(
+				u.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			u.`status`,
+			u.oauth_status,
+			u.is_heavybuyer,
+			u.channel_id,
+			b.enable_flag,
+			u.is_proxy
+		FROM
+			tb_ucpaas_user u
+		LEFT JOIN tb_bill_acct_balance b ON b.sid = u.sid
+		WHERE
+			u.user_type IN (1, 2)
+		AND super_sid = #{superSid}
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+				OR u.mobile LIKE concat(#{text}, '%')
+				OR u.username LIKE concat('%',#{text}, '%')
+				OR u.realname LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.create_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND u.create_date <= #{end_date} ]]>
+		</if>
+		<if test="user_status != null">
+			AND u.`status` = #{user_status}
+		</if>
+		<if test="oauth_status != null">
+			AND u.oauth_status = #{oauth_status}
+		</if>
+		<if test="wallet_status != null">
+			AND b.enable_flag = #{wallet_status}
+		</if>
+		ORDER BY
+			u.create_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询开发者 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_user u
+		LEFT JOIN tb_bill_acct_balance b ON b.sid = u.sid
+		WHERE
+			u.user_type IN (1, 2)
+		AND super_sid = #{superSid}
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+				OR u.mobile LIKE concat(#{text}, '%')
+				OR u.username LIKE concat('%',#{text}, '%')
+				OR u.realname LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		
+		<if test="start_date != null">
+			AND u.create_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND u.create_date <= #{end_date} ]]>
+		</if>
+		<if test="user_status != null">
+			AND u.`status` = #{user_status}
+		</if>
+		<if test="oauth_status != null">
+			AND u.oauth_status = #{oauth_status}
+		</if>
+		<if test="wallet_status != null">
+			AND b.enable_flag = #{wallet_status}
+		</if>
+	</select>
+	
+	<!-- 获取开发者资料 -->
+	<select id="getDeveloper" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.mobile,
+			u.username,
+			u.realname,
+			date_format(
+				u.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			u.`status`,
+			u.realname,
+			u.address,
+			u.revisability,
+			b.acct_id AS wallet_id,
+			u.`status`,
+			u.oauth_status,
+			u.is_heavybuyer,
+			u.channel_id,
+			b.enable_flag,
+			r.money / 1000000 AS remind_money,
+			r.remind_admin,
+			u.is_proxy,
+			u.intern_rate
+		FROM
+			tb_ucpaas_user u
+		LEFT JOIN tb_bill_acct_balance b ON b.sid = u.sid
+		LEFT JOIN tb_srv_remind r ON r.sid = u.sid	AND r.remind_type = 1
+
+		WHERE
+			u.user_type IN (1, 2)
+		AND u.sid = #{sid}
+		LIMIT 1
+	</select>
+	
+	<select id="getUserPic" resultType="map">
+		SELECT
+			p.id_nbr,
+			p.img_url,
+			p.id_type
+		FROM
+			tb_ucpaas_user_pic p
+		WHERE
+			p.sid = #{sid}
+		AND p.`status` = 1
+		ORDER BY
+			p.id_type
+	</select>
+	
+	<!-- 修改开发者之前查重 -->
+	<select id="checkDeveloper" resultType="map">
+		SELECT
+			u.email,
+			u.mobile
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type IN (1,2)
+		AND u.sid != #{sid}
+		AND (u.email = #{email} OR u.mobile = #{mobile})
+	</select>
+	
+	<!-- 修改开发者资料 -->
+	<update id="saveDeveloper">
+		UPDATE tb_ucpaas_user a
+		SET a.email = #{email},
+			a.username = #{username},
+			a.channel_id = #{channel_id},
+			a.mobile = #{mobile},
+			a.intern_rate=#{internRate}
+		WHERE
+			a.user_type IN (1,2)
+	</update>
+	
+	<!-- 是否存在余额提醒 -->
+	<select id="existsRemind" resultType="_boolean">
+		SELECT
+		
+		IF (count(0) > 0, TRUE, FALSE)
+		FROM
+			tb_srv_remind r
+		WHERE
+			r.sid = #{sid}
+		AND r.remind_type = 1
+	</select>
+	
+	<!-- 添加余额提醒 -->
+	<insert id="insertRemind">
+		INSERT INTO tb_srv_remind (
+			method,
+			sid,
+			money,
+			`status`,
+			remind_type,
+			remind_admin
+		)
+		VALUES
+			(1, #{sid}, #{remind_money} * 1000000, 0, 1, #{remind_admin})
+	</insert>
+	
+	<!-- 修改余额提醒 -->
+	<update id="updateRemind">
+		UPDATE tb_srv_remind r
+		SET r.money = #{remind_money} * 1000000,
+			r.remind_admin = #{remind_admin}
+		WHERE
+			r.sid = #{sid}
+		AND r.remind_type = 1
+	</update>
+	
+	<!-- 获取Token和Rest URL -->
+	<select id="getTokenAndRestUrl" resultType="map">
+		SELECT
+			u.sid,
+			u.token,
+			p.param_key AS rest_param_key,
+			p.param_value AS rest_param_value
+		
+		FROM
+			tb_ucpaas_user u
+		LEFT JOIN tb_ucpaas_params p ON p.param_type = 'rest'
+		WHERE
+			u.sid = #{sid}
+		ORDER BY
+			p.param_key
+	</select>
+	
+	<!-- 获取Token变更日志，最近的5条 -->
+	<select id="getTokenLog" resultType="map">
+		SELECT
+			log.token,
+			date_format(
+				log.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date
+		FROM
+			tb_ucpaas_user_log log
+		WHERE
+			log.sid = #{sid}
+		ORDER BY
+			log.create_date DESC
+		LIMIT 0, 5
+	</select>
+	
+	<!-- 修改开发者状态：关闭、重新激活 -->
+	<update id="updateStatus">
+		UPDATE tb_ucpaas_user u
+		SET u.`status` = #{status}
+		WHERE
+			u.user_type IN (1,2)
+		AND u.sid = #{sid}
+	</update>
+	
+	<!-- 删除应用 -->
+	<update id="closeApp">
+		UPDATE tb_ucpaas_application a
+		SET a.`status` = #{app_status}
+		WHERE
+			a.sid = #{sid}
+	</update>
+	
+	<!-- 关闭client -->
+	<update id="closeClient">
+		UPDATE tb_ucpaas_client c
+		SET c.`status` = #{client_status}
+		WHERE
+			c.sid = #{sid}
+	</update>
+	
+	<!-- 注销钱包 -->
+	<update id="closeWallet">
+		UPDATE tb_bill_acct_balance b
+		SET b.enable_flag = #{wallet_status}
+		WHERE
+			b.sid = #{sid}
+	</update>
+	
+	<!-- 获取开发者的所有应用 -->
+	<select id="getAllApp" resultType="map">
+		SELECT
+			a.app_sid
+		FROM
+			tb_ucpaas_application a
+		WHERE
+			a.sid = #{sid}
+	</select>
+	
+	<!-- 获取开发者的所有client -->
+	<select id="getAllClient" resultType="map">
+		SELECT
+			c.client_number
+		FROM
+			tb_ucpaas_client c
+		WHERE
+			c.sid = #{sid}
+	</select>
+	
+	<!-- 安全校正 -->
+	<update id="securityCorrection">
+		UPDATE tb_ucpaas_user u
+		SET u.revisability = 1
+		WHERE
+			u.sid = #{sid}
+	</update>
+	
+	<!-- 获取开发者的email -->
+	<select id="getDeveloperEmail" resultType="string">
+		SELECT
+			u.email
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type IN (1,2)
+		AND u.sid = #{sid}
+	</select>
+	
+	<!-- 设置或取消为大客户 -->
+	<update id="setHeavybuyer">
+		UPDATE tb_ucpaas_user u
+		SET u.is_heavybuyer = #{is_heavybuyer}
+		WHERE
+			u.sid = #{sid}
+	</update>
+	<!-- 设置或取消为代理商 -->
+	<update id="setProxy">
+		UPDATE tb_ucpaas_user u
+		SET u.is_proxy = #{isProxy}
+		WHERE
+			u.sid = #{sid}
+	</update>
+	
+	<!--查询绑定的销售经理是否存在-->
+	<select id="hasSale" resultType="long">
+		SELECT
+			count(*)
+		FROM
+			tb_ucpaas_user_sales t
+		WHERE t.status = 1
+		AND t.sid = #{sid}
+	</select>
+	<!--绑定销售经理   -->
+	<insert id="saveSale">
+		insert into tb_ucpaas_user_sales(sid,sale_name,sale_mobile,status,create_date,update_date)
+		values(#{sid},#{sale_name},#{sale_mobile},1,now(),now())
+	</insert>
+	<!--修改绑定的销售经理信息   -->
+	<update id="updateSale">
+		update tb_ucpaas_user_sales 
+		set sale_name = #{sale_name},
+		sale_mobile = #{sale_mobile},
+		update_date = now()
+		where sid = #{sid}
+	</update>
+</mapper> 

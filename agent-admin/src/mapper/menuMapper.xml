@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 菜单业务 -->
+<mapper namespace="menu">
+	
+	<!-- 查询角色的菜单 -->
+	<select id="getRoleMenu" resultType="map">
+		SELECT
+			m.menu_id,
+			m.menu_name,
+			m.menu_url,
+			m.menu_class,
+			m.parent_id
+		FROM
+			tb_ucpaas_menu m,
+			tb_ucpaas_role_menu rm,
+			tb_ucpaas_role r
+		WHERE
+			m.menu_id = rm.menu_id
+		AND rm.role_id = r.role_id
+		AND m.menu_type = 1
+		AND m.web_id = 1
+		AND m.`status` = 1
+		AND m.`level` = #{level}
+		
+		<if test="parent_id != null">
+			AND m.parent_id LIKE concat('%,', #{parent_id})
+		</if>
+		
+		AND r.`status` = 1
+		AND r.role_id = #{role_id}
+		ORDER BY
+			m.parent_id,
+			m.sort
+	</select>
+	
+</mapper>

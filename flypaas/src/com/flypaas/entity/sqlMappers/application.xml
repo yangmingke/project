@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.Application">
+	 <resultMap id="appResult" type="com.flypaas.entity.Application">
+		<id property="appSid" column="app_sid" />
+		<id property="sid" column="sid" />
+		<id property="appName" column="app_name" />
+		<id property="appKind" column="app_kind" />
+		<id property="isIvr" column="is_ivr" />
+		<id property="isTts" column="is_tts" />
+		<id property="isShowNbr" column="is_show_nbr" />
+		<id property="industry" column="industry" />
+		<id property="status" column="status" />
+		<id property="ivrTestNbr" column="ivr_test_nbr" />
+		<id property="smsMsgNbr" column="sms_msg_nbr" />
+		<id property="createDate" column="create_date" />
+		<id property="updateDate" column="update_date" />
+		<id property="trusteeship" column="trusteeship" />
+		<id property="appType" column="app_type" />
+		<id property="isVoicecodenbrStatus" column="is_voicecodenbr_status" />
+		<id property="isOfficernbrStatus" column="is_officernbr_status" />
+		<id property="callFr" column="call_fr" />
+		<id property="ckKey" column="ck_key" />
+		<id property="ckCallbackUrl" column="ck_callback_url" />
+		<id property="ckEnddate" column="ck_enddate" />
+		<id property="ckWay" column="ck_way" />
+		<id property="ckNum" column="ck_num" />
+		<id property="balance" column="balance" />
+		<id property="blcStatus" column="blcStatus" />
+		<id property="fileTimeout" column="file_timeout" />
+		<id property="oauthFileUrl" column="oauth_file_url" />
+		<id property="oauthAppId" column="oauth_app_id" />
+	</resultMap>
+	
+	<sql id="getApp">
+		select app_sid,app_name,app_kind,status,create_date 
+		from tb_ucpaas_application
+	</sql>
+	
+	<!-- add -->
+	<insert id="addApp" parameterType="app">
+	 <![CDATA[
+		insert into
+		tb_ucpaas_application(app_sid,sid,app_kind,app_name,industry,is_ivr,is_tts,is_show_nbr,
+		status,create_date,update_date,app_type,sms_msg_nbr,audit_date,is_voicecodenbr_status,
+		is_officernbr_status,call_fr,ck_key,ck_callback_url,ck_enddate,ck_way,ck_num,brand,oauth_file_url,oauth_app_id) 
+		values(#{appSid},#{sid},#{appKind},#{appName},#{industry},#{isIvr},#{isTts},#{isShowNbr}
+		,#{status},#{createDate},#{updateDate},#{appType},#{smsMsgNbr},#{auditDate},#{isVoicecodenbrStatus}
+		,#{isOfficernbrStatus},#{callFr},#{ckKey},#{ckCallbackUrl},#{ckEnddate},#{ckWay},#{ckNum},#{brand},#{oauthFileUrl},#{oauthAppId})
+		]]>
+ 	</insert>
+ 	
+ 	<!--update  -->
+	<update id="updateApp" parameterType="app">
+		update tb_ucpaas_application 
+		<set>
+			<if test="appKind!=null">
+				app_kind = #{appKind},
+			</if>
+			<if test="isIvr!=null">
+				is_ivr = #{isIvr},
+			</if>
+			<if test="isTts!=null">
+				is_tts = #{isTts},
+			</if>
+			<if test="isShowNbr!=null">
+				is_show_nbr = #{isShowNbr},
+			</if>
+			<if test="isVoicecodenbrStatus!=null">
+				is_voicecodenbr_status = #{isVoicecodenbrStatus},
+			</if>
+			<if test="isOfficernbrStatus!=null">
+				is_officernbr_status = #{isOfficernbrStatus},
+			</if>
+			<if test="industry!=null and industry!='0'">
+				industry = #{industry},
+			</if>
+			<if test="status!=null">
+				status = #{status},
+			</if>
+			<if test="smsMsgNbr!=null">
+				sms_msg_nbr = #{smsMsgNbr},
+			</if>
+			<if test="updateDate!=null">
+				update_date = #{updateDate},
+			</if>
+			<if test="callFr!=null">
+				call_fr=#{callFr},
+			</if>
+			<if test="ckKey!=null">
+				ck_key=#{ckKey},
+			</if>
+			<if test="ckCallbackUrl!=null">
+				ck_callback_url=#{ckCallbackUrl},
+			</if>
+			<if test="ckEnddate!=null">
+				ck_enddate=#{ckEnddate},
+			</if>
+			<if test="ckWay!=null">
+				ck_way=#{ckWay},
+			</if>
+			<if test="ckNum!=null">
+				ck_num = #{ckNum},
+			</if>
+			<if test="fileTimeout!=null">
+				file_timeout = #{fileTimeout},
+			</if>
+			<if test="oauthFileUrl!=null">
+				oauth_file_url = #{oauthFileUrl},
+			</if>
+			<if test="oauthAppId!=null">
+				oauth_app_id = #{oauthAppId},
+			</if>
+		</set>
+		where app_sid=#{appSid} and sid=#{sid}
+ 	</update>
+ 	
+	<!-- 根据sid获取开发者的应用列表  -->
+	<select id="getAppBySid"  parameterType="java.lang.String" resultMap="appResult">
+		 select app.app_sid,app.app_name,app.app_kind,app.status,app.create_date 
+		 from tb_ucpaas_application app
+		 where  app.sid=#{sid} and app.status!='3' and app.app_type='1' ORDER BY app.create_date DESC
+	</select>
+	
+	<select id="getAppsNotContainsTestAppBySid" parameterType="java.lang.String" resultMap="appResult">
+		<include refid="getApp"/>
+		  where sid=#{sid} and app_type!='0' ORDER BY create_date DESC
+	</select>
+	
+	<!-- 根据sid获取开发者的应用列表(包括测试应用)  -->
+	<select id="getAllAppBySid"  parameterType="java.lang.String" resultMap="appResult">
+		 <include refid="getApp"/>
+		  where sid=#{sid} and status!='3' ORDER BY create_date DESC
+	</select>
+	
+	<!-- 根据应用其他条件模糊查询应用  -->
+	<select id="getAppByOther"  parameterType="app" resultType="map">
+		SELECT
+		app.app_sid,
+		app.app_name,
+		app.app_kind,
+		app.status,
+		app.create_date,
+		ifnull(blc.balance,0)/1000000 as balance,
+		blc.status as blcStatus,
+		client.cli_num
+		FROM
+		tb_ucpaas_application app LEFT JOIN
+		tb_ucpaas_app_balance blc
+		ON (app.app_sid=blc.app_sid)
+		LEFT JOIN (SELECT COUNT(*) cli_num,app_sid FROM tb_ucpaas_client GROUP BY app_sid) client
+		ON app.app_sid = client.app_sid 
+		where  app.sid=#{sid} and app.status!='3' and app.app_type='1'
+		<if test="appName!=null and appName!=''">
+			and app.app_name like concat('%',#{appName},'%')
+		</if>
+		ORDER BY create_date DESC ${limit}
+	</select>
+	
+	<select id="getAppByOtherCount" parameterType="map" resultType="map">
+		SELECT 
+		count(0) as totalCount
+		FROM
+		tb_ucpaas_application app LEFT JOIN
+		tb_ucpaas_app_balance blc
+		ON (app.app_sid=blc.app_sid) 
+		where  app.sid=#{sid} and app.status!='3' and app.app_type='1'
+		<if test="appName!=null and appName!=''">
+			and app.app_name like concat('%',#{appName},'%')
+		</if>
+	</select>
+	
+	<select id="appNameExist"  parameterType="app" resultType="int">
+		select count(0) from tb_ucpaas_application where app_name=#{appName} and sid=#{sid} and status!='3'
+	</select>
+	
+	<select id="getAppById"  parameterType="java.lang.String" resultMap="appResult">
+		select p.*,s.param_value as paramValue,IFNULL(b.balance,0)/1000000 as balance from tb_ucpaas_application p 
+		LEFT JOIN tb_ucpaas_params s on(p.industry=s.param_key and s.param_type='industry') 
+		LEFT JOIN tb_ucpaas_app_balance b on(p.app_sid=b.app_sid)
+		where p.app_sid=#{id} and p.app_type!='0'
+	</select>
+	
+	<select id="getTestApp" parameterType="java.lang.String" resultMap="appResult">
+		select app_sid from tb_ucpaas_application where sid=#{sid} and app_type='0' limit 1
+	</select>
+	
+	<select id="getOnlineApp" parameterType="java.lang.String" resultType="int">
+		select count(sid) from tb_ucpaas_application where sid=#{sid} and status='1' and app_type='1'
+	</select>
+	
+	<select id="getOuthedApp" parameterType="java.lang.String" resultMap="appResult">
+		select app_sid,app_name,sms_msg_nbr,status from tb_ucpaas_application where sid=#{sid} and sms_msg_nbr IS NOT NULL and app_type='1' and status!='3';
+	</select>
+	
+	<select id="getActiveCount"  parameterType="map" resultType="map">
+		SELECT IFNULL(SUM(active_client_count),0) as active_client_num from statistics.tb_rt_client_reg_active WHERE type='day' and sid=#{sid} and statistics_date=DATE_SUB(CURDATE(),INTERVAL 1 DAY); 
+	</select>
+	<select id="getAppBySidAppSid" parameterType="app" resultMap="appResult">
+		select * from tb_ucpaas_application where app_sid=#{appSid} and sid=#{sid}  and app_type='1' and status!='3';
+	</select>
+	
+	<select id="getSessionPacketLoss" resultType="Map" parameterType="Map" >
+	SELECT *
+	FROM t_rs_sess_snapshoot_${dateTime}
+	WHERE cookie = #{cookie}
+      <if test="userSid != null" >
+        AND sid = #{userSid}
+      </if>
+      <if test="appSid != null" >
+        AND appid = #{appSid}
+      </if>
+  </select>
+</mapper>

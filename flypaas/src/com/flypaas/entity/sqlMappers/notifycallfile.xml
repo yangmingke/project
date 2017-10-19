@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.NotifyCallFile">
+
+	<select id="getCloudNtc" parameterType="notifyCallFile" resultType="map">
+		select r.*,a.app_name from tb_notify_call_file r,tb_flypaas_application a 
+		where r.app_sid=a.app_sid and a.status!='3' and r.audit_status!=4 and r.type=1 and r.sid=#{sid} 
+		<if test="text!=null">
+			and (a.app_name=#{text} or r.id=#{text})
+		</if>
+		order by r.update_date desc 
+		${limit}
+	</select>
+	
+	<select id="getCloudCountNtc" parameterType="map" resultType="map">
+		select count(0) as totalCount from tb_notify_call_file r,tb_flypaas_application a 
+		where r.app_sid=a.app_sid and a.status!='3' and r.audit_status!=4 and r.type=1 and r.sid=#{sid} 
+		<if test="text!=null">
+			and (a.app_name=#{text} or r.id=#{text})
+		</if>
+	</select>
+	
+	<insert id="addCloudNtc" parameterType="notifyCallFile">
+		insert into tb_notify_call_file(id,sid,app_sid,create_date,update_date,file_path,file_name,type,user_file_name)
+		values(#{id},#{sid},#{appSid},#{createDate},#{updateDate},#{filePath},#{fileName},#{type},#{userFileName})
+	</insert>
+	
+	<update id="delCloudNtc" parameterType="notifyCallFile">
+		update tb_notify_call_file set audit_status=4 where sid=#{sid} and id=#{id}
+	</update>
+</mapper>

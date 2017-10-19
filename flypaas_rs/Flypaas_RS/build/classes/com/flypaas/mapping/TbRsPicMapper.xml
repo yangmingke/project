@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsPicMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsPic" >
+    <result column="net_sid" property="netSid" jdbcType="VARCHAR" />
+    <result column="id_nbr" property="idNbr" jdbcType="VARCHAR" />
+    <result column="img_url" property="imgUrl" jdbcType="VARCHAR" />
+    <result column="id_type" property="idType" jdbcType="INTEGER" />
+    <result column="id_order" property="idOrder" jdbcType="INTEGER" />
+    <result column="id_desc" property="idDesc" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="status" property="status" jdbcType="CHAR" />
+  </resultMap>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsPic" >
+    insert into tb_rs_pic (net_sid, id_nbr, img_url, 
+      id_type, id_order, id_desc, 
+      create_date, update_date, status
+      )
+    values (#{netSid,jdbcType=VARCHAR}, #{idNbr,jdbcType=VARCHAR}, #{imgUrl,jdbcType=VARCHAR}, 
+      #{idType,jdbcType=INTEGER}, #{idOrder,jdbcType=INTEGER}, #{idDesc,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, #{status,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsPic" >
+    insert into tb_rs_pic
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="netSid != null" >
+        net_sid,
+      </if>
+      <if test="idNbr != null" >
+        id_nbr,
+      </if>
+      <if test="imgUrl != null" >
+        img_url,
+      </if>
+      <if test="idType != null" >
+        id_type,
+      </if>
+      <if test="idOrder != null" >
+        id_order,
+      </if>
+      <if test="idDesc != null" >
+        id_desc,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="netSid != null" >
+        #{netSid,jdbcType=VARCHAR},
+      </if>
+      <if test="idNbr != null" >
+        #{idNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="imgUrl != null" >
+        #{imgUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="idType != null" >
+        #{idType,jdbcType=INTEGER},
+      </if>
+      <if test="idOrder != null" >
+        #{idOrder,jdbcType=INTEGER},
+      </if>
+      <if test="idDesc != null" >
+        #{idDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+</mapper>

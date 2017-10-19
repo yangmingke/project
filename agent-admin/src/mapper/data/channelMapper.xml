@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-渠道管理 -->
+<mapper namespace="channel">
+
+	<!-- 分页查询 -->
+	<select id="query" resultType="map">
+		SELECT t.id,t.channel_mode,t.channel_name,t.channel_type,t.channel_status,t.create_date 
+		from tb_ucpaas_channel t
+		where 1=1 
+		<if test="text != null">
+			AND (
+				t.id = #{text}
+				OR t.channel_name = #{text}
+			)
+		</if>
+		<if test="channel_type != null">
+			AND t.channel_type = #{channel_type}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		from tb_ucpaas_channel t 
+		where 1=1 
+		<if test="text != null">
+			AND (
+				t.id = #{text}
+				OR t.channel_name = #{text}
+			)
+		</if>
+		<if test="channel_type != null">
+			AND t.channel_type = #{channel_type}
+		</if>
+	</select>
+	
+	<!-- 获取实体 -->
+	<select id="getEntity" resultType="map">
+		SELECT t.id,t.channel_mode,t.channel_name,t.channel_type,t.channel_status,t.create_date 
+		from tb_ucpaas_channel t 
+		WHERE
+			t.id = #{id} limit 1
+	</select>
+	
+	<!-- 修改状态 -->
+	<update id="updateStatus">
+		UPDATE tb_ucpaas_channel t
+		SET t.channel_status = #{channel_status},
+		 t.update_date = now()
+		WHERE
+			t.id = #{id} and t.channel_status = #{old_status}
+	</update>
+	
+	<select id="check" resultType="map">
+		select count(*) AS totalCount from tb_ucpaas_channel t where channel_name = #{channel_name}
+		<if test="id != null">
+			and id != id
+		</if>
+	</select>
+	<insert id="insert">
+		insert into tb_ucpaas_channel(channel_name,channel_type,channel_mode,channel_status,create_date,update_date) values(
+			#{channel_name},#{channel_type},#{channel_mode},1,now(),now())
+	</insert>
+	<update id="update">
+		update tb_ucpaas_channel set channel_name = #{channel_name},
+		channel_type = #{channel_type},
+		channel_mode = #{channel_mode},
+		update_date= now()
+		where id = #{id}
+	</update>
+	
+</mapper> 

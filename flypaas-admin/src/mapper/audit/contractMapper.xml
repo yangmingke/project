@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 审核管理-协议用户审核 -->
+<mapper namespace="contract">
+
+	<!-- 分页查询协议用户 -->
+	<select id="query" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.mobile,
+			u.realname,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			t.status,
+			(SELECT a.audit_desc FROM tb_srv_audit a WHERE a.audited_id = u.sid AND a.audit_type = 4 LIMIT 1) AS audit_desc
+		FROM
+			tb_ucpaas_security t,
+			tb_ucpaas_user u
+		WHERE
+			t.sid = u.sid
+		
+		<if test="text != null">
+			AND (
+				t.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR u.mobile LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.status = #{status}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询协议用户 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(*) AS totalCount
+		FROM
+			tb_ucpaas_security t,
+			tb_ucpaas_user u
+		WHERE
+			t.sid = u.sid
+		
+		<if test="text != null">
+			AND (
+				t.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR u.mobile LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.status = #{status}
+		</if>
+	</select>
+	
+	<!-- 获取资质 -->
+	<select id="getContractUser" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.mobile,
+			u.realname,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			t.status,
+			t.agreenment_file,
+			a.audit_desc
+		FROM
+			tb_ucpaas_security t
+			join tb_ucpaas_user u on  t.sid = u.sid 
+		LEFT JOIN tb_srv_audit a ON a.audited_id = u.sid AND a.audit_type = 4
+		WHERE  u.sid = #{sid}
+	</select>
+	
+	<!-- 审核 -->
+	<update id="audit">
+		UPDATE tb_ucpaas_security t
+		SET t.status = #{security_status},t.update_date = now()
+		WHERE t.sid = #{sid}
+	</update>
+	<!-- 查看保障金余额 -->
+	<select id="findBalance" resultType="map">
+		select sid,balance from tb_ucpaas_security_balance where sid = #{sid}
+	</select>
+	<!-- 设置协议用户 -->
+	<update id="setContract">
+		update tb_ucpaas_user set is_contract = 1 where sid = #{sid}
+	</update>
+	<!-- 冻结保障金 -->
+	<update id="frozenBalance">
+		update tb_ucpaas_security_balance set relieve_type = 2 where sid = #{sid}
+	</update>
+	
+	<!-- 设置为协议用户 -->
+	<update id="setContractWithNoBalance">
+		update tb_ucpaas_security_balance t,tb_ucpaas_user u ,tb_ucpaas_security s
+		set u.is_contract =#{is_contract} ,s.status = #{s_status},t.relieve_type = #{t_relieve_type},
+		t.status = #{t_status},	t.update_date = NOW(),u.update_date = now(),s.update_date = now()
+		where t.sid =u.sid and s.sid = t.sid and s.status =#{s_status_old}
+		and t.sid = #{sid}
+	</update>
+</mapper> 

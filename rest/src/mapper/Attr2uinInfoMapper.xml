@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucpaas.commonservice.dao.Attr2uinInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.ucpaas.commonservice.model.Attr2uinInfo" >
+    <id column="uin" property="uin" jdbcType="INTEGER" />
+    <id column="TYPE" property="type" jdbcType="INTEGER" />
+    <result column="attr" property="attr" jdbcType="VARCHAR" />
+    <result column="ctime" property="ctime" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    uin, TYPE, attr, ctime
+  </sql>
+  
+  <select id="selectByMap" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from attr2uin${uin_mod}
+    where 1=1
+    and attr = #{attr}
+    and TYPE = #{type}
+  </select>
+  
+<!-- 插入反向表信息2015-09-01添加  -->
+   <insert id="insert" parameterType="com.ucpaas.commonservice.model.Attr2uinInfo" >
+    insert into attr2uin${uin_mod}
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="uin != null" >
+        uin,
+      </if>
+      <if test="type != null" >
+        TYPE,
+      </if>
+      <if test="attr != null" >
+        attr,
+      </if>
+      <if test="ctime != null" >
+        ctime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="uin != null" >
+        #{uin,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+      <if test="attr != null" >
+        #{attr,jdbcType=VARCHAR},
+      </if>
+      <if test="ctime != null" >
+        #{ctime,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  
+
+  
+  <delete id="deleteByAttrType" parameterType="com.ucpaas.commonservice.model.Attr2uinInfo" >
+    delete from attr2uin${uin_mod}
+    where attr = #{attr}
+    and TYPE = #{type}
+  </delete>
+  
+  <delete id="deleteByUinType" parameterType="com.ucpaas.commonservice.model.Attr2uinInfo" >
+    delete from attr2uin${uin_mod}
+    where uin = #{uin}
+    and TYPE = #{type}
+  </delete>
+  
+  
+  
+  
+ 
+</mapper>

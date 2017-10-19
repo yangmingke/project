@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员管理-前台页面配置 -->
+<mapper namespace="pageConfig">
+
+	<!-- 分页查询 -->
+	<select id="query" resultType="map">
+		select id,page_name,page_key,content,update_date,config_status
+		from tb_page_config t
+		where config_status = 1
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		from tb_page_config t
+		where config_status = 1
+	</select>
+	
+	<!-- 获取实体 -->
+	<select id="getEntity" resultType="map">
+		select id,page_name,page_key,content,update_date
+		from tb_page_config t
+		where config_status = 1
+		and t.id = #{id} limit 1
+	</select>
+	<!-- 修改状态 -->
+	<update id="updateStatus">
+		UPDATE tb_page_config t
+		SET t.config_status = #{config_status},
+		 	t.update_date = now()
+		WHERE
+			t.id = #{id} and t.config_status = #{old_status}
+	</update>
+	<!-- 校验记录是否存在 -->
+	<select id="check" resultType="map">
+		select count(*) AS totalCount from tb_page_config t where page_key = #{page_key}
+		and config_status = 1
+		<if test="id != null">
+			and id != id
+		</if>
+	</select>
+	<insert id="insert">
+		insert into tb_page_config(
+			page_name,page_key,content,config_status,create_date,update_date)
+		values(
+			#{page_name},#{page_key},#{content},1,now(),now())
+	</insert>
+	<update id="update">
+		update tb_page_config set
+		content = #{content},
+		update_date= now()
+		where id = #{id}
+	</update>
+</mapper> 

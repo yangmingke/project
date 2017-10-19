@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.News">
+
+<resultMap type="news" id="newsMap">
+	<id column="news_id" property="newsId"/>
+	<result column="title" property="title"/>
+	<result column="summary" property="summary"/>
+	<result column="content" property="content"/>
+	<result column="status" property="status"/>
+	<result column="create_date" property="createDate"/>
+	<result column="update_date" property="updateDate"/>
+</resultMap>
+
+<select id="getNewsList" resultType="map" parameterType="map">
+	select news_id,title,summary,create_date from tb_flypaas_news where status='1' order by create_date desc ${limit}
+</select>
+<select id="getNewsInfo" resultMap="newsMap" parameterType="java.lang.String">
+	select news_id,title,content,create_date,subtitle from tb_flypaas_news where news_id=#{newsId}
+</select>
+<select id="getNewsListCount" resultType="map" >
+	SELECT count(0) as totalCount from tb_flypaas_news where status='1'
+</select>
+
+<insert id="addVistorMsg" parameterType="map">
+	insert into tb_flypaas_visitors_msg(message,create_date) values(#{message},#{createDate})
+</insert>
+	
+</mapper>

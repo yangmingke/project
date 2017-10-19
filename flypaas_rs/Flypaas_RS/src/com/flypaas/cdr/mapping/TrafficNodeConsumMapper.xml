@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.cdr.dao.TrafficNodeConsumMapper" >
+
+   <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsBillAcctRTPP" >
+	    <id column="id" property="id" jdbcType="BIGINT" />
+	    <result column="datetime" property="createTime" jdbcType="DATE" />
+	    <result column="sid" property="sid" jdbcType="VARCHAR" />
+	    <result column="node_ip" property="ip" jdbcType="VARCHAR" />
+	    <result column="node_sid" property="mainSid" jdbcType="VARCHAR" />
+	    <result column="traffic_in" property="trafficIn" jdbcType="BIGINT" />
+	    <result column="traffic_out" property="trafficOut" jdbcType="BIGINT" />
+	    <result column="traffic_feerate" property="price" jdbcType="BIGINT" />
+	    <result column="traffic_fee" property="fee" jdbcType="FLOAT" />
+  </resultMap>
+  
+  <select id="queryResourceSideCountFlowMonth" resultType="java.lang.Integer" parameterType="Map">
+  	select count(*) from 
+  	(
+	  	select 
+		  	SUM(traffic_in) traffic_in,
+			SUM(traffic_out) traffic_out,
+			AVG(traffic_feerate)  traffic_feerate,
+			SUM(traffic_fee) traffic_fee,
+			node_sid node_sid
+	  	from t_traffic_node_day_consum_${dateTime}
+	  	where 
+		  	node_sid in
+	  	<foreach collection="sidList" item = "netSid" open="(" separator="," close=")">  
+	        #{netSid}  
+	    </foreach> 
+	    GROUP BY
+			node_sid
+	  ) t
+  </select> 
+  
+  <select id="queryResourceSideFlowMonth" resultMap="BaseResultMap" parameterType="Map">
+  	select 
+	  	SUM(traffic_in) traffic_in,
+		SUM(traffic_out) traffic_out,
+		AVG(traffic_res_feerate)  traffic_feerate,
+		FORMAT(SUM(traffic_res_fee)/100,2) traffic_fee,
+		node_sid node_sid
+  	from t_traffic_node_day_consum_${month}
+  	where node_sid = #{netSid}  
+  </select>
+  
+  <select id="queryResourceSideCount" resultType="java.lang.Integer" parameterType="Map">
+  	select count(*) from 
+  	(
+	  	select 
+		  	SUM(traffic_in) traffic_in,
+			SUM(traffic_out) traffic_out,
+			AVG(traffic_feerate)  traffic_feerate,
+			SUM(traffic_fee) traffic_fee,
+			node_sid node_sid
+	  	from t_traffic_node_day_consum_${month}
+	  	where 
+		  	DATE_FORMAT(datetime,'%Y%m%d') = #{dateTime}
+		  	and node_sid in
+	  	<foreach collection="sidList" item = "netSid" open="(" separator="," close=")">  
+	        #{netSid}  
+	    </foreach> 
+	    GROUP BY
+			node_sid
+	  ) t
+  </select> 
+  
+  <select id="queryResourceSideFlowDay" resultMap="BaseResultMap" parameterType="Map">
+  	select 
+	  	SUM(traffic_in) traffic_in,
+		SUM(traffic_out) traffic_out,
+		AVG(traffic_res_feerate)  traffic_feerate,
+		FORMAT(SUM(traffic_res_fee)/100,2) traffic_fee,
+		node_sid node_sid
+  	from t_traffic_node_day_consum_${month}
+  	where DATE_FORMAT(datetime,'%Y-%m-%d') = #{dateTime}
+  	and node_sid = #{netSid}  
+  </select>
+  
+  <select id="queryCountResourceFlowDay" resultType="java.lang.Integer" parameterType="Map">
+  	select count(*)
+  	from t_traffic_node_day_consum_${month}
+  	where DATE_FORMAT(datetime,'%Y%m%d') = #{dateTime}
+  	<if test="keyWord !=null">
+  		and node_ip like concat('%', #{keyWord}, '%')
+  	</if>
+  </select> 
+  
+  <select id="queryResourceFlowDay" resultMap="BaseResultMap" parameterType="Map">
+  	select 
+	  	id,
+	  	datetime,
+	  	sid,
+	  	node_ip,
+	  	node_sid,
+	  	traffic_in,
+	  	traffic_out,
+	  	FORMAT(traffic_res_feerate/100,2) traffic_feerate,
+	  	FORMAT(traffic_res_fee/100,2) traffic_fee
+  	from t_traffic_node_day_consum_${month}
+  	where DATE_FORMAT(datetime,'%Y-%m-%d') = #{dateTime}
+	and node_sid=#{netSid}
+  </select>
+  
+  <select id="queryCountResourceFlowMonth" resultType="java.lang.Integer" parameterType="Map">
+  	select count(*) from 
+  	(
+	  	SELECT
+			node_ip node_ip,
+			SUM(traffic_in) traffic_in,
+			SUM(traffic_out) traffic_out,
+			traffic_feerate traffic_feerate,
+			SUM(traffic_fee) traffic_fee,
+			node_sid node_sid
+		FROM
+			t_traffic_node_day_consum_${dateTime}
+	  	GROUP BY
+			node_ip,
+			traffic_feerate,
+			node_sid
+	  	<if test="keyWord !=null">
+	  		HAVING node_ip like concat('%', #{keyWord}, '%')
+	  	</if>
+  	) t
+  </select> 
+  
+  <select id="queryResourceFlowMonth" resultMap="BaseResultMap" parameterType="Map">
+  	SELECT
+		node_ip node_ip,
+		SUM(traffic_in) traffic_in,
+		SUM(traffic_out) traffic_out,
+		FORMAT(traffic_res_feerate/100,2) traffic_feerate,
+		FORMAT(SUM(traffic_res_fee)/100,2) traffic_fee,
+		node_sid node_sid
+	FROM
+		t_traffic_node_day_consum_${month}
+	where node_sid = #{netSid}
+  	GROUP BY
+		node_ip,
+		traffic_res_feerate,
+		node_sid
+  </select>
+  <select id="queryNodeTodayTraffic" resultType="java.util.Map" parameterType="Map">
+  	select 
+	  	sum(traffic_in) traffic_in,
+	  	sum(traffic_out) traffic_out,
+	  	HOUR(datetime) hour,
+	  	sum(traffic_in+traffic_out) total
+  	from t_traffic_node_today_consume_${dateTime}
+  	where node_ip = #{ip}
+  	group by hour
+	ORDER BY hour
+  </select>
+</mapper>

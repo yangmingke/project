@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- SR节点间质量统计管理 -->
+<mapper namespace="qualityStatistics">
+
+	<!-- 获取SR节点间当前丢包和延时 -->
+	<select id="getCurrentQuality" resultType="map">
+		SELECT
+		FORMAT((q.lost_num/q.ping_num*100),2) AS lost_rate,
+		q.average_delay
+		FROM node_quality_statistics_temp q
+		WHERE q.src_sr_id = #{src_sr_id}
+		AND q.dst_sr_id = #{dst_sr_id}
+		ORDER BY q.time DESC
+		LIMIT 1
+	</select>
+
+	<!-- 批量插入SR节点间质量数据 -->
+	<insert id="insertbatch" parameterType="map">
+		INSERT INTO network_monitor.node_quality_statistics_${opDate}
+		(src_sr_id, dst_ip, ping_num, lost_num, average_delay, metric,time)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			( #{item.src_sr_id}, inet_aton(#{item.dst_ip}),
+			#{item.ping_num},#{item.lost_num},
+			#{item.average_delay},#{item.metric},unix_timestamp(NOW()))
+		</foreach>
+	</insert>
+<!-- 插入到临时表 -->
+
+<insert id="insertbatchtmp" parameterType="map">
+		INSERT INTO network_monitor.node_quality_statistics_temp
+		(src_sr_id, dst_ip, ping_num, lost_num, average_delay, metric,time)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			( #{item.src_sr_id}, inet_aton(#{item.dst_ip}),
+			#{item.ping_num},#{item.lost_num},
+			#{item.average_delay},#{item.metric},unix_timestamp(NOW()))
+		</foreach>
+	</insert>
+	<!-- SR丢包率 -->
+	<select id="lostRate" resultType="map">
+		SELECT
+		truncate(s.lost_num/s.ping_num*100,2) AS y,
+		s.time*1000 AS x
+		FROM
+		network_monitor.node_quality_statistics_temp s
+		WHERE
+		1=1
+		AND s.src_sr_id = #{sr_id}
+		AND s.dst_ip = inet_aton(#{nbrip})
+		<if test="(start_time != null and end_time != null)">
+			AND s.time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+		ORDER BY s.time ASC
+	</select>
+
+	<!-- SR节点间延时统计（延时曲线图） -->
+	<select id="delay" resultType="map">
+		SELECT
+		truncate(s.average_delay,2) AS y,
+		s.time*1000 AS x
+		FROM
+		network_monitor.node_quality_statistics_temp s
+		WHERE
+		1=1
+		AND s.src_sr_id = #{sr_id}
+		AND s.dst_ip = inet_aton(#{nbrip})
+		<if test="(start_time != null and end_time != null)">
+			AND s.time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+		ORDER BY s.time ASC
+	</select>
+
+	<!-- 分页获取SR节点间质量统计 -->
+	<select id="query" resultType="map">
+		SELECT
+		CONVERT(CONCAT(inet_ntoa(c.dst_ip),''),CHAR) AS dst_ip,
+		i.sr_id AS dst_sr_id,
+		i.sr_name sr_name2,
+		k.sr_name,
+		c.total,
+		c.ping_num,
+		CONVERT(CONCAT(inet_ntoa(m.ifip),''),CHAR) AS ifip,
+		f.ifname ifname2,
+		c.lost_num,
+		truncate(c.metric/c.total,2) metric,
+		n.ifname ifname,
+		CONVERT(CONCAT(inet_ntoa(n.nbrip),''),CHAR) nbrip,
+		truncate(c.average_delay/c.total,2) AS average_delay,
+		truncate(c.lost_num/c.ping_num*100,2) AS lost_rate
+		FROM
+		network_monitor.node_neighbors n,
+		network_monitor.sr_node_info i,
+		(SELECT dst_ip,src_sr_id,SUM(ping_num) AS ping_num,SUM(lost_num) AS
+		lost_num,SUM(average_delay) AS average_delay,sum(metric) metric, COUNT(id) AS total
+		FROM network_monitor.node_quality_statistics_temp
+		WHERE src_sr_id = #{sr_id}
+		<if test="(start_time != null and end_time != null)">
+			AND time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+		GROUP BY dst_ip ORDER BY time DESC) c,
+		network_monitor.sr_node_interface f,
+		network_monitor.sr_node_info k,
+		network_monitor.sr_node_interface m
+		WHERE
+		1=1
+		and m.sr_id=n.sr_id
+		and m.ifname=n.ifname
+		
+		and k.sr_id=n.sr_id
+		AND c.dst_ip = n.nbrip
+		and n.nbrip=f.ifip
+		
+		AND n.nbrid = i.sr_id
+		and i.sr_id=f.sr_id
+		
+		AND n.sr_id = #{sr_id}
+		AND n.nbrid = #{dst_sr_id}
+		${limit}
+	</select>
+
+	<!-- 分页获取SR节点间质量统计总记录 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+		count(0) AS totalCount
+		FROM
+		network_monitor.node_neighbors n,
+		network_monitor.sr_node_info i,
+		(SELECT dst_ip,src_sr_id,SUM(ping_num) AS ping_num,SUM(lost_num) AS
+		lost_num,SUM(average_delay) AS average_delay,sum(metric) metric, COUNT(id) AS total
+		FROM network_monitor.node_quality_statistics_temp
+		WHERE src_sr_id = #{sr_id}
+		<if test="(start_time != null and end_time != null)">
+			AND time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+		GROUP BY dst_ip ORDER BY time DESC) c,
+		network_monitor.sr_node_interface f,
+		network_monitor.sr_node_info k,
+		network_monitor.sr_node_interface m
+		WHERE
+		1=1
+		and m.sr_id=n.sr_id
+		and m.ifname=n.ifname
+		
+		and k.sr_id=n.sr_id
+		AND c.dst_ip = n.nbrip
+		and n.nbrip=f.ifip
+		
+		AND n.nbrid = i.sr_id
+		and i.sr_id=f.sr_id
+		
+		AND n.sr_id = #{sr_id}
+		AND n.nbrid = #{dst_sr_id}
+	</select>
+
+	<select id="drawQuality" resultType="map">
+		SELECT
+		q.metric AS metric,
+		truncate(q.lost_num/q.ping_num*100,2) AS lost_rate,
+		truncate(q.average_delay,2) AS average_delay
+		FROM
+<!-- 		network_monitor.node_quality_statistics_${opDate} q -->
+        network_monitor.node_quality_statistics_temp q
+		WHERE q.src_sr_id =
+		#{sr_id}
+		AND q.dst_ip = INET_ATON(#{nbrip})
+<!-- 		<if test="(start_time != null and end_time != null)"> -->
+<!-- 			AND q.time BETWEEN unix_timestamp(#{start_time}) AND -->
+<!-- 			unix_timestamp(#{end_time}) -->
+<!-- 		</if> -->
+		ORDER BY q.time DESC
+		LIMIT 1
+	</select>
+	
+	<select id="drawQualityNew" resultType="map">
+		SELECT
+		q.metric AS metric,
+		truncate(q.lost_num/q.ping_num*100,2) AS lost_rate,
+		truncate(q.average_delay,2) AS average_delay,
+		concat(src_sr_id,' ',INET_NTOA(dst_ip)) AS ip
+		FROM
+        network_monitor.node_quality_statistics_temp q
+		WHERE 
+		concat(src_sr_id,' ',INET_NTOA(dst_ip)) IN (${ipList})
+		ORDER BY q.time DESC
+		LIMIT #{count}
+	</select>
+	
+
+	<!-- 获取网络链路图 -->
+	<select id="getQuality" resultType="map">
+		SELECT
+		truncate(q.metric,0) AS metric,
+		truncate(q.lost_num/q.ping_num*100,2) AS lost_rate,
+		truncate(q.average_delay,2) AS average_delay
+		FROM
+		network_monitor.node_quality_statistics_temp q
+		WHERE q.src_sr_id =
+		#{sr_id}
+		AND q.dst_ip = INET_ATON(#{nbrip})
+		ORDER BY q.time DESC
+		LIMIT 1
+	</select>
+</mapper> 

@@ -1,0 +1,150 @@
+Manifest-Version: 1.0
+Created-By: 1.7.0_67 (Oracle Corporation)
+Implementation-Title: spring-data-redis
+Implementation-Version: 1.4.2.RELEASE
+Implementation-URL: http://projects.spring.io/spring-data-redis
+Implementation-Vendor: Pivotal Software, Inc.
+Implementation-Vendor-Id: org.springframework
+Export-Package: org.springframework.data.redis;version="1.4.2.RELEASE"
+ ;uses:="org.springframework.core.convert.converter,org.springframewor
+ k.dao",org.springframework.data.redis.cache;version="1.4.2.RELEASE";u
+ ses:="org.springframework.cache,org.springframework.cache.transaction
+ ,org.springframework.dao,org.springframework.data.redis.connection,or
+ g.springframework.data.redis.core,org.springframework.data.redis.seri
+ alizer",org.springframework.data.redis.config;version="1.4.2.RELEASE"
+ ;uses:="org.springframework.beans.factory.support,org.springframework
+ .beans.factory.xml,org.w3c.dom",org.springframework.data.redis.connec
+ tion;version="1.4.2.RELEASE";uses:="org.apache.commons.pool2.impl,org
+ .springframework.core,org.springframework.core.convert.converter,org.
+ springframework.dao,org.springframework.dao.support,org.springframewo
+ rk.data.redis,org.springframework.data.redis.core,org.springframework
+ .data.redis.serializer",org.springframework.data.redis.connection.con
+ vert;version="1.4.2.RELEASE";uses:="org.springframework.core.convert.
+ converter,org.springframework.data.redis.connection",org.springframew
+ ork.data.redis.connection.jedis;version="1.4.2.RELEASE";uses:="org.sp
+ ringframework.beans.factory,org.springframework.core.convert.converte
+ r,org.springframework.dao,org.springframework.data.redis,org.springfr
+ amework.data.redis.connection,org.springframework.data.redis.connecti
+ on.convert,org.springframework.data.redis.connection.util,org.springf
+ ramework.data.redis.core,redis.clients.jedis,redis.clients.jedis.exce
+ ptions,redis.clients.util",org.springframework.data.redis.connection.
+ jredis;version="1.4.2.RELEASE";uses:="org.apache.commons.pool2,org.ap
+ ache.commons.pool2.impl,org.jredis,org.jredis.connector,org.springfra
+ mework.beans.factory,org.springframework.dao,org.springframework.data
+ .redis,org.springframework.data.redis.connection,org.springframework.
+ data.redis.core",org.springframework.data.redis.connection.lettuce;ve
+ rsion="1.4.2.RELEASE";uses:="com.lambdaworks.redis,com.lambdaworks.re
+ dis.codec,com.lambdaworks.redis.protocol,com.lambdaworks.redis.pubsub
+ ,org.apache.commons.pool2,org.apache.commons.pool2.impl,org.springfra
+ mework.beans.factory,org.springframework.core.convert.converter,org.s
+ pringframework.dao,org.springframework.data.redis.connection,org.spri
+ ngframework.data.redis.connection.convert,org.springframework.data.re
+ dis.connection.util,org.springframework.data.redis.core",org.springfr
+ amework.data.redis.connection.srp;version="1.4.2.RELEASE";uses:="com.
+ google.common.util.concurrent,org.springframework.beans.factory,org.s
+ pringframework.core.convert.converter,org.springframework.dao,org.spr
+ ingframework.data.redis.connection,org.springframework.data.redis.con
+ nection.convert,org.springframework.data.redis.connection.util,org.sp
+ ringframework.data.redis.core,redis.client,redis.reply",org.springfra
+ mework.data.redis.connection.util;version="1.4.2.RELEASE";uses:="org.
+ springframework.data.redis.connection",org.springframework.data.redis
+ .core;version="1.4.2.RELEASE";uses:="org.aopalliance.intercept,org.ap
+ ache.commons.logging,org.springframework.beans.factory,org.springfram
+ ework.cglib.proxy,org.springframework.core.convert.converter,org.spri
+ ngframework.dao,org.springframework.data.redis.connection,org.springf
+ ramework.data.redis.core.query,org.springframework.data.redis.core.sc
+ ript,org.springframework.data.redis.serializer,org.springframework.tr
+ ansaction.support",org.springframework.data.redis.core.query;version=
+ "1.4.2.RELEASE";uses:="org.springframework.data.redis.connection,org.
+ springframework.data.redis.serializer",org.springframework.data.redis
+ .core.script;version="1.4.2.RELEASE";uses:="org.springframework.beans
+ .factory,org.springframework.core,org.springframework.core.io,org.spr
+ ingframework.dao,org.springframework.data.redis.connection,org.spring
+ framework.data.redis.core,org.springframework.data.redis.serializer,o
+ rg.springframework.scripting",org.springframework.data.redis.core.typ
+ es;version="1.4.2.RELEASE",org.springframework.data.redis.hash;versio
+ n="1.4.2.RELEASE";uses:="org.codehaus.jackson.map",org.springframewor
+ k.data.redis.listener;version="1.4.2.RELEASE";uses:="org.springframew
+ ork.beans.factory,org.springframework.context,org.springframework.cor
+ e.task,org.springframework.data.redis.connection,org.springframework.
+ data.redis.serializer,org.springframework.scheduling,org.springframew
+ ork.util",org.springframework.data.redis.listener.adapter;version="1.
+ 4.2.RELEASE";uses:="org.springframework.beans.factory,org.springframe
+ work.dao,org.springframework.data.redis.connection,org.springframewor
+ k.data.redis.serializer,org.springframework.util",org.springframework
+ .data.redis.serializer;version="1.4.2.RELEASE";uses:="com.fasterxml.j
+ ackson.databind,org.codehaus.jackson.map,org.codehaus.jackson.type,or
+ g.springframework.beans,org.springframework.beans.factory,org.springf
+ ramework.core,org.springframework.core.convert,org.springframework.ox
+ m",org.springframework.data.redis.support.atomic;version="1.4.2.RELEA
+ SE";uses:="org.springframework.dao,org.springframework.data.redis.con
+ nection,org.springframework.data.redis.core",org.springframework.data
+ .redis.support.collections;version="1.4.2.RELEASE";uses:="org.springf
+ ramework.beans.factory,org.springframework.core.convert.converter,org
+ .springframework.dao,org.springframework.data.redis.connection,org.sp
+ ringframework.data.redis.core"
+Bundle-Vendor: Pivotal Software, Inc.
+Bundle-Version: 1.4.2.RELEASE
+Tool: Bundlor 1.0.0.RELEASE
+Bundle-Name: Spring Data Redis Support
+Bundle-ManifestVersion: 2
+Bundle-SymbolicName: org.springframework.data.redis
+Import-Package: com.fasterxml.jackson.databind;version="[2.2.4, 3.0.0)
+ ";resolution:="optional",com.fasterxml.jackson.databind.type;version=
+ "[2.2.4, 3.0.0)";resolution:="optional",com.google.common.base;versio
+ n="[11.0.0, 20.0.0)";resolution:="optional",com.google.common.util.co
+ ncurrent;version="[11.0.0, 20.0.0)";resolution:="optional",com.lambda
+ works.redis;version="[2.2.0, 3.0.0)";resolution:="optional",com.lambd
+ aworks.redis.codec;version="[2.2.0, 3.0.0)";resolution:="optional",co
+ m.lambdaworks.redis.output;version="[2.2.0, 3.0.0)";resolution:="opti
+ onal",com.lambdaworks.redis.protocol;version="[2.2.0, 3.0.0)";resolut
+ ion:="optional",com.lambdaworks.redis.pubsub;version="[2.2.0, 3.0.0)"
+ ;resolution:="optional",javax.xml.transform;version="0";resolution:="
+ optional",javax.xml.transform.stream;version="0";resolution:="optiona
+ l",org.aopalliance.aop;version="[1.0.0, 2.0.0)";resolution:="optional
+ ",org.aopalliance.intercept;version="[1.0.0, 2.0.0)";resolution:="opt
+ ional",org.apache.commons.beanutils;version="1.8.5";resolution:="opti
+ onal",org.apache.commons.logging;version="[1.1.1, 2.0.0)",org.apache.
+ commons.pool2;version="[1.0, 2.2)";resolution:="optional",org.apache.
+ commons.pool2.impl;version="[1.0, 2.2)";resolution:="optional",org.co
+ dehaus.jackson.map;version="[1.6, 2.0.0)";resolution:="optional",org.
+ codehaus.jackson.map.type;version="[1.6, 2.0.0)";resolution:="optiona
+ l",org.codehaus.jackson.type;version="[1.6, 2.0.0)";resolution:="opti
+ onal",org.jboss.netty.channel;version="[3.0.0, 4.0.0)";resolution:="o
+ ptional",org.jredis;version="[1.0.0, 2.0.0)";resolution:="optional",o
+ rg.jredis.connector;version="[1.0.0, 2.0.0)";resolution:="optional",o
+ rg.jredis.protocol;version="[1.0.0, 2.0.0)";resolution:="optional",or
+ g.jredis.ri.alphazero;version="[1.0.0, 2.0.0)";resolution:="optional"
+ ,org.jredis.ri.alphazero.connection;version="[1.0.0, 2.0.0)";resoluti
+ on:="optional",org.springframework.aop.framework;version="[4.0.9, 4.1
+ .0)",org.springframework.beans;version="[4.0.9, 4.1.0)",org.springfra
+ mework.beans.factory;version="[4.0.9, 4.1.0)",org.springframework.bea
+ ns.factory.config;version="[4.0.9, 4.1.0)",org.springframework.beans.
+ factory.support;version="[4.0.9, 4.1.0)",org.springframework.beans.fa
+ ctory.xml;version="[4.0.9, 4.1.0)",org.springframework.cache;version=
+ "[4.0.9, 4.1.0)",org.springframework.cache.support;version="[4.0.9, 4
+ .1.0)",org.springframework.cache.transaction;version="[4.0.9, 4.1.0)"
+ ,org.springframework.cglib.proxy;version="[4.0.9, 4.1.0)",org.springf
+ ramework.context;version="[4.0.9, 4.1.0)",org.springframework.core;ve
+ rsion="[4.0.9, 4.1.0)",org.springframework.core.convert;version="[4.0
+ .9, 4.1.0)",org.springframework.core.convert.converter;version="[4.0.
+ 9, 4.1.0)",org.springframework.core.convert.support;version="[4.0.9, 
+ 4.1.0)",org.springframework.core.io;version="[4.0.9, 4.1.0)",org.spri
+ ngframework.core.io.support;version="[4.0.9, 4.1.0)",org.springframew
+ ork.core.serializer.support;version="[4.0.9, 4.1.0)",org.springframew
+ ork.core.task;version="[4.0.9, 4.1.0)",org.springframework.dao;versio
+ n="[4.0.9, 4.1.0)",org.springframework.dao.support;version="[4.0.9, 4
+ .1.0)",org.springframework.oxm;version="[4.0.9, 4.1.0)";resolution:="
+ optional",org.springframework.scheduling;version="[4.0.9, 4.1.0)";res
+ olution:="optional",org.springframework.scripting;version="[4.0.9, 4.
+ 1.0)";resolution:="optional",org.springframework.scripting.support;ve
+ rsion="[4.0.9, 4.1.0)";resolution:="optional",org.springframework.tra
+ nsaction.support;version="[4.0.9, 4.1.0)",org.springframework.util;ve
+ rsion="[4.0.9, 4.1.0)",org.springframework.util.xml;version="[4.0.9, 
+ 4.1.0)",org.w3c.dom;version="0",redis;version="[0.2, 1.0)";resolution
+ :="optional",redis.client;version="[0.2, 1.0)";resolution:="optional"
+ ,redis.clients.jedis;version="[2.5.2, 2.5.2)";resolution:="optional",
+ redis.clients.jedis.exceptions;version="[2.5.2, 2.5.2)";resolution:="
+ optional",redis.clients.util;version="[2.5.2, 2.5.2)";resolution:="op
+ tional",redis.reply;version="[0.2, 1.0)";resolution:="optional"
+

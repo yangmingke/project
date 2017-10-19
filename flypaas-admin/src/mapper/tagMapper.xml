@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 自定义标签业务 -->
+<mapper namespace="tag">
+
+	<!-- 查询数据字典表 -->
+	<select id="queryDictionary" resultType="map">
+		SELECT
+			t.`value`,
+			t.text
+		FROM
+			(
+				<if test="showAll">
+					SELECT
+						'' AS `value`,
+						'${placeholder}：所有' AS text,
+						- 1 AS sort
+					UNION ALL
+				</if>
+					SELECT
+						p.param_key AS `value`,
+						p.param_value AS text,
+						p.param_order AS sort
+					FROM
+						tb_ucpaas_params p
+					WHERE
+						p.param_type = #{dictionaryType}
+			) t
+		WHERE
+			1 = 1
+		
+		<if test="includeValue != null">
+			AND t.`value` in 
+			<foreach collection="includeValue" item="i" open="(" close=")" separator=",">
+				#{i}
+			</foreach>
+		</if>
+		<if test="excludeValue != null">
+			AND t.`value` not in 
+			<foreach collection="excludeValue" item="i" open="(" close=")" separator=",">
+				#{i}
+			</foreach>
+		</if>
+		ORDER BY
+			sort
+	</select>
+
+	<!-- 获取所有的角色（除了匿名用户） -->
+	<select id="role" resultType="map">
+		SELECT
+			t.`value`,
+			t.text
+		FROM
+			(
+				SELECT
+					'' AS `value`,
+					'${placeholder}：所有' AS text,
+					- 1 AS sort
+				UNION ALL
+					SELECT
+						CONVERT (r.role_id, CHAR) AS `value`,
+						r.role_name AS text,
+						r.role_id AS sort
+					FROM
+						tb_ucpaas_role r
+					WHERE
+						r.`status` = 1
+			) t
+		WHERE
+			1 = 1
+		
+		<if test="excludeValue != null">
+			AND t.`value` not in 
+			<foreach collection="excludeValue" item="i" open="(" close=")" separator=",">
+				#{i}
+			</foreach>
+		</if>
+		ORDER BY
+			sort
+	</select>
+	
+	<!-- 获取启用的资费套餐 -->
+	<select id="package" resultType="map">
+		SELECT
+			CONVERT (
+				concat(
+					t.package_id,
+					'__',
+					t.package_name,
+					'__',
+					ifnull(t.min_consumption, '')
+				),
+				CHAR
+			) AS 'value',
+			CONVERT (
+				concat(
+					t.package_id,
+					'(',
+					t.package_name,
+					')'
+				),
+				CHAR
+			) AS text
+		FROM
+			(
+				SELECT
+					p.package_id,
+					p.package_name,
+					(
+						SELECT
+							i.fee
+						FROM
+							tb_bill_fee_item_rel ir,
+							tb_bill_fee_item i
+						WHERE
+							ir.package_id = p.package_id
+						AND i.fee_id = ir.fee_id
+						AND i.fee_id LIKE '${event_id_1017}%'
+					) / ${money_rate} AS min_consumption
+				FROM
+					tb_bill_package p
+				WHERE
+					p.`status` = 1
+				ORDER BY
+					p.update_date DESC
+			) t
+	</select>
+	
+	<!-- 获取所有的资费套餐 -->
+	<select id="allPackage" resultType="map">
+		SELECT
+			p.package_id AS 'value',
+			CONVERT (
+				concat(
+					p.package_id,
+					'(',
+					p.package_name,
+					')'
+				),
+				CHAR
+			) AS text
+		FROM
+			tb_bill_package p
+	</select>
+	
+	<!-- 下拉框中启用的资费套餐 -->
+	<select id="selectPackage" resultType="map">
+		SELECT
+			'' AS `value`,
+			'${placeholder}：所有' AS text
+		UNION ALL
+			(
+				SELECT
+					CONVERT (p.package_id, CHAR) AS 'value',
+					CONVERT (
+						concat(
+							p.package_id,
+							'(',
+							p.package_name,
+							')'
+						),
+						CHAR
+					) AS text
+				FROM
+					tb_bill_package p
+				WHERE
+					p.`status` = 1
+				ORDER BY
+					p.update_date DESC
+			)
+	</select>
+	
+	<!-- 获取定时任务 -->
+	<select id="task" resultType="map">
+		SELECT
+			t.`value`,
+			t.text
+		FROM
+			(
+				SELECT
+					'' AS `value`,
+					'${placeholder}：所有' AS text,
+					- 1 AS sort
+				UNION ALL
+					SELECT
+						CONVERT (t.task_id, CHAR) AS `value`,
+						CONVERT (
+							concat(
+								t.task_id,
+								'(',
+								t.task_name,
+								')'
+							),
+							CHAR
+						) AS text,
+						t.task_id AS sort
+					FROM
+						tb_ucpaas_task t
+			) t
+		WHERE
+			1 = 1
+		
+		<if test="excludeValue != null">
+			AND t.`value` not in 
+			<foreach collection="excludeValue" item="i" open="(" close=")" separator=",">
+				#{i}
+			</foreach>
+		</if>
+		ORDER BY
+			t.sort
+	</select>
+	
+	<!-- 获取定时任务分组 -->
+	<select id="task_group" resultType="map">
+		SELECT
+			t.`value`,
+			t.text
+		FROM
+			(
+				SELECT
+					'' AS `value`,
+					'${placeholder}：所有' AS text,
+					- 1 AS sort
+				UNION ALL
+					SELECT DISTINCT
+						CONVERT (t1.`group`, CHAR) AS `value`,
+						CONVERT (t1.`group`, CHAR) AS text,
+						t1.`group` AS sort
+					FROM
+						tb_ucpaas_task t1
+			) t
+		ORDER BY
+			t.sort
+	</select>
+	
+	<!-- 获取管理员手机号 -->
+	<select id="adminMobile" resultType="map">
+		SELECT
+			u.sid AS `value`,
+			concat(
+				u.realname,
+				'（',
+				u.mobile,
+				'）'
+			) AS text
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type = 3
+		AND u.`status` = 1
+		ORDER BY
+			CONVERT (u.realname USING gbk)
+	</select>
+		
+	<select id="loadProvince" resultType="map">
+		select CONVERT (t.id , CHAR) as value,t.name as text from tb_ucpaas_province t ORDER BY t.orderid
+	</select>
+	
+	<select id="loadCityByProvinceId"  resultType="map">
+		select  CONVERT (t.id , CHAR) as value,t.name as text from tb_ucpaas_city t where t.provinceId=#{provinceId}
+	</select>
+	<!-- 渠道标签-->
+	<select id="findAllChannel" resultType="map">
+		SELECT
+			CONVERT (t.id, CHAR) AS `value`,
+			CONVERT (
+				concat(
+					t.id,
+					'(',
+					t.channel_name,
+					')'
+				),
+				CHAR
+			) AS text,
+			t.id AS sort
+		FROM
+			tb_ucpaas_channel t
+		WHERE
+			t.channel_status  = 1
+	</select>
+	
+</mapper>

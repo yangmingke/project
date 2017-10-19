@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ClientOldMapper" >
+
+<!-- jdbcType="VARCHAR" -->
+<!-- uin分配存储过程 -->
+  <select id="call_create_clientandbalance" resultType="java.util.Map" parameterType="java.util.Map" statementType="CALLABLE" >
+     {call p_reg_app_clientid_uin(#{pi_client_sid,mode=IN,jdbcType=VARCHAR},
+							     #{pi_app_sid,mode=IN,jdbcType=VARCHAR},
+							     #{pi_friendly_name,mode=IN,jdbcType=VARCHAR},
+							     #{pi_client_pwd,mode=IN,jdbcType=VARCHAR},
+							     #{pi_client_token,mode=IN,jdbcType=VARCHAR},
+							     
+							     #{pi_status,mode=IN,jdbcType=VARCHAR},
+							     #{pi_sid,mode=IN,jdbcType=VARCHAR},
+							     #{pi_charge,mode=IN,jdbcType=INTEGER},
+							     #{pi_chargetype,mode=IN,jdbcType=VARCHAR},
+							     #{pi_mobile,mode=IN,jdbcType=VARCHAR},
+							     
+							     #{pi_client_type,mode=IN,jdbcType=VARCHAR},
+							     #{pi_balance,mode=IN,jdbcType=INTEGER},
+							     #{pi_app_prefix,mode=IN,jdbcType=VARCHAR},
+							     #{pi_is_fee,mode=IN,jdbcType=INTEGER},
+							     #{pi_app_uin,mode=IN,jdbcType=VARCHAR},
+							     
+   								 #{po_code,mode=OUT,jdbcType=INTEGER},
+   								 #{po_client_number,mode=OUT,jdbcType=VARCHAR})
+     }
+  </select>
+ 
+	<delete id="deletePoolByAppAndMobile">
+		DELETE FROM 
+				tb_ucpaas_client_pool 
+				WHERE 
+					appid = #{appSid} 
+				AND 
+					mobile = #{mobile}
+	
+	</delete>
+	
+	
+	<delete id="deleteBalanceByClientNumber">
+	
+			DELETE FROM 
+				tb_bill_client_balance 
+				WHERE 
+					client_number = #{clientNumber}
+	</delete>
+	
+	
+	<delete id="deleteClientByClientNumber">
+		DELETE FROM 
+				tb_ucpaas_client 
+				WHERE 
+					client_number = #{clientNumber}
+	</delete>
+ 
+</mapper>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.Coupon">
+
+	<select id="getCouponByNum" parameterType="java.lang.String" resultType="map">
+		select * from tb_flypaas_coupon where couponnum=#{num}
+	</select>
+	
+	<insert id="addCouponLog" parameterType="map">
+		insert into tb_flypaas_coupon_log(couponnum,sid,money,create_date,meet_Id)
+		values(#{couponNum},#{sid},#{money},#{createDate},#{meetId})
+	</insert>
+	
+	<insert id="addCoupon" parameterType="map">
+		<![CDATA[
+		insert into tb_flypaas_coupon(couponnum,money,meet_id,create_date,end_date,sended,exp_date) 
+		values(#{couponNum},#{money},#{meetId},#{createDate},#{endDate},#{sended},#{expDate})
+		]]>
+	</insert>
+	
+	<select id="getCouponByOther" parameterType="map" resultType="map">
+		select * from tb_flypaas_coupon where 1=1  
+		<if test="meetId!=null">
+			and meet_id=#{meetId} 
+		</if>
+		<if test="couponMoney!=null and couponMoney>=0">
+			and money=#{couponMoney} 
+		</if>
+		<if test="createDate!=null">
+			and DATE_FORMAT(create_date,'%Y-%m-%d')=#{createDate} 
+		</if>
+	</select>
+	
+	<select id="getMeetIdList" resultType="map">
+		SELECT DISTINCT meet_id from tb_flypaas_coupon
+	</select>
+	
+	<select id="getLogCount" parameterType="map" resultType="int">
+		select count(*) from tb_flypaas_coupon_log where 1=1
+		<if test="meetId!=null and meetId!=''">
+		 and meet_id=#{meetId}
+		</if>
+		<if test="sid!=null and sid!=''">
+		 and sid=#{sid}
+		</if>
+		<if test="couponNum!=null and couponNum!=''">
+		 and couponnum=#{couponNum}
+		</if>
+	</select>
+	
+	<select id="getCouponLogCountByNum" parameterType="java.lang.String" resultType="int">
+		select count(*) from tb_flypaas_coupon_log where couponnum=#{couponnum}
+	</select>
+	<select id="getRodomNum" resultType="map" parameterType="java.lang.String">
+		SELECT * 
+		FROM tb_flypaas_coupon AS t1 JOIN (SELECT ROUND(RAND() * ((SELECT MAX(id) FROM tb_flypaas_coupon)-(SELECT MIN(id) FROM tb_flypaas_coupon))+(SELECT MIN(id) FROM tb_flypaas_coupon)) AS id) AS t2 
+		WHERE t1.id >= t2.id and t1.meet_id=#{meetId} and t1.sended=0
+		ORDER BY t1.id LIMIT 1;
+	</select>
+	<update id="updateSended" parameterType="java.lang.String">
+		update tb_flypaas_coupon set sended=1 where id=#{id}
+	</update>
+	<insert id="addMeet" parameterType="java.lang.String">
+		insert into tb_flypaas_meet(meet,status) values(#{meetId},1)
+	</insert>
+	<update id="deletemeet">
+		update tb_flypaas_meet set status=2 where 1=1 
+	</update>
+	<select id="getCurrentMeet" resultType="java.lang.String">
+		select meet from tb_flypaas_meet where status=1 limit 1
+	</select>
+</mapper>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 审核管理-发票审核 -->
+<mapper namespace="invoiceAudit">
+
+	<!-- 分页查询发票 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.id,
+			u.sid,
+			u.email,
+			t.title,
+			t.type,
+			t.opentype,
+			t.money/${money_rate} as money_fmt,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date_fmt,
+			t.status,
+			t.logistics_company,
+			t.logistics_no,
+			(SELECT a.audit_desc FROM tb_srv_audit a WHERE a.audited_id = t.id AND a.audit_type = 5 LIMIT 1) AS audit_desc
+		FROM
+			tb_srv_invoice t,
+			tb_ucpaas_user u
+		WHERE
+			t.sid = u.sid
+		
+		<if test="text != null">
+			AND (
+				t.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR u.mobile LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.status = #{status}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(*) AS totalCount
+		FROM
+			tb_srv_invoice t,
+			tb_ucpaas_user u
+		WHERE
+			t.sid = u.sid
+		
+		<if test="text != null">
+			AND (
+				t.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR u.mobile LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.status = #{status}
+		</if>
+	</select>
+	
+	<!-- 获取实体-->
+	<select id="getEntity" resultType="map">
+		SELECT
+			t.id,
+			u.sid,
+			u.email,
+			t.title,
+			t.type,
+			t.opentype,
+			t.money/${money_rate} as money_fmt,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date_fmt,
+			t.status,
+			t.identificationnum,
+			t.identificationimg,
+			t.bankaccount,
+			t.bankaddr,
+			a.audit_desc,
+			p.name as province_name,
+			c.name as city_name,
+			t.logistics_company,
+			t.logistics_no,
+			l.*
+		FROM
+			tb_srv_invoice t
+			join tb_ucpaas_user u on  t.sid = u.sid 
+			join tb_srv_invoice_addresslist l on t.postaddr = l.id
+		left join tb_ucpaas_province p on p.id = l.province
+		left join tb_ucpaas_city c on c.id = l.city
+		LEFT JOIN tb_srv_audit a ON a.audited_id = t.id AND a.audit_type = 5
+		where t.id = #{id} limit 1
+	</select>
+	
+	<!-- 审核 -->
+	<update id="audit">
+		UPDATE tb_srv_invoice t
+		SET t.status = #{bill_status},t.update_date = now()
+		WHERE t.id = #{id}
+	</update>
+	<!-- 邮寄 -->
+	<update id="postBill">
+		UPDATE tb_srv_invoice t
+			SET t.status = 3,t.logistics_company = #{logistics_company},
+			t.logistics_no= #{logistics_no},t.update_date = now()
+		WHERE t.id = #{id} and t.status = 2
+	</update>
+	<!-- 加载用户信息 -->
+	<select id="loadUserInfo" resultType="map">
+		select sid,username,email,mobile,realname as title,user_type as opentype from tb_ucpaas_user where sid = #{sid} LIMIT 1;
+	</select>
+	
+	<insert id="addInvoice">
+		insert into tb_srv_invoice(sid,opentype,money,title,type,identificationnum,identificationimg,bankaccount,bankaddr,status,postaddr,create_date,update_date)
+		values(#{sid},#{opentype},#{money},#{title},#{type},#{identificationnum},#{identificationimg},#{bankaccount},#{bankaddr},2,#{postaddr},now(),now())
+	</insert>
+		
+	<update id="updateInvoice" >
+		update tb_srv_invoice
+		<set>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="opentype!=null">
+				opentype=#{opentype},
+			</if>
+			<if test="money!=null">
+				money=#{money},
+			</if>
+			<if test="title!=null">
+				title=#{title},
+			</if>
+			<if test="type!=null">
+				type=#{type},
+			</if>
+			<if test="identificationnum!=null">
+				identificationnum=#{identificationnum},
+			</if>
+			<if test="identificationimg!=null">
+				identificationimg=#{identificationimg},
+			</if>
+			<if test="bankaccount!=null">
+				bankaccount=#{bankaccount},
+			</if>
+			<if test="bankaddr!=null">
+				bankaddr=#{bankaddr},
+			</if>
+			<if test="logistics_company!=null">
+				logistics_company=#{logistics_company},
+			</if>
+			<if test="logistics_no!=null">
+				logistics_no=#{logistics_no},
+			</if>
+			update_date=now()
+		</set>
+		where id=#{id} and sid=#{sid}
+	</update>
+	<insert id="addInvoiceAddr" useGeneratedKeys="true" keyProperty="postaddr">
+		insert into tb_srv_invoice_addresslist(sid,province,city,street,postnum,contacts,contactmobile,status,create_date,update_date)
+		values(#{sid},#{province},#{city},#{street},#{postnum},#{contacts},#{contactmobile},1,now(),now());
+	</insert>
+	<update id="updateInvoiceAddr">
+		update tb_srv_invoice_addresslist
+		<set>
+			<if test="province>0">
+				province=#{province},
+			</if>
+			<if test="city>0">
+				city=#{city},
+			</if>
+			<if test="street!=null">
+				street=#{street},
+			</if>
+			<if test="postnum!=null">
+				postnum=#{postnum},
+			</if>
+			<if test="contacts!=null">
+				contacts=#{contacts},
+			</if>
+			<if test="contactmobile!=null">
+				contactmobile=#{contactmobile},
+			</if>
+			<if test="status!=null">
+				status=#{status},
+			</if>
+			<if test="updateDate!=null">
+				update_date=#{updateDate}
+			</if>
+		</set>
+		where id=#{id} and sid=#{sid}
+	</update>
+	
+	<select id="getAllPayMoneyLastYear" resultType="java.lang.Long">
+		SELECT
+			ifnull(
+				sum(
+	
+					IF (charge_type != 'A3', charge, 0)
+				) - sum(
+	
+					IF (charge_type = 'A3', charge, 0)
+				),
+				0
+			)
+		FROM
+			tb_srv_payment_order
+		WHERE
+			sid = #{sid}
+		AND STATUS = '3'
+		AND account_type = '0'
+		AND (
+			charge_type IN ('A1', 'A3', 'B2')
+			OR charge_type REGEXP '^[0-9]'
+		)
+	</select>
+	<select id="getInvoiceMoney" resultType="java.lang.Long">
+		select ifnull(sum(money),0) from tb_srv_invoice  where sid=#{sid} and status in('1','2','3')
+	</select>
+	
+</mapper> 

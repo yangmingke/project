@@ -1,0 +1,490 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsUserInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsUserInfo" >
+    <id column="sid" property="sid" jdbcType="VARCHAR" />
+    <result column="net_sid" property="netSid" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="chat_type" property="chatType" jdbcType="INTEGER" />
+    <result column="chat_nbr" property="chatNbr" jdbcType="VARCHAR" />
+    <result column="realname" property="realname" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="national" property="national" jdbcType="INTEGER" />
+    <result column="o_con_type1" property="oConType1" jdbcType="CHAR" />
+    <result column="o_con_nbr1" property="oConNbr1" jdbcType="VARCHAR" />
+    <result column="o_con_type2" property="oConType2" jdbcType="CHAR" />
+    <result column="o_con_nbr2" property="oConNbr2" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="login_times" property="loginTimes" jdbcType="INTEGER" />
+    <result column="province" property="province" jdbcType="INTEGER" />
+    <result column="city" property="city" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="queryForListMap" type="com.flypaas.model.TbRsUserInfo">  
+        <id column="sid" property="sid" jdbcType="VARCHAR" />
+	    <result column="net_sid" property="netSid" jdbcType="VARCHAR" />
+	    <result column="username" property="username" jdbcType="VARCHAR" />
+	    <result column="email" property="email" jdbcType="VARCHAR" />
+	    <result column="password" property="password" jdbcType="VARCHAR" />
+	    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+	    <result column="chat_type" property="chatType" jdbcType="INTEGER" />
+	    <result column="chat_nbr" property="chatNbr" jdbcType="VARCHAR" />
+	    <result column="realname" property="realname" jdbcType="VARCHAR" />
+	    <result column="address" property="address" jdbcType="VARCHAR" />
+	    <result column="national" property="national" jdbcType="INTEGER" />
+	    <result column="o_con_type1" property="oConType1" jdbcType="CHAR" />
+	    <result column="o_con_nbr1" property="oConNbr1" jdbcType="VARCHAR" />
+	    <result column="o_con_type2" property="oConType2" jdbcType="CHAR" />
+	    <result column="o_con_nbr2" property="oConNbr2" jdbcType="VARCHAR" />
+	    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+	    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+	    <result column="login_times" property="loginTimes" jdbcType="INTEGER" />
+	    <result column="province" property="province" jdbcType="INTEGER" />
+	    <result column="city" property="city" jdbcType="INTEGER" />
+	    <result column="status" property="status" jdbcType="INTEGER" />
+	    <result column="valicode" property="valiCode" jdbcType="VARCHAR" />
+        <collection property="role" javaType="java.util.List" ofType="com.flypaas.model.TbRsRole">  
+            <id column="role_id" property="roleId" jdbcType="INTEGER" />
+		    <result column="role_name" property="roleName" jdbcType="VARCHAR" />
+		    <result column="welcome_page" property="welcomePage" jdbcType="VARCHAR" />
+		    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+		    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+		    <result column="status" property="status" jdbcType="CHAR" />
+        </collection>  
+    </resultMap> 
+  <sql id="Base_Column_List" >
+    sid, net_sid, username, email, password, mobile, chat_type, chat_nbr, realname, address, 
+    national, o_con_type1, o_con_nbr1, o_con_type2, o_con_nbr2, create_date, update_date, 
+    login_times, province, city,status,valicode
+  </sql>
+  
+  <select id="queryManagerSidBynetSid" resultType="java.util.Map" parameterType="Map">
+  	select tb_rs_user_info.sid as sid from tb_rs_user_info,tb_rs_role_user
+		where tb_rs_user_info.sid = tb_rs_role_user.sid 
+		and tb_rs_user_info.net_sid = #{netSid,jdbcType=VARCHAR} and tb_rs_role_user.role_id = 0
+  </select>
+  
+  <select id="queryManagerSid" resultType="java.lang.String" parameterType="java.lang.String">
+  	select tb_rs_user_info.sid as sid from tb_rs_user_info,tb_rs_role_user
+		where tb_rs_user_info.sid = tb_rs_role_user.sid 
+		and tb_rs_user_info.net_sid = #{netSid,jdbcType=VARCHAR} and tb_rs_role_user.role_id = 0
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_user_info
+    where sid = #{sid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryUserInfo" resultMap="BaseResultMap" parameterType="com.flypaas.model.TbRsUserInfo" >
+  	select 
+    u.sid, net_sid, username, email, password, mobile, chat_type, chat_nbr, realname, address, national, o_con_type1, o_con_nbr1, o_con_type2, o_con_nbr2, create_date, update_date, login_times, province, city,status,valicode
+    from tb_rs_user_info u
+    LEFT JOIN tb_rs_role_user ru
+	ON u.sid = ru.sid
+    where username = #{username,jdbcType=VARCHAR}
+    and password = #{password,jdbcType=VARCHAR}  and status = 1
+  </select>
+  <select id="queryUserInfo2" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  	select 
+    <include refid="Base_Column_List" />
+    from tb_rs_user_info
+    where email = #{email,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_rs_user_info
+    where sid = #{sid,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsUserInfo" >
+    insert into tb_rs_user_info (sid, net_sid, username, 
+      email, password, mobile, 
+      chat_type, chat_nbr, realname, 
+      address, national, o_con_type1, 
+      o_con_nbr1, o_con_type2, o_con_nbr2, 
+      create_date, update_date, login_times, 
+      province, city,valicode,status)
+      values (#{sid,jdbcType=VARCHAR}, 
+    		#{netSid,jdbcType=VARCHAR}, 
+    		#{username,jdbcType=VARCHAR}, 
+      		#{email,jdbcType=VARCHAR}, 
+      		#{password,jdbcType=VARCHAR}, 
+      		#{mobile,jdbcType=VARCHAR}, 
+     		#{chatType,jdbcType=INTEGER}, 
+     		#{chatNbr,jdbcType=VARCHAR}, 
+     		#{realname,jdbcType=VARCHAR}, 
+      		#{address,jdbcType=VARCHAR}, 
+      		#{national,jdbcType=INTEGER}, 
+      		#{oConType1,jdbcType=CHAR}, 
+      		#{oConNbr1,jdbcType=VARCHAR}, 
+      		#{oConType2,jdbcType=CHAR}, 
+      		#{oConNbr2,jdbcType=VARCHAR}, 
+      		#{createDate,jdbcType=TIMESTAMP}, 
+      		#{updateDate,jdbcType=TIMESTAMP}, 
+      		#{loginTimes,jdbcType=INTEGER}, 
+      		#{province,jdbcType=INTEGER}, 
+      		#{city,jdbcType=INTEGER},
+      		#{valiCode,jdbcType=VARCHAR},
+      		#{status,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsUserInfo" >
+    insert into tb_rs_user_info
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="sid != null" >
+        sid,
+      </if>
+      <if test="netSid != null" >
+        net_sid,
+      </if>
+      <if test="username != null" >
+        username,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="password != null" >
+        password,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="chatType != null" >
+        chat_type,
+      </if>
+      <if test="chatNbr != null" >
+        chat_nbr,
+      </if>
+      <if test="realname != null" >
+        realname,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="national != null" >
+        national,
+      </if>
+      <if test="oConType1 != null" >
+        o_con_type1,
+      </if>
+      <if test="oConNbr1 != null" >
+        o_con_nbr1,
+      </if>
+      <if test="oConType2 != null" >
+        o_con_type2,
+      </if>
+      <if test="oConNbr2 != null" >
+        o_con_nbr2,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="loginTimes != null" >
+        login_times,
+      </if>
+      <if test="province != null" >
+        province,
+      </if>
+      <if test="city != null" >
+        city,
+      </if>
+      <if test="valiCode != null" >
+        valicode,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="sid != null" >
+        #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="netSid != null" >
+        #{netSid,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="chatType != null" >
+        #{chatType,jdbcType=INTEGER},
+      </if>
+      <if test="chatNbr != null" >
+        #{chatNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null" >
+        #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="national != null" >
+        #{national,jdbcType=INTEGER},
+      </if>
+      <if test="oConType1 != null" >
+        #{oConType1,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr1 != null" >
+        #{oConNbr1,jdbcType=VARCHAR},
+      </if>
+      <if test="oConType2 != null" >
+        #{oConType2,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr2 != null" >
+        #{oConNbr2,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginTimes != null" >
+        #{loginTimes,jdbcType=INTEGER},
+      </if>
+      <if test="province != null" >
+        #{province,jdbcType=INTEGER},
+      </if>
+      <if test="city != null" >
+        #{city,jdbcType=INTEGER},
+      </if>
+      <if test="valiCode != null" >
+        #{valiCode,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsUserInfo" >
+    update tb_rs_user_info
+    <set >
+      <if test="netSid != null" >
+        net_sid = #{netSid,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="chatType != null" >
+        chat_type = #{chatType,jdbcType=INTEGER},
+      </if>
+      <if test="chatNbr != null" >
+        chat_nbr = #{chatNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null" >
+        realname = #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="national != null" >
+        national = #{national,jdbcType=INTEGER},
+      </if>
+      <if test="oConType1 != null" >
+        o_con_type1 = #{oConType1,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr1 != null" >
+        o_con_nbr1 = #{oConNbr1,jdbcType=VARCHAR},
+      </if>
+      <if test="oConType2 != null" >
+        o_con_type2 = #{oConType2,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr2 != null" >
+        o_con_nbr2 = #{oConNbr2,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginTimes != null" >
+        login_times = #{loginTimes,jdbcType=INTEGER},
+      </if>
+      <if test="province != null" >
+        province = #{province,jdbcType=INTEGER},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=INTEGER},
+      </if>
+      <if test="valiCode != null" >
+        valicode = #{valiCode,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    where sid = #{sid,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateByEmial" parameterType="com.flypaas.model.TbRsUserInfo" >
+    update tb_rs_user_info
+    <set >
+      <if test="netSid != null" >
+        net_sid = #{netSid,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="chatType != null" >
+        chat_type = #{chatType,jdbcType=INTEGER},
+      </if>
+      <if test="chatNbr != null" >
+        chat_nbr = #{chatNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="realname != null" >
+        realname = #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="national != null" >
+        national = #{national,jdbcType=INTEGER},
+      </if>
+      <if test="oConType1 != null" >
+        o_con_type1 = #{oConType1,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr1 != null" >
+        o_con_nbr1 = #{oConNbr1,jdbcType=VARCHAR},
+      </if>
+      <if test="oConType2 != null" >
+        o_con_type2 = #{oConType2,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr2 != null" >
+        o_con_nbr2 = #{oConNbr2,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginTimes != null" >
+        login_times = #{loginTimes,jdbcType=INTEGER},
+      </if>
+      <if test="province != null" >
+        province = #{province,jdbcType=INTEGER},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=INTEGER},
+      </if>
+      <if test="valiCode != null" >
+        valicode = #{valiCode,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=INTEGER},
+      </if>
+    </set>
+    where email = #{email,jdbcType=VARCHAR}
+  </update>
+  
+  
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsUserInfo" >
+    update tb_rs_user_info
+    set net_sid = #{netSid,jdbcType=VARCHAR},
+      username = #{username,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      chat_type = #{chatType,jdbcType=INTEGER},
+      chat_nbr = #{chatNbr,jdbcType=VARCHAR},
+      realname = #{realname,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      national = #{national,jdbcType=INTEGER},
+      o_con_type1 = #{oConType1,jdbcType=CHAR},
+      o_con_nbr1 = #{oConNbr1,jdbcType=VARCHAR},
+      o_con_type2 = #{oConType2,jdbcType=CHAR},
+      o_con_nbr2 = #{oConNbr2,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      login_times = #{loginTimes,jdbcType=INTEGER},
+      province = #{province,jdbcType=INTEGER},
+      city = #{city,jdbcType=INTEGER}
+      status = #{status,jdbcType=INTEGER},
+      valicode = #{valiCode,jdbcType=INTEGER}
+    where sid = #{sid,jdbcType=VARCHAR}
+  </update>
+  
+  <!-- 修改用户信息时可以直接用 updateByPrimaryKeySelective-->
+  <update id="updateUserStatusBySid" parameterType="java.lang.String">
+  	update tb_rs_user_info
+  	set status = 1 
+  	where sid = #{sid,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="updateUserValiCode" parameterType="com.flypaas.model.TbRsUserInfo">
+  	update tb_rs_user_info
+  	set valicode = #{valiCode,jdbcType=VARCHAR}
+  	where sid = #{sid,jdbcType=VARCHAR}
+  </update>
+  
+  <update id="editUserPwd" parameterType="com.flypaas.model.TbRsUserInfo">
+  	update tb_rs_user_info
+  	set password = #{password,jdbcType=VARCHAR}
+  	where sid = #{sid,jdbcType=VARCHAR}
+  </update>
+  
+  <select id="queryAllUser" resultMap="queryForListMap" parameterType="java.lang.String">
+  	select * from tb_rs_user_info as a,tb_rs_role as b,tb_rs_role_user as c
+	where a.sid = c.sid and b.role_id = c.role_id and a.net_sid = #{netSid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+  	select count(*) from tb_rs_user_info as a,tb_rs_role as b,tb_rs_role_user as c
+	where a.sid = c.sid and b.role_id = c.role_id and a.net_sid = #{netSid,jdbcType=VARCHAR}
+  </select>
+  
+  <delete id="delUser" parameterType="java.lang.String" >
+    delete from tb_rs_user_info
+    where sid = #{sid,jdbcType=VARCHAR}
+  </delete>
+  
+  <select id="queryUserInfoById" parameterType="java.lang.String" resultMap="queryForListMap">
+  	select * from tb_rs_user_info as a,tb_rs_role as b,tb_rs_role_user as c
+	where a.sid = c.sid and b.role_id = c.role_id and a.sid = #{sid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="queryUsersCount" parameterType="com.flypaas.model.TbRsUserInfo" resultType="java.lang.Integer">
+  	select count(*)
+  		from tb_rs_user_info
+  		where email = #{email,jdbcType=VARCHAR}
+  	<if test="mobile != null" >
+  		or	mobile = #{mobile,jdbcType=VARCHAR}
+  	</if>
+  </select>
+  
+</mapper>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE xml>
+<configuration scan="true" scanPeriod="60 seconds" debug="false" >
+
+	<!-- 控制台输出 -->
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<!--格式化输出 -->
+			<pattern>%date [%thread] %-5level %class.%method\(%line\) - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<!-- 根据不同的运行环境配置不同的日志策略 -->
+	<if
+		condition='"${spring.profiles.active}" == "devtest" || "${spring.profiles.active}" == "test" || "${spring.profiles.active}" == "production"'>
+		<then>
+
+			<if condition='"${spring.profiles.active}" == "devtest"'>
+				<then>
+					<!-- 配置日志文件的保存地址 -->
+					<property name="file_path" value="/home/logs/common-service" />
+				</then>
+			</if>
+			<if condition='"${spring.profiles.active}" == "test"'>
+				<then>
+					<property name="file_path" value="/data/weblog/common-service" />
+				</then>
+			</if>
+			<if condition='"${spring.profiles.active}" == "production"'>
+				<then>
+					<!-- 配置日志文件的保存地址 -->
+					<property name="file_path" value="/opt/paas/tomcat-common-service-18080/logs/common-service" />
+				</then>
+			</if>
+
+			<!-- 每天生成日志文件 -->
+			<appender name="debug_file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<!--日志文件输出的文件名 -->
+				<file>${file_path}/debug.log</file>
+				<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+					<!-- daily rollover -->
+					<fileNamePattern>${file_path}/debug.%d{yyyy-MM-dd}.log</fileNamePattern>
+					<!--日志文件保留天数 -->
+					<maxHistory>365</maxHistory>
+				</rollingPolicy>
+				<encoder>
+					<pattern>%date [%thread] %-5level %class.%method\(%line\) - %msg%n</pattern>
+				</encoder>
+				<!--日志文件最大的大小 <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy"> <MaxFileSize>10MB</MaxFileSize> 
+					</triggeringPolicy> -->
+			</appender>
+			<appender name="error_file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<file>${file_path}/error.log</file>
+				<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+					<fileNamePattern>${file_path}/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+					<maxHistory>365</maxHistory>
+				</rollingPolicy>
+				<encoder>
+					<pattern>%date [%thread] %-5level %class.%method\(%line\) - %msg%n</pattern>
+				</encoder>
+				<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+					<level>error</level>
+				</filter>
+			</appender>
+			
+			<appender name="http_log" class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<file>${file_path}/http_log.log</file>
+				<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+					<fileNamePattern>${file_path}/http_log.%d{yyyy-MM-dd}.log</fileNamePattern>
+					<maxHistory>365</maxHistory>
+				</rollingPolicy>
+				<encoder>
+					<pattern>%date [%thread] %-5level %class.%method\(%line\) - %msg%n</pattern>
+				</encoder>
+				<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+					<level>debug</level>
+				</filter>
+			</appender>
+
+			<!-- 错误日志发送邮件 -->
+			<appender name="email" class="ch.qos.logback.classic.net.SMTPAppender">
+				<smtpHost>mail.ucpaas.com</smtpHost>
+				<smtpPort>25</smtpPort>
+				<username>errorlog@ucpaas.com</username>
+				<password>ucpaas2014</password>
+				<from>errorlog@ucpaas.com</from>
+				<to>errorlog@ucpaas.com</to>
+				<subject>【common-service，${spring.profiles.active}服务器发生错误】%class.%method\(%line\) - %msg</subject>
+				<asynchronousSending>true</asynchronousSending>
+				<includeCallerData>false</includeCallerData>
+				<layout class="ch.qos.logback.classic.html.HTMLLayout" />
+				<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+					<level>error</level>
+				</filter>
+			</appender>
+
+			<!-- 测试、线上环境的日志输出 -->
+			<root level="info">
+				<appender-ref ref="stdout" />
+				<appender-ref ref="debug_file" />
+				<appender-ref ref="error_file" />
+			</root>
+			<!-- 日志名称为noErrorEmail的日志输出，错误日志不发送邮件 -->
+			<logger name="noErrorEmail" additivity="false" level="debug">
+				<appender-ref ref="stdout" />
+				<appender-ref ref="debug_file" />
+				<appender-ref ref="error_file" />
+			</logger>
+			
+			<!-- http请求的日志打印的另外一个文件 -->
+			<logger name="http_log" additivity="false" level="debug">
+				
+				<appender-ref ref="http_log" />
+			</logger>
+			
+			
+
+		</then>
+		<else>
+
+			<!-- 开发环境的日志输出 -->
+			<root level="debug">
+				<appender-ref ref="stdout" />
+			</root>
+		</else>
+	</if>
+
+	<logger name="com.ucpaas" level="debug" />
+	<logger name="org.mybatis" level="warn" />
+	<!-- 连接池druid日志级别设置 -->
+	<logger name="druid.sql.Connection" level="warn" />
+	<logger name="druid.sql.ResultSet" level="warn" />
+	<logger name="druid.sql.DataSource" level="warn" />
+	<logger name="druid.sql.Statement" level="warn" />
+	
+	
+	<logger name="org.apache.ibatis" level="debug" />
+	<logger name="org.apache.zookeeper" level="warn" />
+	
+	
+
+
+</configuration>

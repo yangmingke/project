@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsPaymentOrderMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsPaymentOrder" >
+    <id column="order_id" property="orderId" jdbcType="BIGINT" />
+    <result column="net_sid" property="netSid" jdbcType="VARCHAR" />
+    <result column="charge" property="charge" jdbcType="BIGINT" />
+    <result column="charge_type" property="chargeType" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="pay_date" property="payDate" jdbcType="TIMESTAMP" />
+    <result column="pay_result_date" property="payResultDate" jdbcType="TIMESTAMP" />
+    <result column="charge_balance" property="chargeBalance" jdbcType="BIGINT" />
+    <result column="pay_id" property="payId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    order_id, net_sid, charge, charge_type, status, create_date, pay_date, pay_result_date, 
+    charge_balance, pay_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_payment_order
+    where order_id = #{orderId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tb_rs_payment_order
+    where order_id = #{orderId,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsPaymentOrder" >
+    insert into tb_rs_payment_order (order_id, net_sid, charge, 
+      charge_type, status, create_date, 
+      pay_date, pay_result_date, charge_balance, 
+      pay_id)
+    values (#{orderId,jdbcType=BIGINT}, #{netSid,jdbcType=VARCHAR}, #{charge,jdbcType=BIGINT}, 
+      #{chargeType,jdbcType=CHAR}, #{status,jdbcType=CHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{payDate,jdbcType=TIMESTAMP}, #{payResultDate,jdbcType=TIMESTAMP}, #{chargeBalance,jdbcType=BIGINT}, 
+      #{payId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsPaymentOrder" >
+    insert into tb_rs_payment_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        order_id,
+      </if>
+      <if test="netSid != null" >
+        net_sid,
+      </if>
+      <if test="charge != null" >
+        charge,
+      </if>
+      <if test="chargeType != null" >
+        charge_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="payDate != null" >
+        pay_date,
+      </if>
+      <if test="payResultDate != null" >
+        pay_result_date,
+      </if>
+      <if test="chargeBalance != null" >
+        charge_balance,
+      </if>
+      <if test="payId != null" >
+        pay_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="orderId != null" >
+        #{orderId,jdbcType=BIGINT},
+      </if>
+      <if test="netSid != null" >
+        #{netSid,jdbcType=VARCHAR},
+      </if>
+      <if test="charge != null" >
+        #{charge,jdbcType=BIGINT},
+      </if>
+      <if test="chargeType != null" >
+        #{chargeType,jdbcType=CHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payDate != null" >
+        #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payResultDate != null" >
+        #{payResultDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="chargeBalance != null" >
+        #{chargeBalance,jdbcType=BIGINT},
+      </if>
+      <if test="payId != null" >
+        #{payId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsPaymentOrder" >
+    update tb_rs_payment_order
+    <set >
+      <if test="netSid != null" >
+        net_sid = #{netSid,jdbcType=VARCHAR},
+      </if>
+      <if test="charge != null" >
+        charge = #{charge,jdbcType=BIGINT},
+      </if>
+      <if test="chargeType != null" >
+        charge_type = #{chargeType,jdbcType=CHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payDate != null" >
+        pay_date = #{payDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="payResultDate != null" >
+        pay_result_date = #{payResultDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="chargeBalance != null" >
+        charge_balance = #{chargeBalance,jdbcType=BIGINT},
+      </if>
+      <if test="payId != null" >
+        pay_id = #{payId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where order_id = #{orderId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsPaymentOrder" >
+    update tb_rs_payment_order
+    set net_sid = #{netSid,jdbcType=VARCHAR},
+      charge = #{charge,jdbcType=BIGINT},
+      charge_type = #{chargeType,jdbcType=CHAR},
+      status = #{status,jdbcType=CHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      pay_date = #{payDate,jdbcType=TIMESTAMP},
+      pay_result_date = #{payResultDate,jdbcType=TIMESTAMP},
+      charge_balance = #{chargeBalance,jdbcType=BIGINT},
+      pay_id = #{payId,jdbcType=VARCHAR}
+    where order_id = #{orderId,jdbcType=BIGINT}
+  </update>
+</mapper>

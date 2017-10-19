@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-应用管理 -->
+<mapper namespace="app">
+
+	<!-- 分页查询应用 -->
+	<select id="query" resultType="map">
+		SELECT
+			app.app_sid,
+			app.app_name,
+			u.email,
+			date_format(
+				app.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			app.`status`,
+			app.app_kind,
+			app.industry,
+			app.brand
+		FROM
+			tb_ucpaas_application app Join tb_ucpaas_user u on u.sid = app.sid 
+		WHERE app.industry !=0
+		AND u.super_sid = #{superSid}
+		<if test="text != null">
+			AND (
+				app.app_sid LIKE concat('%', #{text}, '%')
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND app.create_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND app.create_date <= #{end_date} ]]>
+		</if>
+		<if test="industry != null">
+			AND app.industry = #{industry}
+		</if>
+		<if test="status != null">
+			AND app.`status` = #{status}
+		</if>
+		
+		ORDER BY
+			app.create_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询应用 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_application app Join tb_ucpaas_user u on u.sid = app.sid 
+		WHERE app.industry !=0
+		AND u.super_sid = #{superSid}
+		<if test="text != null">
+			AND (
+				app.app_sid LIKE concat('%', #{text}, '%')
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND app.create_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND app.create_date <= #{end_date} ]]>
+		</if>
+		<if test="industry != null">
+			AND app.industry = #{industry}
+		</if>
+		<if test="status != null">
+			AND app.`status` = #{status}
+		</if>
+	</select>
+	
+	<!-- 获取应用 -->
+	<select id="getApp" resultType="map">
+		SELECT
+			app.app_sid,
+			app.app_name,
+			u.sid,
+			u.email,
+			date_format(
+				app.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			app.`status`,
+			w.white_address,
+			app.is_ivr,
+			app.is_tts,
+			app.is_show_nbr,
+			app.industry,
+			app.sms_msg_nbr,
+			app.app_kind,
+			app.industry,
+			app.brand,	
+			app.call_fr,
+			app.ck_key,
+			app.ck_callback_url,
+			app.ck_enddate,
+			app.ck_way,
+			app.ck_num,
+			b.balance/${money_rate} as app_balance,
+			ver_can,
+			max_hop_num,
+			route_num,
+			route_policy,
+			node_max_price
+		FROM
+			tb_ucpaas_application app
+		JOIN tb_ucpaas_user u ON u.sid = app.sid
+		LEFT JOIN tb_srv_white_list w ON w.app_sid = app.app_sid
+		left join tb_ucpaas_app_balance b on app.app_sid  = b.app_sid
+		WHERE
+			app.app_sid = #{app_sid}
+	</select>
+	
+	<!-- 获取回调地址 -->
+	<select id="getCallback" resultType="map">
+		SELECT
+			p.param_value AS call_type_name,
+			c.call_address
+		FROM
+			tb_srv_callback c
+		LEFT JOIN tb_ucpaas_params p ON p.param_key = c.call_type
+		AND p.param_type = 'callbackfun'
+		WHERE
+			c.app_sid = #{app_sid}
+	</select>
+	<!-- 获取显号 -->
+	<select id="getShownbrs" resultType="map">
+		SELECT
+			c.nbr_type,
+			c.nbr
+		FROM
+			tb_ucpaas_application_shownbrs c
+		WHERE
+			c.app_sid = #{app_sid} and c.status = 1
+		ORDER by nbr_type 
+	</select>
+	
+	<!-- 获取显号 -->
+	<select id="getRings" resultType="map">
+		SELECT
+			t.file_name,
+			t.type
+		FROM
+			tb_ucpaas_call_ring t
+		WHERE
+			t.app_sid = #{app_sid} and audit_status = 2
+		ORDER by type 
+	</select>
+	
+	<!-- 修改应用状态：强制下线 -->
+	<update id="updateStatus">
+		UPDATE tb_ucpaas_application app
+		SET app.`status` = #{status},
+		 app.update_date = now()
+		WHERE
+			app.app_sid = #{app_sid}
+	</update>
+	<select id="queryAppSidBySid" resultType="map">
+		select app_sid from tb_ucpaas_application where sid = #{sid}
+		<if test="status != null">
+			and status = #{status}
+		</if>
+	</select>
+	<!-- 更新应用品牌 -->
+	<update id="saveBrand">
+		UPDATE tb_ucpaas_application app
+		SET app.brand = #{brand},
+		 app.update_date = now()
+		WHERE
+			app.app_sid = #{app_sid}
+	</update>
+	
+	<update id="update">
+		UPDATE tb_ucpaas_application app
+		SET app.max_hop_num = #{max_hop_num},
+			app.route_num = #{route_num},
+			app.node_max_price = #{node_max_price},
+			app.ver_can = #{ver_can},
+			app.route_policy = #{route_policy},
+			app.update_date = now()
+		WHERE
+			app.app_sid = #{app_sid}
+	</update>
+	
+</mapper> 

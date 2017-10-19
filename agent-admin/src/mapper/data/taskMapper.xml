@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心-任务管理 -->
+<mapper namespace="task">
+	
+	<!-- 分页查询任务 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.task_id,
+			t.task_name,
+			t.procedure_name,
+			t.`group`,
+			t.`order`,
+			t.execute_next,
+			date_format(
+				t.scan_next,
+				'%Y-%m-%d %H:%i:%S'
+			) AS scan_next,
+			t.`status`
+		FROM
+			tb_ucpaas_task t
+		WHERE
+			1 = 1
+		
+		<if test="text != null">
+			AND (
+				t.task_id LIKE concat('%', #{text}, '%')
+				OR t.task_name LIKE concat('%', #{text}, '%')
+				OR t.procedure_name LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.scan_next >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND t.scan_next <= #{end_date} ]]>
+		</if>
+		<if test="task_type !=null">
+			AND t.task_type = #{task_type}
+		</if>
+		<if test="db_type !=null">
+			AND t.db_type = #{db_type}
+		</if>
+		<if test="execute_type !=null">
+			AND t.execute_type = #{execute_type}
+		</if>
+		<if test="scan_execute !=null">
+			AND t.scan_execute = #{scan_execute}
+		</if>
+		<if test="group !=null">
+			AND t.`group` = #{group}
+		</if>
+		<if test="status != null">
+			AND t.`status` = #{status}
+		</if>
+		
+		ORDER BY
+			t.scan_next,
+			t.`group`,
+			t.`order`
+		${limit}
+	</select>
+	
+	<!-- 分页查询任务 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_task t
+		WHERE
+			1 = 1
+		
+		<if test="text != null">
+			AND (
+				t.task_id LIKE concat('%', #{text}, '%')
+				OR t.task_name LIKE concat('%', #{text}, '%')
+				OR t.procedure_name LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.scan_next >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND t.scan_next <= #{end_date} ]]>
+		</if>
+		<if test="task_type !=null">
+			AND t.task_type = #{task_type}
+		</if>
+		<if test="db_type !=null">
+			AND t.db_type = #{db_type}
+		</if>
+		<if test="execute_type !=null">
+			AND t.execute_type = #{execute_type}
+		</if>
+		<if test="scan_execute !=null">
+			AND t.scan_execute = #{scan_execute}
+		</if>
+		<if test="group !=null">
+			AND t.`group` = #{group}
+		</if>
+		<if test="status != null">
+			AND t.`status` = #{status}
+		</if>
+	</select>
+	
+	<!-- 查看任务 -->
+	<select id="view" resultType="map">
+		SELECT
+			t.task_id,
+			t.task_name,
+			t.task_type,
+			t.db_type,
+			t.procedure_name,
+			t.execute_type,
+			t.execute_next,
+			t.execute_period,
+			t.scan_type,
+			date_format(
+				t.scan_next,
+				'%Y-%m-%d %H:%i:%S'
+			) AS scan_next,
+			t.scan_period,
+			t.scan_execute,
+			t.dependency,
+			t.allow_start,
+			t.allow_end,
+			t.`group`,
+			t.`order`,
+			t.`status`,
+			date_format(
+				t.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date
+		FROM
+			tb_ucpaas_task t
+		WHERE
+			t.task_id = #{task_id}
+	</select>
+	
+	<!-- 添加、修改任务之前查重 -->
+	<select id="check" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_task t
+		WHERE
+			t.task_name = #{task_name}
+		<if test="task_id != null">
+			AND t.task_id != #{task_id}
+		</if>
+	</select>
+	
+	<!-- 添加任务 -->
+	<insert id="insert">
+		INSERT INTO tb_ucpaas_task (
+			task_name,
+			task_type,
+			db_type,
+			procedure_name,
+			execute_type,
+			execute_next,
+			execute_period,
+			scan_type,
+			scan_next,
+			scan_period,
+			scan_execute,
+			dependency,
+			allow_start,
+			allow_end,
+			`group`,
+			`order`,
+			`status`,
+			create_date,
+			update_date
+		)
+		VALUES
+			(
+				#{task_name},
+				#{task_type},
+				#{db_type},
+				#{procedure_name},
+				#{execute_type},
+				#{execute_next},
+				#{execute_period},
+				#{scan_type},
+				#{scan_next},
+				#{scan_period},
+				#{scan_execute},
+				#{dependency},
+				#{allow_start},
+				#{allow_end},
+				#{group},
+				#{order},
+				0,
+				now(),
+				now()
+			)
+	</insert>
+	
+	<!-- 修改任务 -->
+	<update id="update">
+		UPDATE tb_ucpaas_task t
+		SET t.task_name = #{task_name},
+		t.task_type = #{task_type},
+		t.db_type = #{db_type},
+		t.procedure_name = #{procedure_name},
+		t.execute_type = #{execute_type},
+		t.execute_next = #{execute_next},
+		t.execute_period = #{execute_period},
+		t.scan_type = #{scan_type},
+		t.scan_next = #{scan_next},
+		t.scan_period = #{scan_period},
+		t.scan_execute = #{scan_execute},
+		t.dependency = #{dependency},
+		t.allow_start = #{allow_start},
+		t.allow_end = #{allow_end},
+		t.`group` = #{group},
+		t.`order` = #{order},
+		t.update_date = now()
+		WHERE
+			t.task_id = #{task_id}
+	</update>
+	
+	<!-- 修改任务状态 -->
+	<update id="updateStatus">
+		UPDATE tb_ucpaas_task t
+		SET t.`status` = #{status}
+		WHERE
+			t.task_id = #{task_id}
+	</update>
+	
+</mapper> 

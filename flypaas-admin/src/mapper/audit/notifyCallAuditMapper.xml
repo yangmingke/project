@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 审核管理-语音通知审核 -->
+<mapper namespace="notifyCall">
+
+	<!-- 分页查询 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.id,
+			app.app_sid,
+			app.app_name,
+			t.sid,
+			u.email,
+			t.type,
+			t.content,
+			t.user_file_name,
+			t.file_path,
+			t.file_name,
+			t.create_date,
+			t.update_date,
+			t.audit_status,
+			t.upload_status,
+			t.send_status,
+			(SELECT a.audit_desc FROM tb_srv_audit a WHERE a.audited_id = t.id AND a.audit_type = 8 LIMIT 1) AS audit_desc
+		FROM
+			tb_notify_call_file t,
+			tb_ucpaas_application app,
+			tb_ucpaas_user u
+		WHERE
+			t.app_sid = app.app_sid
+		AND t.sid = u.sid
+		AND t.audit_status != 4
+		
+		<if test="text != null">
+			AND (
+				app.app_sid LIKE concat('%', #{text}, '%')
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR t.id = #{text}
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="audit_status != null">
+			AND t.`audit_status` = #{audit_status}
+		</if>
+		<if test="upload_status != null">
+			AND t.`upload_status` = #{upload_status}
+		</if>
+		<if test="send_status != null">
+			AND t.`send_status` = #{send_status}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_notify_call_file t,
+			tb_ucpaas_application app,
+			tb_ucpaas_user u
+		WHERE
+			t.app_sid = app.app_sid
+		AND t.sid = u.sid
+		AND t.audit_status != 4
+		
+		<if test="text != null">
+			AND (
+				app.app_sid LIKE concat('%', #{text}, '%')
+				OR app.app_name LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR t.id = #{text}
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="audit_status != null">
+			AND t.`audit_status` = #{audit_status}
+		</if>
+		<if test="upload_status != null">
+			AND t.`upload_status` = #{upload_status}
+		</if>
+		<if test="send_status != null">
+			AND t.`send_status` = #{send_status}
+		</if>
+	</select>
+	<!-- 审核 -->
+	<update id="audit">
+		UPDATE tb_notify_call_file t
+		SET t.`audit_status` = #{audit_status},
+		<if test="send_status!=null">
+			send_status =#{send_status},
+		</if>
+		<if test="upload_status!=null">
+			upload_status =#{upload_status},
+		</if>
+		t.update_date = now(),
+		t.audit_date = now()
+		WHERE
+			t.id = #{id}
+	</update>
+	<!-- 查询所有待执行的任务. -->
+	<select id="findAllTasks" resultType="map">
+		SELECT t.id,t.app_sid,t.sid,t.audit_status,t.upload_status,t.content,t.file_path,t.file_name,
+			t.to,t.toServNum,t.type,t.playTimes,t.send_status,t.is_contract,t.call_id,t.call_time
+		FROM
+			tb_notify_call_file t
+		WHERE
+			t.upload_status IN (1, 2)
+		AND (
+				(<!-- 所有待发送 审核通过语音与文本 或 协议用户发送的文本. -->
+					t.send_status IN (1, 2)
+					AND (
+						(type = 1 AND audit_status = 2)
+						OR (
+							type = 0
+							AND audit_status IN (1, 2)
+							AND (
+								is_contract = 1
+								OR audit_status = 2
+							)
+						)
+					)
+				)
+				OR (<!-- 60秒没有执行完成的重新执行  -->
+					TIMESTAMPDIFF(SECOND, update_date, now()) > 60
+					AND send_status = 5
+				)
+		)
+		ORDER BY
+			update_date
+		LIMIT 10000
+	</select>
+	
+	<update id="updateRun">
+		update tb_notify_call_file 
+		set send_status = #{send_status},
+			update_date = now()
+		where id in
+		<foreach collection="list" item="i" open="(" close=")" separator=",">
+			#{i.id}
+		</foreach>
+	</update>
+	
+	<update id="updateProcessResult">
+		update tb_notify_call_file 
+		<set>
+			<if test="upload_status != null">
+				upload_status = #{upload_status},
+			</if>
+			<if test="audit_status != null">
+				audit_status = #{audit_status},
+				audit_date = now(),
+			</if>
+			<if test="send_status != null">
+				send_status = #{send_status},
+			</if>
+			<if test="file_path != null">
+				file_path = #{file_path},
+			</if>
+			<if test="file_name != null">
+				file_name = #{file_name},
+			</if>
+			<if test="remote_path != null">
+				remote_path = #{remote_path},
+			</if>
+			update_date = now()
+		</set>
+		where id = #{id}
+	</update>
+	
+</mapper> 

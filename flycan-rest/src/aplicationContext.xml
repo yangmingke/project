@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Application context definition for PetClinic on JDBC. -->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+		http://www.springframework.org/schema/beans  
+	    http://www.springframework.org/schema/beans/spring-beans.xsd  
+	    http://www.springframework.org/schema/util  
+	    http://www.springframework.org/schema/util/spring-util.xsd  
+	    http://cxf.apache.org/jaxrs  
+	    http://cxf.apache.org/schemas/jaxrs.xsd  
+	    http://cxf.apache.org/core   
+	    http://cxf.apache.org/schemas/core.xsd"
+		xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:jaxrs="http://cxf.apache.org/jaxrs">
+		
+		<import resource="classpath:META-INF/cxf/cxf.xml"/>
+		<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+		<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+		
+		<util:list id="jsonKeys">  
+	        <value>app</value>  
+	        <value>comment</value>  
+	        <value>routes</value>
+	    </util:list>  
+	  
+	    <util:list id="jsonTypes">  
+	        <value>application/json</value>  
+	        <value>application/jettison</value>  
+	    </util:list>  
+		
+		<bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.JSONProvider">  
+			<property name="arrayKeys" ref="jsonKeys" />  
+	        <property name="serializeAsArray" value="true" />  
+	        <property name="produceMediaTypes" ref="jsonTypes" />  
+	        <property name="consumeMediaTypes" ref="jsonTypes" />  
+		</bean>  
+	    <bean id="listResp" class="com.yzx.rest.resp.ListResp"></bean>
+	    <jaxrs:server id="accountService" address="/">  
+	        <jaxrs:serviceBeans>  
+	        	<ref bean="listResp"/>
+	        </jaxrs:serviceBeans>  
+	        <jaxrs:providers>  
+	            <ref bean="jsonProvider" />  
+	        </jaxrs:providers>  
+	    </jaxrs:server>  
+    
+		<bean id="inMessageInterceptor" class="org.apache.cxf.interceptor.LoggingInInterceptor" /> 
+		<bean id="outMessageInterceptor" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
+		
+		<!-- spring beans 组件扫描 -->
+		<context:component-scan base-package="com.yzx.rest"/>
+		
+		<!-- 其他配置文件 -->
+		<context:property-placeholder location="classpath:config_${spring.profiles.active}.properties" ignore-unresolvable="true"/>
+		
+		
+		<import resource="applicationContext-beans.xml" />
+</beans>

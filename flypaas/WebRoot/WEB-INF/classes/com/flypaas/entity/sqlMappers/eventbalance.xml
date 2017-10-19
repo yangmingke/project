@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.EventBalance">
+
+	<insert id="addEventBalance" parameterType="map">
+		insert into tb_service_balance(sid,balance,eff_date,exp_date,event_id,status,create_date,update_date)
+		values(#{sid},#{balance},#{effDate},#{expDate},#{eventId},#{status},#{createDate},#{updateDate})
+	</insert>
+	
+	<update id="updateEventBalance" parameterType="map">
+		update tb_service_balance set balance=balance+#{balance},update_date=#{updateDate} where sid=#{sid} and event_id=#{eventId}
+	</update>
+	
+	<select id="getEventBalanceCount" parameterType="map" resultType="int">
+		select count(*) from tb_service_balance where sid=#{sid} and event_id=#{eventId}
+	</select>
+	
+	<select id="getEventBalanceBySid" parameterType="java.lang.String" resultType="map">
+		SELECT b.id,b.sid,b.balance/1000000 as balance,b.event_id,b.eff_date,b.exp_date,b.status,t.event_name FROM tb_service_balance b LEFT JOIN tb_bill_event_type t ON(b.event_id=t.event_id) WHERE sid=#{sid}
+	</select>
+
+</mapper>

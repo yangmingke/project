@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsBillAcctMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsBillAcct" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="main_sid" property="mainSid" jdbcType="VARCHAR" />
+    <result column="event_id" property="eventId" jdbcType="BIGINT" />
+    <result column="event_name" property="eventName" jdbcType="VARCHAR" />
+    <result column="fee" property="fee" jdbcType="BIGINT" />
+    <result column="charge_type" property="chargeType" jdbcType="VARCHAR" />
+    <result column="itemfee" property="itemfee" jdbcType="BIGINT" />
+    <result column="total" property="total" jdbcType="INTEGER" />
+    <result column="actual_fee" property="actualFee" jdbcType="BIGINT" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, main_sid, event_id, event_name, fee, charge_type, itemfee, total, actual_fee, 
+    create_date
+  </sql>
+  
+  
+  <select id="queryResourceSideFlowDay" resultType="java.util.Map" parameterType="Map">
+  	select 
+  	tb_rs_account_info.username,
+  	tb_ba.*
+  	from tb_rs_bill_acct as tb_ba, tb_rs_account_info
+  	<!-- _#{monthTime,jdbcType=VARCHAR} -->
+  	where tb_ba.main_sid = tb_rs_account_info.net_sid 
+  		and   create_time = #{dateTime,jdbcType=VARCHAR}
+  	<if test="keyWord !=null">
+  		and ip = #{keyWord,jdbcType=VARCHAR} or net_name = #{keyWord,jdbcType=VARCHAR}
+  	</if>
+  	limit #{begin,jdbcType=INTEGER} , #{count,jdbcType=INTEGER};
+  </select>
+  
+  
+  <select id="statisticsResourceSideFlowDay" resultType="java.util.Map" parameterType="Map">
+  	select 
+  	sum(tb_ba.fee) as totalFee,
+  	round(avg(tb_ba.price),2) as avgPrice,
+  	sum(tb_ba.traffic_total) as totalTraffic,
+  	sum(tb_ba.traffic_in) as totalTrafficIn,
+  	sum(tb_ba.traffic_out) as totalTrafficOut
+  	from tb_rs_bill_acct as tb_ba, tb_rs_account_info
+  	<!-- _#{monthTime,jdbcType=VARCHAR} -->
+  	where tb_ba.main_sid = tb_rs_account_info.net_sid 
+  		and   create_time = #{dateTime,jdbcType=VARCHAR}
+  	<if test="keyWord !=null">
+  		and ip = #{keyWord,jdbcType=VARCHAR} or net_name = #{keyWord,jdbcType=VARCHAR}
+  	</if>
+  </select>
+  
+  <select id="queryResourceSideFlowMonth" resultType="java.util.Map" parameterType="Map">
+  	select 
+  	tb_rs_account_info.username,
+  	ba_monthTime.*
+  	from tb_rs_bill_acct  as ba_monthTime, tb_rs_account_info
+  	<!-- _#{monthTime,jdbcType=VARCHAR} -->
+  	where ba_monthTime.main_sid = tb_rs_account_info.net_sid 
+  	<if test="dateTime !=null">
+  		and   create_time = #{dateTime,jdbcType=VARCHAR}
+  	</if>
+  	<if test="keyWord !=null">
+  		and ip = #{keyWord,jdbcType=VARCHAR} or net_name = #{keyWord,jdbcType=VARCHAR}
+  	</if>
+  	order by create_time desc 
+  	limit #{begin,jdbcType=INTEGER} , #{count,jdbcType=INTEGER};
+  </select>
+  
+  
+  
+  <select id="statisticsResourceSideFlowMonth" resultType="java.util.Map" parameterType="Map">
+  	select 
+  	sum(tb_ba.fee) as totalFee,
+  	round(avg(tb_ba.price),2) as avgPrice,
+  	sum(tb_ba.traffic_total) as totalTraffic,
+  	sum(tb_ba.traffic_in) as totalTrafficIn,
+  	sum(tb_ba.traffic_out) as totalTrafficOut
+  	from tb_rs_bill_acct as tb_ba, tb_rs_account_info
+  	<!-- _#{monthTime,jdbcType=VARCHAR} -->
+  	where tb_ba.main_sid = tb_rs_account_info.net_sid 
+  		and   create_time = #{dateTime,jdbcType=VARCHAR}
+  	<if test="keyWord !=null">
+  		and ip = #{keyWord,jdbcType=VARCHAR} or net_name = #{keyWord,jdbcType=VARCHAR}
+  	</if>
+  </select>
+  
+  
+  <select id="queryResourceSideCount" resultType="java.lang.Integer" parameterType="Map">
+  	select 
+  	count(*)
+  	from tb_rs_bill_acct as tb_ba, tb_rs_account_info
+  	where tb_ba.main_sid = tb_rs_account_info.net_sid 
+  	<if test="dateTime !=null">
+  		and   create_time = #{dateTime,jdbcType=VARCHAR}
+  	</if>
+  	<if test="keyWord !=null">
+  		and ip = #{keyWord,jdbcType=VARCHAR} or net_name = #{keyWord,jdbcType=VARCHAR}
+  	</if>
+  </select>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_bill_acct
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <select id="queryAccount" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_bill_acct
+    where main_sid = #{0}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tb_rs_bill_acct
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsBillAcct" >
+    insert into tb_rs_bill_acct (id, main_sid, event_id, 
+      event_name, fee, charge_type, 
+      itemfee, total, actual_fee, 
+      create_date)
+    values (#{id,jdbcType=BIGINT}, #{mainSid,jdbcType=BIGINT}, #{eventId,jdbcType=BIGINT}, 
+      #{eventName,jdbcType=VARCHAR}, #{fee,jdbcType=BIGINT}, #{chargeType,jdbcType=VARCHAR}, 
+      #{itemfee,jdbcType=BIGINT}, #{total,jdbcType=INTEGER}, #{actualFee,jdbcType=BIGINT}, 
+      #{createDate,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsBillAcct" >
+    insert into tb_rs_bill_acct
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="mainSid != null" >
+        main_sid,
+      </if>
+      <if test="eventId != null" >
+        event_id,
+      </if>
+      <if test="eventName != null" >
+        event_name,
+      </if>
+      <if test="fee != null" >
+        fee,
+      </if>
+      <if test="chargeType != null" >
+        charge_type,
+      </if>
+      <if test="itemfee != null" >
+        itemfee,
+      </if>
+      <if test="total != null" >
+        total,
+      </if>
+      <if test="actualFee != null" >
+        actual_fee,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="mainSid != null" >
+        #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="eventId != null" >
+        #{eventId,jdbcType=BIGINT},
+      </if>
+      <if test="eventName != null" >
+        #{eventName,jdbcType=VARCHAR},
+      </if>
+      <if test="fee != null" >
+        #{fee,jdbcType=BIGINT},
+      </if>
+      <if test="chargeType != null" >
+        #{chargeType,jdbcType=VARCHAR},
+      </if>
+      <if test="itemfee != null" >
+        #{itemfee,jdbcType=BIGINT},
+      </if>
+      <if test="total != null" >
+        #{total,jdbcType=INTEGER},
+      </if>
+      <if test="actualFee != null" >
+        #{actualFee,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsBillAcct" >
+    update tb_rs_bill_acct
+    <set >
+      <if test="mainSid != null" >
+        main_sid = #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="eventId != null" >
+        event_id = #{eventId,jdbcType=BIGINT},
+      </if>
+      <if test="eventName != null" >
+        event_name = #{eventName,jdbcType=VARCHAR},
+      </if>
+      <if test="fee != null" >
+        fee = #{fee,jdbcType=BIGINT},
+      </if>
+      <if test="chargeType != null" >
+        charge_type = #{chargeType,jdbcType=VARCHAR},
+      </if>
+      <if test="itemfee != null" >
+        itemfee = #{itemfee,jdbcType=BIGINT},
+      </if>
+      <if test="total != null" >
+        total = #{total,jdbcType=INTEGER},
+      </if>
+      <if test="actualFee != null" >
+        actual_fee = #{actualFee,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsBillAcct" >
+    update tb_rs_bill_acct
+    set main_sid = #{mainSid,jdbcType=VARCHAR},
+      event_id = #{eventId,jdbcType=BIGINT},
+      event_name = #{eventName,jdbcType=VARCHAR},
+      fee = #{fee,jdbcType=BIGINT},
+      charge_type = #{chargeType,jdbcType=VARCHAR},
+      itemfee = #{itemfee,jdbcType=BIGINT},
+      total = #{total,jdbcType=INTEGER},
+      actual_fee = #{actualFee,jdbcType=BIGINT},
+      create_date = #{createDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

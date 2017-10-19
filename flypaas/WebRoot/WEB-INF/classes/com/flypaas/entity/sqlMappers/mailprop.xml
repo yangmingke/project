@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.MailProp">
+	
+	 
+	 <resultMap id="mailResult" type="com.flypaas.entity.MailProp">
+		<id property="id" column="id" />
+		<result property="frm" column="frm" />
+		<result property="fromNickname" column="fromnickname" />
+		<result property="toNbr" column="tonbr" />
+		<result property="cc" column="cc" />
+		<result property="bcc" column="bcc" />
+		<result property="subject" column="subject" />
+		<result property="text" column="text" />
+		<result property="attUrl" column="atturl" />
+		<result property="type" column="type" />
+		<result property="createtime" column="createtime" />
+	</resultMap>
+	
+	<select id="getMailByType"  parameterType="java.lang.String"  resultMap="mailResult">
+		select * from tb_ucpaas_mailprop m where m.type=#{type}
+	</select>
+
+	
+</mapper>

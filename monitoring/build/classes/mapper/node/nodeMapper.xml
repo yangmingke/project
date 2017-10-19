@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- SR节点信息管理 -->
+<mapper namespace="node">
+
+	<!-- 获取SR所有节点 -->
+	<select id="getNodes" resultType="map">
+		SELECT 
+			a.sr_id,
+			a.level,
+			a.sr_name,
+			c.name AS city,
+			a.lng,
+			a.lat
+		FROM
+			network_monitor.sr_node_info a,
+			network_monitor.network_monitor_city c
+		WHERE a.cityId = c.id
+	</select>
+	
+	<!-- 获取SR所有可作为邻居的节点 -->
+	<select id="getNeighborNodes" resultType="map">
+		<if test="level == 0">
+			SELECT
+				n.sr_id nbrid
+			FROM
+				sr_node_info n,
+				network_monitor_city c,
+				network_monitor_province p
+			WHERE
+				n.cityId = c.id
+			AND c.provinceId = p.id
+			AND n.sr_id != #{sr_id}
+			AND n.mnos is not null
+			AND n.mnos = #{mnos}
+			AND p.areaid = (
+				SELECT
+					p.areaid
+				FROM
+					network_monitor_city c,
+					network_monitor_province p
+				WHERE
+					c.provinceId = p.id
+				AND n.`level` = '1'
+				AND c.Id = #{cityId}
+				AND n.sr_id != #{cityId}
+			)
+			UNION
+		</if>
+			SELECT
+				n.sr_id nbrid
+			FROM
+				sr_node_info n
+			WHERE
+				n.`level` = '2'
+			AND n.sr_id != #{sr_id}
+	</select>
+	
+	
+		<!-- 获取SR中国节点 -->
+	<select id="getChinaNodes" resultType="map">
+		SELECT 
+			a.sr_id,
+			a.level,
+			a.sr_name,
+			c.name AS city,
+			a.lng,
+			a.lat
+		FROM
+			network_monitor.sr_node_info a,
+			network_monitor.network_monitor_city c
+		WHERE a.cityId = c.id
+		and (a.lng between 73.33 and 135.05)
+		and (a.lat between 3.51 and 53.33)
+	</select>
+	
+	<!-- 根据SR节点ID获取SR节点配置信息 -->
+	<select id="getNodeByID" resultType="map">
+		SELECT
+			a.sr_id,
+			a.sr_name,
+			a.level,
+			a.mnos,
+			p.id AS provinceId,
+            p.name AS provinceName,
+			a.cityId,
+			c.ireaCode,
+			c.name AS cityName,
+            co.id as countryId,
+            co.country as countryName
+		FROM
+				network_monitor.sr_node_info a,
+			network_monitor_city c,
+			network_monitor_province p,
+      network_monitor_country co
+		WHERE a.cityId = c.id
+		AND c.provinceId = p.id
+        AND p.countryid=co.id
+		AND a.sr_id = #{sr_id}
+	</select>
+	
+	<!-- 添加SR节点配置信息 -->
+	<insert id="insertNodeInfo">
+		INSERT INTO network_monitor.sr_node_info(
+			sr_id,
+			sr_name,
+			level,
+			mnos,
+			cityId,
+			lng,
+			lat,
+			create_time
+		)
+		VALUES
+			(#{sr_id},#{sr_name},#{level},#{mnos},#{cityId},#{lng},#{lat},now())
+	</insert>
+	
+	<!-- 修改SR节点配置信息 -->
+	<update id="updaeChangeCity">
+		UPDATE network_monitor.sr_node_info
+		SET sr_name = #{sr_name},
+			level = #{level},
+			mnos = #{mnos},
+			cityId = #{cityId},
+			lng = #{lng},
+			lat = #{lat}
+		WHERE sr_id = #{operate}
+	</update>
+	
+	<!-- 修改SR节点配置信息 -->
+	<update id="updaeNodeInfo">
+		UPDATE network_monitor.sr_node_info
+		SET sr_name = #{sr_name},
+			level = #{level},
+			mnos = #{mnos},
+			cityId = #{cityId}
+		WHERE sr_id = #{operate}
+	</update>
+	
+	<!-- 删除SR节点配置信息 -->
+	<delete id="deleteNodeINfo">
+		DELETE FROM network_monitor.sr_node_info
+		WHERE sr_id = #{sr_id}
+	</delete>
+	
+	<!-- 获取监控的SR节点 -->
+	<select id="queryQualityNode" resultType="map">
+		SELECT
+			a.sr_id,
+			a.sr_name
+		FROM
+			network_monitor.sr_node_info a
+		ORDER BY
+			a.create_time DESC
+	</select>
+	
+	<!-- 分页获取SR节点信息 -->
+	<select id="getNode" resultType="map">
+		SELECT
+			a.sr_id,
+			a.sr_name,
+			a.level,
+			a.mnos,
+			c.name AS city,
+			c.ireaCode,
+			p.name AS province,
+			area.area
+		FROM
+			network_monitor.sr_node_info a,
+			network_monitor.network_monitor_city c,
+			network_monitor.network_monitor_province p,
+			network_monitor.network_monitor_area area
+		WHERE a.cityId = c.id
+		AND c.provinceId = p.id
+		AND p.areaid = area.id
+		<if test="sr_id != null">
+			AND (
+				a.sr_id = #{sr_id}
+				OR a.sr_name LIKE concat('%', #{sr_id}, '%')
+			)
+		</if>
+		<if test="level != null">
+			AND a.level = #{level}
+		</if>
+		<if test="mnos != null">
+			AND a.mnos = #{mnos}
+		</if>
+		ORDER BY 
+			a.create_time DESC
+		${limit}
+	</select>
+	
+	<!-- 分页获取SR节点信息 -->
+	<select id="getNodeCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			network_monitor.sr_node_info a,
+			network_monitor.network_monitor_city c,
+			network_monitor.network_monitor_province p,
+			network_monitor.network_monitor_area area
+		WHERE a.cityId = c.id
+		AND c.provinceId = p.id
+		AND p.areaid = area.id
+		<if test="sr_id != null">
+			AND (
+				a.sr_id = #{sr_id}
+				OR a.sr_name LIKE concat('%', #{sr_id}, '%')
+			)
+		</if>
+		<if test="level != null">
+			AND a.level = #{level}
+		</if>
+		<if test="mnos != null">
+			AND a.mnos = #{mnos}
+		</if>
+	</select>
+	
+	<select id="getByCityId" resultType="map">
+		SELECT
+			a.sr_id,
+			a.sr_name,
+			a.lng,
+			a.lat
+		FROM
+			network_monitor.sr_node_info a
+		WHERE a.cityId = #{cityId}
+	</select>
+	
+	
+	<delete id="deleteBatch">
+    	DELETE FROM network_monitor.sr_node_info
+		WHERE sr_id in 
+			<foreach collection="ids" item="i" open="(" close=")"
+			separator=",">
+			#{i}
+		</foreach>
+	</delete>
+</mapper> 

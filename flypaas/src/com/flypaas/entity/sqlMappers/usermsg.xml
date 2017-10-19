@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.UserMsg">
+	 <resultMap id="userMsgResult" type="com.flypaas.entity.UserMsg">
+		<id property="msgId" column="msg_id" />
+		<result property="sid" column="sid" />
+		<result property="msgType" column="msg_type" />
+		<result property="msgDesc" column="msg_desc" />
+		<result property="createDate" column="create_date" />
+		<result property="hasread" column="hasread" />
+		<result property="msgTitle" column="msg_title" />
+	</resultMap>
+	
+	<select id="getUserMsgBySid"  parameterType="java.lang.String"  resultType="map">
+		select * from tb_ucpaas_user_msg  where sid=#{sid}  order by create_date desc ${limit}
+	</select>
+	<select id="getLastUserMsg" parameterType="java.lang.String" resultMap="userMsgResult">
+		select * from tb_ucpaas_user_msg where sid=#{sid}  order by create_date desc limit 1
+	</select>
+	<delete id="delUserMsg" parameterType="userMsg">
+		delete from tb_ucpaas_user_msg where msg_id=#{msgId} and sid=#{sid}
+	</delete>
+	<select id="getCountMsg" parameterType="java.lang.String" resultType="int">
+		select count(*) from tb_ucpaas_user_msg where sid=#{sid} and hasread='0'
+	</select>
+	
+	<update id="updateHasRead" parameterType="userMsg">
+		update tb_ucpaas_user_msg set hasread='1' where msg_id=#{msgId} and sid=#{sid}
+	</update>
+	
+	<select id="getMsgDesc" parameterType="java.lang.Long" resultType="java.lang.String">
+		select msg_desc from tb_ucpaas_user_msg where msg_id=#{id}
+	</select>
+	
+	<select id="getNoticeCount"  parameterType="map" resultType="map">
+		select count(0) as totalCount from tb_ucpaas_user_msg where sid=#{sid} 
+	</select>
+</mapper>

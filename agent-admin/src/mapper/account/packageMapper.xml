@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 账务管理-资费套餐 -->
+<mapper namespace="package">
+
+	<!-- 分页查询资费套餐 -->
+	<select id="query" resultType="map">
+		SELECT
+			p.package_id,
+			p.package_name,
+			p1.param_value AS pay_type_name,
+			p.`status`,
+			p2.param_value AS status_name,
+			p3.param_value AS package_type_name,
+			(
+				SELECT
+					i.fee
+				FROM
+					tb_bill_fee_item_rel ir,
+					tb_bill_fee_item i
+				WHERE
+					ir.package_id = p.package_id
+				AND i.fee_id = ir.fee_id
+				AND i.fee_id LIKE '${event_id_1017}%'
+			) / ${money_rate} AS min_consumption,
+			(
+				SELECT
+					count(0)
+				FROM
+					tb_bill_acct_package_rel pr
+				WHERE
+					pr.package_id = p.package_id
+			) AS developer_number,
+			date_format(
+				p.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			date_format(
+				p.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date
+		FROM
+			tb_bill_package p
+		LEFT JOIN tb_ucpaas_params p1 ON p1.param_key = p.charge_type
+		AND p1.param_type = 'pay_type'
+		LEFT JOIN tb_ucpaas_params p2 ON p2.param_key = p.`status`
+		AND p2.param_type = 'package_status'
+		LEFT JOIN tb_ucpaas_params p3 ON p3.param_key = p.package_type
+		AND p3.param_type = 'package_type'
+		WHERE
+			1 = 1
+		
+		<if test="text != null">
+			AND p.package_name LIKE concat('%', #{text}, '%')
+		</if>
+		<if test="package_type != null">
+			AND p.package_type = #{package_type}
+		</if>
+		ORDER BY
+			p.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询资费套餐 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_bill_package p
+		WHERE
+			1 = 1
+		
+		<if test="text != null">
+			AND p.package_name LIKE concat('%', #{text}, '%')
+		</if>
+		<if test="package_type != null">
+			AND p.package_type = #{package_type}
+		</if>
+	</select>
+	
+	<!-- 获取资费套餐 -->
+	<select id="getPackage" resultType="map">
+		SELECT
+			p.package_id,
+			p.package_name,
+			p.charge_type,
+			p.package_type
+		FROM
+			tb_bill_package p
+		WHERE
+			p.package_id = #{package_id}
+	</select>
+	
+	<!-- 获取资费列表 -->
+	<select id="getFeeList" resultType="map">
+		SELECT
+			t1.event_id,
+			t1.event_name,
+			t1.is_show_nbr,
+			t2.fee_id,
+			TRUNCATE (t2.fee / ${money_rate}, 4) AS fee
+		FROM
+			(
+				SELECT
+					e.event_id,
+					e.event_name,
+					1 AS is_show_nbr
+				FROM
+					tb_bill_event_type e
+				WHERE
+					e.event_id NOT IN (${event_id_1001}, ${event_id_1002}, ${event_id_1016})
+				UNION ALL
+					SELECT
+						e.event_id,
+						concat(e.event_name, '(隐号)') AS event_name,
+						0 AS is_show_nbr
+					FROM
+						tb_bill_event_type e
+					WHERE
+						e.event_id IN (${event_id_1001}, ${event_id_1002}, ${event_id_1016})
+					UNION ALL
+						SELECT
+							e.event_id,
+							concat(e.event_name, '(显号)') AS event_name,
+							1 AS is_show_nbr
+						FROM
+							tb_bill_event_type e
+						WHERE
+							e.event_id = ${event_id_1016}
+						UNION ALL
+							SELECT
+								e.event_id,
+								concat(
+									e.event_name,
+									'(单显官方号码)'
+								) AS event_name,
+								1 AS is_show_nbr
+							FROM
+								tb_bill_event_type e
+							WHERE
+								e.event_id IN (${event_id_1001}, ${event_id_1002})
+							UNION ALL
+								SELECT
+									e.event_id,
+									concat(
+										e.event_name,
+										'(单显手机号)'
+									) AS event_name,
+									2 AS is_show_nbr
+								FROM
+									tb_bill_event_type e
+								WHERE
+									e.event_id IN (${event_id_1001}, ${event_id_1002})
+			) t1
+		LEFT JOIN (
+			SELECT
+				i.fee_id,
+				i.fee,
+				i.is_show_nbr
+			FROM
+				tb_bill_fee_item i,
+				tb_bill_fee_item_rel ir
+			WHERE
+				i.fee_id = ir.fee_id
+			AND ir.package_id = #{package_id}
+		) t2 ON t2.fee_id LIKE concat(t1.event_id, '%')
+		AND t2.is_show_nbr = t1.is_show_nbr
+		ORDER BY
+			t1.event_id,
+			t1.is_show_nbr DESC
+	</select>
+	
+	<!-- 添加、修改资费套餐之前查重 -->
+	<select id="checkPackage" resultType="map">
+		SELECT
+			p.package_id
+		FROM
+			tb_bill_package p
+		WHERE
+			p.package_name = #{package_name}
+		
+		<if test="package_id != null">
+			AND p.package_id != #{package_id}
+		</if>
+	</select>
+	
+	<!-- 添加资费套餐 -->
+	<insert id="insertPackage">
+		INSERT INTO tb_bill_package (
+			package_name,
+			STATUS,
+			is_default,
+			charge_type,
+			package_type,
+			create_date,
+			update_date
+		)
+		VALUES
+			(#{package_name}, 0, 0, #{charge_type}, #{package_type}, now(), now())
+	</insert>
+	
+	<!-- 修改资费套餐 -->
+	<update id="updatePackage">
+		UPDATE tb_bill_package p
+		SET p.package_name = #{package_name},
+		 p.charge_type = #{charge_type},
+		 p.package_type = #{package_type},
+		 p.update_date = now()
+		WHERE
+			p.package_id = #{package_id}
+	</update>
+	
+	<!-- 添加、修改资费之前查重 -->
+	<select id="checkFeeItem" resultType="map">
+		SELECT
+			i.fee_id
+		FROM
+			tb_bill_fee_item i
+		WHERE
+			i.fee_id LIKE '${event_id}%'
+		AND i.is_show_nbr = #{is_show_nbr}
+		AND i.fee = ${fee} * ${money_rate}
+	</select>
+	
+	<!-- 生成新的fee_id -->
+	<select id="generateFeeId" resultType="int">
+		SELECT
+		
+		IF (
+			count(0) = 0,
+			${event_id}001,
+			max(i.fee_id) + 1
+		) AS fee_id
+		FROM
+			tb_bill_fee_item i
+		WHERE
+			i.fee_id LIKE '${event_id}%'
+	</select>
+	
+	<!-- 添加资费 -->
+	<insert id="insertFeeItem">
+		INSERT INTO tb_bill_fee_item (fee_id, fee_name, fee_type, fee, is_show_nbr) SELECT
+			#{fee_id},
+			t.event_name,
+			t.fee_type,
+			CONVERT (
+				${fee} * ${money_rate},
+				DECIMAL (20)
+			),
+			#{is_show_nbr}
+		FROM
+			tb_bill_event_type t
+		WHERE
+			t.event_id = #{event_id}
+	</insert>
+	
+	<!-- 添加套餐资费关系 -->
+	<insert id="insertFeeItemRel">
+		INSERT INTO tb_bill_fee_item_rel (fee_id, package_id)
+		VALUES
+			(#{fee_id}, #{package_id})
+	</insert>
+	
+	<!-- 修改套餐资费关系 -->
+	<update id="updateFeeItemRel">
+		UPDATE tb_bill_fee_item_rel ir
+		SET ir.fee_id = #{fee_id}
+		WHERE
+			ir.package_id = #{package_id}
+		AND ir.fee_id = #{old_fee_id}
+	</update>
+	
+	<!-- 修改资费套餐状态：关闭、启用、删除 -->
+	<update id="updateStatus">
+		UPDATE tb_bill_package p
+		SET p.`status` = #{status}
+		<if test="eff_date != null">
+		 	, p.eff_date = now()
+		</if>
+		<if test="exp_date != null">
+			, p.exp_date = now()
+		</if>
+		WHERE
+			p.package_id = #{package_id}
+	</update>
+	
+	<!-- 获取套餐使用者 -->
+	<select id="getPackageUser" resultType="map">
+		SELECT
+			u.sid,
+			u.email
+		FROM
+			tb_ucpaas_user u,
+			tb_bill_acct_package_rel pr
+		WHERE
+			u.sid = pr.sid
+		AND pr.package_id = #{package_id}
+		
+		<if test="sid != null">
+			AND u.sid = #{sid}
+		</if>
+	</select>
+	
+	<!-- 开发者转移 -->
+	<update id="developerTransfer">
+		UPDATE tb_bill_acct_package_rel pr
+		SET pr.package_id = #{new_package_id}
+		WHERE
+			pr.package_id = #{package_id}
+		
+		<if test="sid != null">
+			AND pr.sid = #{sid}
+		</if>
+	</update>
+	
+	<!-- 获取资费套餐名称 -->
+	<select id="getPackageName" resultType="string">
+		SELECT
+			p.package_name
+		FROM
+			tb_bill_package p
+		WHERE
+			p.package_id = #{package_id}
+	</select>
+	
+</mapper> 

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心 -->
+<mapper namespace="admin">
+
+	<!-- 获取管理员资料 -->
+	<select id="getAdmin" resultType="map">
+		SELECT
+			a.sid,
+			a.email,
+			a.mobile,
+			a.realname,
+			c.role_id,
+			c.role_name
+		FROM
+			ucpaas.tb_ucpaas_admin a,
+			ucpaas.tb_ucpaas_admin_role b,
+			ucpaas.tb_ucpaas_role c
+		WHERE
+			a.sid = b.sid
+		AND b.role_id = c.role_id
+		AND a.sid = #{id}
+	</select>
+</mapper> 

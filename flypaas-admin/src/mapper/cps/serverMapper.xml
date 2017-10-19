@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 策略管理-策略权限配置-服务器地址 -->
+<mapper namespace="server">
+	
+	<!-- 查询服务器地址 -->
+	<select id="query" resultType="map">
+		SELECT
+			l.id,
+			l.ipaddress,
+			l.`port`,
+			l.`describe`,
+			date_format(
+				l.createtime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS createtime
+		FROM
+			${table} l
+		WHERE
+			1 = 1
+		<if test="ipaddress != null">
+			AND l.ipaddress LIKE concat('%', #{ipaddress}, '%')
+		</if>
+		<if test="describe != null">
+			AND l.`describe` LIKE concat('%', #{describe}, '%')
+		</if>
+		ORDER BY
+			l.createtime DESC
+		${limit}
+	</select>
+	
+	<!-- 查询服务器地址：记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			${table} l
+		WHERE
+			1 = 1
+		<if test="ipaddress != null">
+			AND l.ipaddress LIKE concat('%', #{ipaddress}, '%')
+		</if>
+		<if test="describe != null">
+			AND l.`describe` LIKE concat('%', #{describe}, '%')
+		</if>
+	</select>
+	
+	<!-- 查看服务器地址 -->
+	<select id="view" resultType="map">
+		SELECT
+			l.id,
+			l.ipaddress,
+			l.`port`,
+			l.`describe`,
+			date_format(
+				l.createtime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS createtime
+		FROM
+			${table} l
+		WHERE
+			l.id = #{id}
+	</select>
+	
+	<!-- 添加、修改服务器地址之前查重 -->
+	<select id="check" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			${table} l
+		WHERE
+			l.ipaddress = #{ipaddress}
+		AND l.`port` = #{port}
+		<if test="id != null">
+			AND l.id != #{id}
+		</if>
+	</select>
+	
+	<!-- 添加服务器地址 -->
+	<insert id="insert">
+		INSERT INTO ${table} (
+			ipaddress,
+			`port`,
+			`describe`,
+			createtime
+		)
+		VALUES
+			(
+				#{ipaddress},
+				#{port},
+				#{describe},
+				now()
+			)
+	</insert>
+	
+	<!-- 修改服务器地址 -->
+	<update id="update">
+		UPDATE ${table} l
+		SET l.ipaddress = #{ipaddress},
+		l.`port` = #{port},
+		l.`describe` = #{describe}
+		WHERE
+			l.id = #{id}
+	</update>
+	
+	<!-- 删除服务器地址 -->
+	<delete id="delete">
+		DELETE l
+		FROM
+			${table} l
+		WHERE
+			l.id = #{id}
+	</delete>
+	
+</mapper> 

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心-权限管理 -->
+<mapper namespace="authority">
+	
+	<!-- 是否配置了菜单url -->
+	<select id="existsMenuUrl" resultType="_boolean">
+		SELECT
+		
+		IF (count(0) > 0, TRUE, FALSE)
+		FROM
+			tb_ucpaas_menu m
+		WHERE
+			m.menu_url = #{menu_url}
+	</select>
+	
+	<!-- 查询父菜单 -->
+	<select id="getParentIds" resultType="map">
+		SELECT
+			CONVERT (
+		
+				IF (
+					m.parent_id = '0',
+					m.menu_id,
+					concat(m.parent_id, ',', m.menu_id)
+				),
+				CHAR
+			) AS parent_ids
+		FROM
+			tb_ucpaas_menu m,
+			tb_ucpaas_role_menu rm,
+			tb_ucpaas_role r
+		WHERE
+			m.menu_id = rm.menu_id
+		AND rm.role_id = r.role_id
+		AND m.`status` = 1
+		AND m.menu_url = #{menu_url}
+		AND r.`status` = 1
+		AND r.role_id = #{role_id}
+		ORDER BY
+			m.`level` DESC
+		LIMIT 1
+	</select>
+	
+	<!-- 查询当前选中的菜单 -->
+	<select id="getSelectMenu" resultType="map">
+		SELECT
+			m.menu_id,
+			m.`level`
+		FROM
+			tb_ucpaas_menu m
+		WHERE
+			m.menu_type = 1
+		AND m.menu_id IN 
+		<foreach collection="array" item="i" open="(" close=")" separator=",">
+			#{i}
+		</foreach>
+	</select>
+	
+	<!-- 查询角色是否对menuId有访问权限 -->
+	<select id="isAuthorityMenuId" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_menu m,
+			tb_ucpaas_role_menu rm,
+			tb_ucpaas_role r
+		WHERE
+			m.menu_id = rm.menu_id
+		AND rm.role_id = r.role_id
+		AND m.`status` = 1
+		AND m.menu_id = #{menu_id}
+		AND r.`status` = 1
+		AND r.role_id = #{role_id}
+	</select>
+
+	<!-- 分页查询权限 -->
+	<select id="query" resultType="map">
+		SELECT
+			r.role_id,
+			r.role_name,
+			r.`status`
+		FROM
+			tb_ucpaas_role r
+		WHERE
+			r.`status` = 1
+		
+		<if test="role_name != null">
+			AND r.role_name LIKE concat('%', #{role_name}, '%')
+		</if>
+		ORDER BY
+			r.role_id
+		${limit}
+	</select>
+	
+	<!-- 分页查询权限 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_role r
+		WHERE
+			r.`status` = 1
+		
+		<if test="role_name != null">
+			AND r.role_name LIKE concat('%', #{role_name}, '%')
+		</if>
+	</select>
+	
+	<!-- 获取角色信息 -->
+	<select id="getRole" resultType="map">
+		SELECT
+			r.role_id,
+			r.role_name
+		FROM
+			tb_ucpaas_role r
+		WHERE
+			1 = 1
+		<if test="role_id != null">
+			AND r.role_id = #{role_id}
+		</if>
+		<if test="role_name != null">
+			AND r.role_name = #{role_name}
+		</if>
+	</select>
+	
+	<!-- 获取所有的菜单 -->
+	<select id="getAllMeum" resultType="map">
+		SELECT
+			m.menu_id,
+			m.menu_name,
+			m.`level`,
+			m.parent_id,
+		
+		IF (
+			rm.role_menu_Id IS NULL,
+			'',
+			'checked'
+		) AS checked
+		FROM
+			tb_ucpaas_menu m
+		LEFT JOIN tb_ucpaas_role_menu rm ON rm.menu_id = m.menu_id
+		AND rm.role_id = #{role_id}
+		WHERE
+			m.`status` = 1
+		ORDER BY
+			m.parent_id,
+			m.sort
+	</select>
+	
+	<!-- 添加、修改角色之前查重 -->
+	<select id="checkRole" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_role r
+		WHERE
+			r.`status` = 1
+		AND r.role_name = #{role_name}
+		<if test="role_id != null">
+			AND r.role_id != #{role_id}
+		</if>
+	</select>
+	
+	<!-- 添加角色 -->
+	<insert id="insertRole">
+		INSERT INTO tb_ucpaas_role (
+			role_name,
+			create_date,
+			STATUS
+		)
+		VALUES
+			(#{role_name}, now(), 1)
+	</insert>
+	
+	<!-- 添加角色菜单 -->
+	<insert id="insertRoleMenu">
+		INSERT INTO tb_ucpaas_role_menu (role_id, menu_id)
+		VALUES
+		<foreach collection="list" item="item" separator="," >
+			(#{item.role_id},#{item.menu_id})
+		</foreach> 
+	</insert>
+	
+	<!-- 修改角色 -->
+	<update id="updateRole">
+		UPDATE tb_ucpaas_role r
+		SET r.role_name = #{role_name},
+		 r.update_date = now()
+		WHERE
+			r.role_id = #{role_id}
+	</update>
+	
+	<!-- 删除角色菜单 -->
+	<delete id="deleteRoleMenu">
+		DELETE
+		FROM
+			tb_ucpaas_role_menu
+		WHERE
+			role_id = #{role_id}
+	</delete>
+	
+	<!-- 修改角色状态 -->
+	<update id="updateStatus">
+		UPDATE tb_ucpaas_role r
+		SET r.`status` = #{status}
+		WHERE
+			r.role_id = #{role_id}
+	</update>
+	<!-- 判断是否有用户绑定角色 -->
+	<select id="hasUserInRole"  resultType="map">
+		SELECT count(1) as totalCount FROM tb_ucpaas_user_role r WHERE	r.role_id = #{role_id}
+	</select>
+	
+</mapper> 

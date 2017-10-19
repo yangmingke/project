@@ -1,0 +1,12 @@
+@charset "utf-8";
+
+#pageControl a {
+	text-decoration:none;
+}
+#jumpTo{
+	width:35px;
+}
+.currentPage{
+	font-weight:bold;
+	color:#ff9a00;
+}

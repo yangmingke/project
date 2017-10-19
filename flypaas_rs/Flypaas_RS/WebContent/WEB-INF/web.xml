@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xmlns="http://java.sun.com/xml/ns/javaee" 
+xmlns:web="http://java.sun.com/xml/ns/javaee" 
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>Flypaas_RS</display-name>
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:spring.xml,classpath:spring-mybatis.xml</param-value>
+  </context-param>
+  
+  <filter>
+    <description>字符集过滤器</description>
+    <filter-name>encodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <description>字符集编码</description>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>encodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  <filter>
+    <filter-name>signFilter</filter-name>
+    <filter-class>com.flypaas.filter.LogoutFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>signFilter</filter-name>
+    <url-pattern>/areaController/*</url-pattern>
+    <url-pattern>/accountSideAcctController/*</url-pattern>
+    <url-pattern>/accountBalanceController/*</url-pattern>
+    <url-pattern>/billFlowController/*</url-pattern>
+    <url-pattern>/cityController/*</url-pattern>
+    <url-pattern>/financeController/*</url-pattern>
+    <url-pattern>/flushRedisController/*</url-pattern>
+    <url-pattern>/index.jsp</url-pattern>
+    <url-pattern>/loginController/*</url-pattern>
+    <url-pattern>/logController/*</url-pattern> 
+    <url-pattern>/messageController/*</url-pattern>
+    <url-pattern>/menuController/*</url-pattern>
+    <url-pattern>/provinceController/*</url-pattern>
+    <url-pattern>/userController/*</url-pattern>
+    <url-pattern>/resourceController/*</url-pattern>
+    <url-pattern>/resourceAcctController/*</url-pattern>
+    <url-pattern>/route/*</url-pattern>
+    <url-pattern>/roleController/*</url-pattern>
+    <url-pattern>/resourceStatusController/*</url-pattern>
+    <url-pattern>/userController/*</url-pattern> 
+  </filter-mapping>
+  
+  
+  <listener>
+    <description>spring监听器</description>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
+  </listener>
+  
+  <servlet>
+    <description>spring mvc servlet</description>
+    <servlet-name>springMvc</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <description>spring mvc 配置文件</description>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:spring-mvc.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springMvc</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>default</servlet-name>
+    <url-pattern>*.jpg</url-pattern>
+    <url-pattern>*.js</url-pattern>
+    <url-pattern>*.css</url-pattern>
+    <url-pattern>*.png</url-pattern>
+    <url-pattern>*.gif</url-pattern>
+    <url-pattern>*.json</url-pattern>
+    <url-pattern>*.html</url-pattern>
+    <url-pattern>*.htm</url-pattern>
+    <url-pattern>*.swf</url-pattern>
+    <url-pattern>*.less</url-pattern>
+    <url-pattern>*.ttf</url-pattern>
+    <url-pattern>*.otf</url-pattern>
+    <url-pattern>*.woff</url-pattern>
+    <url-pattern>*.woff2</url-pattern>
+    <url-pattern>*.svg</url-pattern>
+    <url-pattern>*.eot</url-pattern>
+    <url-pattern>*.scss</url-pattern>
+  </servlet-mapping>
+  
+  <error-page>
+    <error-code>403</error-code>
+    <location>/403.html</location>
+  </error-page>
+  <error-page>
+    <error-code>404</error-code>
+    <location>/404.html</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
+    <location>/500.html</location>
+  </error-page>
+  <!-- java.lang.Exception异常错误,依据这个标记可定义多个类似错误提示 -->  
+  <error-page>  
+	<exception-type>java.lang.Exception</exception-type>  
+	<location>/500.html</location>  
+  </error-page>  
+  <!-- java.lang.NullPointerException异常错误,依据这个标记可定义多个类似错误提示 -->  
+  <error-page>  
+	<exception-type>java.lang.NullPointerException </exception-type>  
+	<location>/500.html</location>  
+  </error-page>    
+  <error-page>  
+	<exception-type>javax.servlet.ServletException</exception-type>  
+	<location>/500.html</location>  
+  </error-page>  
+  
+  <welcome-file-list>
+    <welcome-file>/login.jsp</welcome-file>
+  </welcome-file-list>
+  
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+  
+</web-app>

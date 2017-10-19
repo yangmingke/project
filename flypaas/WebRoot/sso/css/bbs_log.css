@@ -1,0 +1,50 @@
+@charset "utf-8";
+/* CSS Document */
+* { margin: 0px; padding: 0px; outline:none;}
+body { font-family: 微软雅黑; font-size: 12px; line-height: 1.5; background: #fbfbfb;border-top: 7px solid #fff;}
+h1,h2,h3,h4,h5,h6,b{ font-weight: normal;}
+ul,ol,li { list-style: none;}
+a { color: #585858; text-decoration: none; outline: none; cursor: pointer;}
+a:hover {color:#53b231;}
+img { border: none; vertical-align: middle;}
+input { vertical-align: middle; outline: none;}
+.hr { height:1px; border:none; border-top:1px #c7c7c7 solid;}
+.clear { clear: both;}
+-webkit-appearance:none;
+
+.login_header, .login_content, .login_footer { width: 100%; overflow: hidden;}
+
+/*登录头部*/
+.login_header { height: 120px;}
+.login_header_wrapper { width: 980px; margin: 0 auto;}
+.login_header .logo { float: left; display: inline; margin-top: 17px;}
+.login_header_link { float: right; display: inline; margin-top: 70px;}
+.login_header_link a { font-size: 14px; display: inline-block; margin-left:40px;}
+
+/*登录主体*/
+.login_content { height: 300px; background: url("../images/log_banner.png") center center no-repeat; width: 100%;}
+.login_content_wrapper { width: 980px; margin: 0 auto; position: relative; }
+.loginbox { position: absolute; right: 0px; width: 291px; top: -40px; padding: 0px 0px 0px 35px; ; background: url("../images/log_bg.png") 0 0 no-repeat; height: 395px; color: #353535; font-size: 14px; }
+.loginbox h1 { font-size: 18px; color: #4c8a2d; background: url("../images/log_icon.png") 0 0 no-repeat; padding-left: 25px; margin-bottom: 40px;}
+.loginbox .field { margin-bottom: 10px; }
+.loginbox .field label { float:left; display:inline; line-height:36px; }
+/*.loginbox .field span.error { color: #f00; position: absolute; left: 50px; top: 38px; font-size: 12px;}*/
+.loginbox input[type='text'],.loginbox input[type='password'] { border: 1px #e4e4e4 solid; background: #fff; width: 201px; padding-left: 10px; height: 36px; line-height: 18px; line-height:36px\0; font-family:微软雅黑;}
+.loginbox p.remember { margin-left: 46px; font-size: 12px; color: #585858; margin-bottom: 8px; margin-top:-5px;}
+.loginbox p.remember a { color: #920808; float: right; display: inline; margin-right: 35px;}
+.loginbox p.btn { margin-bottom: 15px; /*margin-left: 46px;*/ padding-top:10px;}
+.loginbox p.btn input { height: 46px; line-height: 46px; text-align: center; color: #fff; font-size: 18px; border: none; font-family: 微软雅黑; cursor: pointer;}
+.loginbox p.btn input.log { background: url("../images/btn_bg.png") 0 0 no-repeat; width: 123px; margin-bottom: 15px; margin-right:10px; float:left; display:inline; }
+.loginbox p.btn input.reg { background: url("../images/btn_bg.png") 0 -54px no-repeat; width: 123px; }
+.loginbox p.form_tips { margin-left:46px; color:#f00; margin-bottom:8px; height:12px;visibility:visible; font-size:12px}
+.loginbox p.code {margin-left:-14px ;margin-bottom:10px;}
+.loginbox p.code input[type='text'] { width:105px; margin-right:10px; color:#aaa;}
+.loginbox p.code input[type='text']:focus { color:#333;}
+.loginbox p.code a { display:inline-block; font-size:12px; color:#777; }
+
+
+/*登录底部*/
+.login_footer_wrapper { width: 980px; margin: 20px auto;}
+.login_footer_wrapper p { color: #999; text-align: left; margin: 10px 0px;}
+
+

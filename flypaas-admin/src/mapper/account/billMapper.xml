@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 账务管理-账单信息 -->
+<mapper namespace="bill">
+
+	<!-- 分页查询资费套餐 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.order_id,a.email,t.charge/${money_rate} as charge,t.charge_type,t.sid,
+			date_format(
+				t.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			t.status
+		FROM
+			tb_srv_payment_order t join tb_ucpaas_user a on  t.sid = a.sid
+		WHERE 1=1
+		<if test="text != null">
+			AND (
+				t.order_id LIKE concat('%', #{text}, '%')
+				OR a.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		ORDER BY
+			t.create_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询资费套餐 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_srv_payment_order t join tb_ucpaas_user a on  t.sid = a.sid
+		WHERE 1=1
+		<if test="text != null">
+			AND (
+				t.order_id LIKE concat('%', #{text}, '%')
+				OR a.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+	</select>
+	<select id="findById" resultType="map">
+		SELECT
+			t.order_id,a.email,t.charge/${money_rate} as charge_fee,t.charge_type,t.sid,
+			date_format(
+				t.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			t.status
+		FROM
+			tb_srv_payment_order t join tb_ucpaas_user a on  t.sid = a.sid
+		where t.order_id=#{order_id}
+	</select>
+	<select id="findById_Bak" resultType="map">
+				SELECT c.*,
+			DATE_FORMAT(
+				c.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date
+		FROM
+			tb_ucpaas_client c 
+    WHERE c.client_number=#{client_number} limit 1
+	</select>
+	<update id="updateCloseOrder">
+		update tb_srv_payment_order set status = #{status} where order_id = #{order_id}
+	</update>
+</mapper> 

@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd  
+		http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+		">
+
+	<!-- ucpaas主库配置 -->
+	<!-- 配置DBCP数据库连接池org.apache.commons.dbcp2.BasicDataSource -->
+	<!-- com.alibaba.druid.pool.DruidDataSource -->
+	<bean id="master_dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+		<!-- 基本属性 url、user、password -->
+		<property name="url" value="${master.jdbc.url}" />
+		<property name="username" value="${master.jdbc.username}" />
+		<property name="password" value="${master.jdbc.password}" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="initialSize" value="20" />
+		<property name="minIdle" value="20" />
+		<property name="maxActive" value="80" />
+		<property name="maxWait" value="60000" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="filters" value="stat,slf4j" />
+	</bean>
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="master_sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="master_dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<property name="mapperLocations" value="classpath:mapper/**/*Mapper.xml" />
+	</bean>
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="master_sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="master_sqlSessionFactory" />
+	</bean>
+	<!-- 事务配置 -->
+	<bean id="master_transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="master_dataSource" />
+	</bean>
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="master_transactionManager" />
+	
+	
+	<!-- ucpaas_client_collect库配置 -->
+	<!-- 配置DBCP数据库连接池 -->
+	<bean id="slave_dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+		<property name="url" value="${slave.jdbc.url}" />
+		<property name="username" value="${slave.jdbc.username}" />
+		<property name="password" value="${slave.jdbc.password}" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="initialSize" value="10" />
+		<property name="minIdle" value="10" />
+		<property name="maxActive" value="50" />
+		<property name="maxWait" value="60000" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="filters" value="stat,slf4j" />		
+	</bean>
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="slave_sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="slave_dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<property name="mapperLocations" value="classpath:mapper/**/*Mapper.xml" />
+	</bean>
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="slave_sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="slave_sqlSessionFactory" />
+	</bean>
+	<!-- 事务配置 -->
+	<bean id="slave_transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="slave_dataSource" />
+	</bean>
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="slave_transactionManager" />
+	
+	
+
+
+	<!-- client节点1配置 -->
+	<!-- 配置DBCP数据库连接池 -->
+	<bean id="client_node_1_dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+		<property name="url" value="${client_node_1.jdbc.url}" />
+		<property name="username" value="${client_node_1.jdbc.username}" />
+		<property name="password" value="${client_node_1.jdbc.password}" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="initialSize" value="20" />
+		<property name="minIdle" value="20" />
+		<property name="maxActive" value="80" />
+		<property name="maxWait" value="60000" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="filters" value="stat,slf4j" />		
+	</bean>
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="client_node_1_sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="client_node_1_dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<property name="mapperLocations" value="classpath:mapper/**/*Mapper.xml" />
+	</bean>
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="client_node_1_sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="client_node_1_sqlSessionFactory" />
+	</bean>
+	<!-- 事务配置 -->
+	<bean id="client_node_1_transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="client_node_1_dataSource" />
+	</bean>
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="client_node_1_transactionManager" />
+
+	<!-- client节点2配置 -->
+	<!-- 配置DBCP数据库连接池 -->
+	<bean id="client_node_2_dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+		<property name="url" value="${client_node_2.jdbc.url}" />
+		<property name="username" value="${client_node_2.jdbc.username}" />
+		<property name="password" value="${client_node_2.jdbc.password}" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="initialSize" value="20" />
+		<property name="minIdle" value="20" />
+		<property name="maxActive" value="80" />
+		<property name="maxWait" value="60000" />
+		<property name="timeBetweenEvictionRunsMillis" value="60000" />
+		<property name="minEvictableIdleTimeMillis" value="300000" />
+		<property name="validationQuery" value="SELECT 1" />
+		<property name="testWhileIdle" value="true" />
+		<property name="testOnBorrow" value="false" />
+		<property name="testOnReturn" value="false" />
+		<property name="poolPreparedStatements" value="true" />
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
+		<property name="filters" value="stat,slf4j" />		
+	</bean>
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="client_node_2_sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="client_node_2_dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<property name="mapperLocations" value="classpath:mapper/**/*Mapper.xml" />
+	</bean>
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="client_node_2_sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="client_node_2_sqlSessionFactory" />
+	</bean>
+	<!-- 事务配置 -->
+	<bean id="client_node_2_transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="client_node_2_dataSource" />
+	</bean>
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="client_node_2_transactionManager" />
+
+
+</beans>

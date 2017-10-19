@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 账务管理-保障金管理 -->
+<mapper namespace="securityDeposit">
+
+	<!-- 分页查询保障金 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.id,
+			t.sid,
+			u.email,
+			u.is_contract,
+			t.balance / ${money_rate} as balance_fmt,
+			t.status,
+			t.relieve_type
+		FROM
+			tb_ucpaas_security_balance t
+		LEFT JOIN tb_ucpaas_user u ON t.sid = u.sid
+			WHERE 1 = 1
+		<if test="text != null">
+			AND (
+				t.id LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+			)
+		</if>
+		<if test="status != null">
+			AND t.status = #{status}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询保障金 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_security_balance t
+		LEFT JOIN tb_ucpaas_user u ON t.sid = u.sid
+			WHERE 1 = 1
+		<if test="text != null">
+			AND (
+				t.id LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+			)
+		</if>
+		<if test="status != null">
+			AND t.status = #{status}
+		</if>
+	</select>
+	
+	<!-- 获取保障金 -->
+	<select id="getEntity" resultType="map">
+			SELECT
+			t.id,
+			t.sid,
+			u.email,
+			u.is_contract,
+			t.balance / ${money_rate} as balance_fmt,
+			t.status,
+			t.relieve_type
+		FROM
+			tb_ucpaas_security_balance t
+		LEFT JOIN tb_ucpaas_user u ON t.sid = u.sid
+			WHERE t.id = #{id} limit 1
+	</select>
+	
+	<!-- 分页查询充值记录 -->
+	<select id="queryRecharge" resultType="map">
+		SELECT
+			p.order_id,
+			date_format(
+				p.pay_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS pay_date,
+			p.charge / ${money_rate} AS charge,
+			p.charge_type
+		FROM
+			tb_srv_payment_order p
+		WHERE account_type = 1 and
+			p.`status` = #{payStatus}
+		AND p.sid = #{sid}
+		ORDER BY
+			p.pay_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询充值记录 记录总数 -->
+	<select id="queryRechargeCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_srv_payment_order p
+		WHERE account_type = 1 and
+			p.`status` =#{payStatus}
+		AND p.sid = #{sid}
+	</select>
+	
+	
+	<!-- 分页查询充值记录 -->
+	<select id="queryConsumption" resultType="map">
+		SELECT
+			t.id,
+			date_format(
+				t.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date_fmt,
+			t.charge / ${money_rate} AS charge_fmt,
+			t.to_account_type,
+			t.banknum,
+			t.bankaddr,
+			t.company
+		FROM
+			tb_ucpaas_security_deduction_log t
+		where t.sid = #{sid}
+		ORDER BY
+			t.create_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询充值记录 记录总数 -->
+	<select id="queryConsumptionCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_security_deduction_log t
+		WHERE
+			t.sid = #{sid}
+	</select>
+	
+	<update id="updateEnableFlag">
+		update tb_ucpaas_security_balance t,tb_ucpaas_user u ,tb_ucpaas_security s
+		set u.is_contract =#{is_contract} ,s.status = #{s_status},t.status = #{t_status},
+		t.update_date = NOW(),u.update_date = now(),s.update_date = now()
+		where t.sid =u.sid and s.sid = t.sid and t.status =#{t_status_old}
+		and t.sid = #{sid}
+	</update>
+	<!-- 充值 or 赠送-->
+	<update id="rechargeOrGifts">
+		update tb_ucpaas_security_balance t set balance = balance + #{cv} ,update_date=now() where sid=#{sid} and status = 1
+	</update>
+	<!-- 扣费 -->
+	<update id="deduction">
+		update tb_ucpaas_security_balance t set balance = balance - #{cv} ,update_date=now() where sid=#{sid} and status = 1
+	</update>
+	
+	<update id="setContractAtRechange">
+		update tb_ucpaas_security_balance t,tb_ucpaas_user u ,tb_ucpaas_security s
+		set u.is_contract =1 ,t.relieve_type =2,s.status = 4,
+		t.update_date = NOW(),u.update_date = now(),s.update_date = now()
+		where t.sid =u.sid and s.sid = t.sid and t.status =1 and s.status = 2 
+		and t.balance >= #{security_money} and t.sid = #{sid}
+	</update>
+	
+	<insert id="insertPayOrder" >
+		insert into tb_srv_payment_order(sid,charge,charge_type,status,create_date,pay_date,pay_result_date,charge_balance,account_type)
+		values(#{sid},#{charge},#{charge_type},#{status},now(),now(),now(),
+		(select balance from tb_bill_acct_balance where sid = #{sid}),1)
+	</insert>
+	
+	<insert id="insertDeductionLog" >
+		insert into tb_ucpaas_security_deduction_log(sid,charge,frm_account_type,frm_id,to_account_type,create_date)
+		values(#{sid},#{charge},#{frm_account_type},(select id from tb_ucpaas_security_balance t where t.sid = #{sid} limit 1),#{to_account_type},now())
+	</insert>
+</mapper> 

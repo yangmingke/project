@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.AppBalance">
+
+	<select id="getAppBalance" parameterType="java.lang.String" resultType="appBalance">
+		select sid,app_sid as appSid,balance/1000000 as balance,status from tb_ucpaas_app_balance where sid=#{sid} and app_sid=#{appSid}
+	</select>
+	
+	<insert id="addAppBalance" parameterType="appBalance">
+		insert into tb_ucpaas_app_balance(sid,app_sid,balance,status,create_date,update_date)
+		values(#{sid},#{appSid},#{balance},#{status},#{createDate},#{updateDate})
+	</insert>
+	
+	<update id="updateAppBalance" parameterType="appBalance">
+		update tb_ucpaas_app_balance set balance=balance+#{balance},status=#{status} where sid=#{sid} and app_sid=#{appSid}
+	</update>
+	
+	<update id="deleteAppBalance" parameterType="appBalance">
+		update tb_ucpaas_app_balance set balance=0,status=2 where sid=#{sid} and app_sid=#{appSid}
+	</update>
+	
+	<select id="getAllBalance" parameterType="java.lang.String" resultType="java.lang.Double">
+		SELECT ifnull(SUM(if(balance>0,balance,0)),0)/1000000 FROM tb_ucpaas_app_balance
+		WHERE sid=#{sid} and status=1
+	</select>
+	
+	<select id="unBindAppBalance" parameterType="appBalance" >
+<!-- 		update tb_ucpaas_app_balance  -->
+<!-- 		<set> -->
+<!-- 			<if test="balance!=null"> -->
+<!-- 				balance = #{balance}, -->
+<!-- 			</if> -->
+<!-- 			<if test="status!=null"> -->
+<!-- 				status = #{status}, -->
+<!-- 			</if> -->
+<!-- 			<if test="updateDate!=null"> -->
+<!-- 				update_date=#{updateDate} -->
+<!-- 			</if> -->
+<!-- 		</set> -->
+<!-- 		  where sid=#{sid} and app_sid=#{appSid} -->
+		delete from tb_ucpaas_app_balance where sid=#{sid} and app_sid=#{appSid}
+	</select>
+</mapper>

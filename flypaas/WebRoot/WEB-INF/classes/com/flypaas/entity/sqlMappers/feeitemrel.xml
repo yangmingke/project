@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.FeeItemRel">
+	
+	 
+	 <resultMap id="feeItemRelResult" type="com.flypaas.entity.FeeItemRel">
+		<id property="relId" column="rel_id" />
+		<result property="feeId" column="fee_id" />
+		<result property="packageId" column="package_id" />
+	</resultMap>
+	
+	<select id="getFeeItemById" parameterType="java.util.HashMap" resultType="feeItem">
+		select i.fee_name as feeName, i.fee_type as feeType,i.fee as fee,i.fee_desc as feeDesc from tb_bill_fee_item as i where fee_id=#{feeId}
+	</select>
+	<select id="getFeeItemRelList" resultMap="feeItemRelResult">
+		select *  from tb_bill_fee_item_rel
+	</select>
+	
+	<select id="getFeeItemRelListM" resultType="map">
+		SELECT
+		  ir.package_id as packageId,
+<!-- 			e.event_name as feeName, -->
+			i.fee_name as feeName,
+			e.fee_type as feeType,
+			TRUNCATE (i.fee / 1000000, 4) AS fee,
+			i.fee_id as feeId,
+			i.is_show_nbr as isShowNbr
+		FROM
+			tb_bill_event_type e,tb_bill_fee_item i,
+				tb_bill_fee_item_rel ir
+		where i.fee_id LIKE concat(e.event_id, '%')
+		and i.fee_id = ir.fee_id
+		ORDER BY
+		ir.package_id,i.fee_id;
+	</select>
+	
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 策略管理-策略权限配置-策略权限过滤 -->
+<mapper namespace="permissionFilter">
+	
+	<!-- 查询策略权限过滤 -->
+	<select id="query" resultType="map">
+		SELECT
+			l.id,
+			l.uid,
+			l.pv,
+			l.ver,
+			l.osv,
+			l.brand,
+			l.model,
+			l.permission,
+			l.`describe`,
+			date_format(
+				l.createtime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS createtime
+		FROM
+			t_permission_filter_list l
+		WHERE
+			1 = 1
+		<if test="text != null">
+			AND l.uid LIKE concat('%', #{text}, '%')
+		</if>
+		ORDER BY
+			l.createtime DESC
+		${limit}
+	</select>
+	
+	<!-- 查询策略权限过滤：记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			t_permission_filter_list l
+		WHERE
+			1 = 1
+		<if test="text != null">
+			AND l.uid LIKE concat('%', #{text}, '%')
+		</if>
+	</select>
+	
+	<!-- 查看策略权限过滤 -->
+	<select id="view" resultType="map">
+		SELECT
+			l.id,
+			l.uid,
+			l.pv,
+			l.ver,
+			l.osv,
+			l.brand,
+			l.model,
+			l.permission,
+			l.`describe`,
+			date_format(
+				l.createtime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS createtime
+		FROM
+			t_permission_filter_list l
+		WHERE
+			l.id = #{id}
+	</select>
+	
+	<!-- 添加、修改策略权限过滤之前查重 -->
+	<select id="check" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			t_permission_filter_list l
+		WHERE
+			l.uid = #{uid}
+		<if test="id != null">
+			AND l.id != #{id}
+		</if>
+	</select>
+	
+	<!-- 添加策略权限过滤 -->
+	<insert id="insert">
+		INSERT INTO t_permission_filter_list (
+			uid,
+			pv,
+			ver,
+			osv,
+			brand,
+			model,
+			permission,
+			`describe`,
+			createtime
+		)
+		VALUES
+			(
+				#{uid},
+				#{pv},
+				#{ver},
+				#{osv},
+				#{brand},
+				#{model},
+				#{permission},
+				#{describe},
+				now()
+			)
+	</insert>
+	
+	<!-- 修改策略权限过滤 -->
+	<update id="update">
+		UPDATE t_permission_filter_list l
+		SET l.uid = #{uid},
+		l.pv = #{pv},
+		l.ver = #{ver},
+		l.osv = #{osv},
+		l.brand = #{brand},
+		l.model = #{model},
+		l.permission = #{permission},
+		l.`describe` = #{describe}
+		WHERE
+			l.id = #{id}
+	</update>
+	
+	<!-- 删除策略权限过滤 -->
+	<delete id="delete">
+		DELETE l
+		FROM
+			t_permission_filter_list l
+		WHERE
+			l.id = #{id}
+	</delete>
+	
+</mapper> 

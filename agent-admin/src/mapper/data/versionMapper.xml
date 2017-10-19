@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-版本管理 -->
+<mapper namespace="version">
+
+	<!-- 分页查询 -->
+	<select id="query" resultType="map">
+		SELECT id,version_name,version_name_key,version_index,version_type,download_count,
+			version_status,version_desc,create_date,update_date	
+		FROM tb_ucpaas_download_version t
+		where t.version_status != 3 
+		<if test="version_name_key != null">
+			AND t.version_name_key = #{version_name_key}
+		</if>
+		<if test="version_status != null">
+			AND t.version_status = #{version_status}
+		</if>
+		<if test="version_type != null">
+			AND t.version_type = #{version_type}
+		</if>
+		<if test="version_index != null">
+			AND t.version_index = #{version_index}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM tb_ucpaas_download_version t
+		where t.version_status != 3
+		<if test="version_name_key != null">
+			AND t.version_name_key = #{version_name_key}
+		</if>
+		<if test="version_status != null">
+			AND t.version_status = #{version_status}
+		</if>
+		<if test="version_type != null">
+			AND t.version_type = #{version_type}
+		</if>
+		<if test="version_index != null">
+			AND t.version_index = #{version_index}
+		</if>
+	</select>
+	
+	<!-- 获取实体 -->
+	<select id="getEntity" resultType="map">
+		SELECT
+			id,
+			version_name,
+			version_name_key,
+			version_index,
+			version_type,
+			download_count,
+			version_status,
+			version_path,
+			version_desc,
+			create_date,
+			update_date
+		FROM
+			tb_ucpaas_download_version t
+		WHERE
+			t.id = #{id} limit 1
+	</select>
+	<update id="updateStatusCurrStatus">
+		UPDATE tb_ucpaas_download_version t
+			SET t.version_status = 4,
+		 		t.update_date = now()
+		WHERE
+			t.version_name_key = #{version_name_key} and t.version_status = 2
+	</update>
+	<!-- 修改状态 -->
+	<update id="updateStatus">
+		UPDATE tb_ucpaas_download_version t
+		SET t.version_status = #{version_status},
+		 	t.update_date = now()
+		WHERE
+			t.id = #{id} and t.version_status = #{old_status}
+	</update>
+	<!-- 校验记录是否存在 -->
+	<select id="check" resultType="map">
+		select count(*) AS totalCount from tb_ucpaas_download_version t where version_name_key = #{version_name_key} and version_index = #{version_index}
+		and version_status != 3
+		<if test="id != null">
+			and id != id
+		</if>
+	</select>
+	<insert id="insert">
+		insert into tb_ucpaas_download_version(
+			version_name,version_name_key,version_index,version_type,
+			version_status,version_path,version_desc,create_date,update_date)
+		values(
+			#{version_name},#{version_name_key},#{version_index},#{version_type},
+			1,#{version_path},#{version_desc},now(),now())
+	</insert>
+	<update id="update">
+		update tb_ucpaas_download_version set version_name = #{version_name},
+		version_name_key = #{version_name_key},
+		version_index = #{version_index},
+		version_desc = #{version_desc},
+		<if test="version_path!=null">
+			version_path = #{version_path},
+		</if>
+		update_date= now()
+		where id = #{id}
+	</update>
+	
+</mapper> 

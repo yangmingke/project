@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心-审核通知管理 -->
+<mapper namespace="auditNotice">
+	
+	<!-- 分页查询审核通知时段 -->
+	<select id="query" resultType="map">
+		SELECT
+			n.notice_id,
+			n.`name`,
+			n.start_date,
+			n.end_date,
+			date_format(
+				n.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			n.`status`,
+			p.param_value AS status_name,
+			(
+				SELECT
+					group_concat(
+						us.realname,
+						'（',
+						us.mobile,
+						'）'
+					)
+				FROM
+					tb_srv_audit_notice_user u,
+					tb_ucpaas_user us
+				WHERE
+					u.notice_id = n.notice_id
+				AND us.sid = u.sid
+			) AS mobile
+		FROM
+			tb_srv_audit_notice n,
+			tb_ucpaas_params p
+		WHERE
+			n.`status` = p.param_key
+		AND p.param_type = 'audit_notice_status'
+		
+		<if test="text != null">
+			AND (
+				n.notice_id LIKE concat('%', #{text}, '%')
+				OR n.`name` LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND n.start_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND n.start_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND n.`status` = #{status}
+		</if>
+		ORDER BY
+			n.start_date
+		${limit}
+	</select>
+	
+	<!-- 分页查询审核通知时段 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_srv_audit_notice n
+		WHERE
+			1 = 1
+		
+		<if test="text != null">
+			AND (
+				n.notice_id LIKE concat('%', #{text}, '%')
+				OR n.`name` LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND n.start_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND n.start_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND n.`status` = #{status}
+		</if>
+	</select>
+	
+	<!-- 查看审核通知时段 -->
+	<select id="view" resultType="map">
+		SELECT
+			n.notice_id,
+			n.`name`,
+			n.start_date,
+			n.end_date,
+			date_format(
+				n.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			n.`status`,
+			p.param_value AS status_name,
+			(
+				SELECT
+					group_concat(
+						us.realname,
+						'（',
+						us.mobile,
+						'）'
+					)
+				FROM
+					tb_srv_audit_notice_user u,
+					tb_ucpaas_user us
+				WHERE
+					u.notice_id = n.notice_id
+				AND us.sid = u.sid
+			) AS mobile,
+			(
+				SELECT
+					group_concat(u.sid)
+				FROM
+					tb_srv_audit_notice_user u
+				WHERE
+					u.notice_id = n.notice_id
+			) AS sid
+		FROM
+			tb_srv_audit_notice n,
+			tb_ucpaas_params p
+		WHERE
+			n.`status` = p.param_key
+		AND p.param_type = 'audit_notice_status'
+		AND n.notice_id = #{notice_id}
+	</select>
+	
+	<!-- 获取所有的时段 -->
+	<select id="allTimeRange" resultType="map">
+		SELECT
+			n.notice_id,
+			n.`name`,
+			n.start_date,
+			n.end_date
+		FROM
+			tb_srv_audit_notice n
+		ORDER BY
+			n.start_date
+	</select>
+	
+	<!-- 添加、修改审核通知时段之前查重 -->
+	<select id="check" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_srv_audit_notice n
+		WHERE
+			n.`name` = #{name}
+		<if test="notice_id != null">
+			AND n.notice_id != #{notice_id}
+		</if>
+	</select>
+	
+	<!-- 添加审核通知时段 -->
+	<insert id="insert">
+		INSERT INTO tb_srv_audit_notice (
+			`name`,
+			start_date,
+			end_date,
+			`status`,
+			create_date,
+			update_date
+		)
+		VALUES
+			(#{name}, #{start_date}, #{end_date}, 0, now(), now())
+	</insert>
+	
+	<!-- 查看审核通知时段id -->
+	<select id="getId" resultType="map">
+		SELECT
+			n.notice_id
+		FROM
+			tb_srv_audit_notice n
+		WHERE
+			n.`name` = #{name}
+		LIMIT 1
+	</select>
+	
+	<!-- 添加审核通知时段和用户的关系表 -->
+	<insert id="insertNoticeUser">
+		INSERT INTO tb_srv_audit_notice_user (notice_id, sid)
+		VALUES
+		<foreach collection="list" item="item" separator="," >
+			(#{item.notice_id}, #{item.sid})
+		</foreach> 
+	</insert>
+	
+	<!-- 删除审核通知时段和用户的关系 -->
+	<delete id="deleteNoticeUser">
+		DELETE
+		FROM
+			tb_srv_audit_notice_user
+		WHERE
+			notice_id = #{notice_id}
+	</delete>
+	
+	<!-- 修改审核通知时段 -->
+	<update id="update">
+		UPDATE tb_srv_audit_notice n
+		SET n.`name` = #{name},
+		 n.start_date = #{start_date},
+		 n.end_date = #{end_date},
+		 n.update_date = now()
+		WHERE
+			n.notice_id = #{notice_id}
+	</update>
+	
+	<!-- 修改审核通知时段状态 -->
+	<update id="updateStatus">
+		UPDATE tb_srv_audit_notice n
+		SET n.`status` = #{status}
+		WHERE
+			n.notice_id = #{notice_id}
+	</update>
+	
+</mapper> 

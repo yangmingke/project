@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsIspMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsIsp" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="isp" property="isp" jdbcType="CHAR" />
+    <result column="ispid" property="ispid" jdbcType="INTEGER" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, isp, ispid, name
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_isp
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryById" resultType="java.lang.String" parameterType="java.lang.String">
+	select name
+	from tb_rs_isp
+	where ispid = #{operator,jdbcType=INTEGER}
+  </select>
+  
+  <select id="queryAllIsp" resultMap="BaseResultMap" >
+  	select 
+    <include refid="Base_Column_List" />
+    from tb_rs_isp
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_rs_isp
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsIsp" >
+    insert into tb_rs_isp (id, isp, ispid, 
+      name)
+    values (#{id,jdbcType=INTEGER}, #{isp,jdbcType=CHAR}, #{ispid,jdbcType=INTEGER}, 
+      #{name,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsIsp" >
+    insert into tb_rs_isp
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="isp != null" >
+        isp,
+      </if>
+      <if test="ispid != null" >
+        ispid,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="isp != null" >
+        #{isp,jdbcType=CHAR},
+      </if>
+      <if test="ispid != null" >
+        #{ispid,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsIsp" >
+    update tb_rs_isp
+    <set >
+      <if test="isp != null" >
+        isp = #{isp,jdbcType=CHAR},
+      </if>
+      <if test="ispid != null" >
+        ispid = #{ispid,jdbcType=INTEGER},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsIsp" >
+    update tb_rs_isp
+    set isp = #{isp,jdbcType=CHAR},
+      ispid = #{ispid,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

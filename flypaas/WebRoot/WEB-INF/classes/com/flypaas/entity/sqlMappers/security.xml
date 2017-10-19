@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.Security">
+
+	<resultMap  id="securityMap" type="com.flypaas.entity.Security">
+		<id property="id" column="id"/>
+		<result property="sid" column="sid"/>
+		<result property="balance" column="balance"/>
+		<result property="status" column="status"/>
+		<result property="agreenmentFile" column="agreenment_file"/>
+		<result property="createDate" column="create_date"/>
+		<result property="updateDate" column="update_date"/>
+	</resultMap>
+
+	<insert id="addAgreementUser" parameterType="security" >
+		 insert into tb_ucpaas_security(sid,status,agreenment_file,create_date,update_date)
+		 values(#{sid},#{status},#{agreenmentFile},#{createDate},#{updateDate})
+	</insert>
+	
+	<update id="updateAgreementUser" parameterType="security">
+		 update tb_ucpaas_security 
+		 <set>
+		 	<if test="status!=null">
+		 		status=#{status},
+		 	</if>
+		 	<if test="agreenmentFile!=null">
+		 		agreenment_file=#{agreenmentFile},
+		 	</if>
+		 	<if test="updateDate!=null">
+		 		update_date=#{updateDate}
+		 	</if>
+		 </set>
+		 where sid=#{sid}
+	</update>
+	
+	<select id="getAgreementUser" parameterType="java.lang.String" resultMap="securityMap" >
+		select id,sid,status from tb_ucpaas_security where sid=#{sid} limit 1
+	</select>
+</mapper>

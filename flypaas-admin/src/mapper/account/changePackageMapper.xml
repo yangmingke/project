@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 账务管理-套餐变更日志 -->
+<mapper namespace="changePackage">
+	
+	<!-- 分页查询套餐变更日志 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.id,
+			t.old_package_id,
+			t.package_id AS new_package_id,
+			t.`status`,
+			p1.param_value AS status_name,
+			t.type,
+			p2.param_value AS type_name,
+			date_format(
+				t.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			u.sid,
+			u.email,
+			b.balance / ${money_rate} AS balance,
+			p.package_id,
+			(
+				SELECT
+					i.fee
+				FROM
+					tb_bill_fee_item_rel ir,
+					tb_bill_fee_item i
+				WHERE
+					ir.package_id = p.package_id
+				AND i.fee_id = ir.fee_id
+				AND i.fee_id LIKE '${event_id_1017}%'
+			) / ${money_rate} AS min_consumption
+		FROM
+			(
+				SELECT
+					t2.*
+				FROM
+					(
+						SELECT
+							t1.*
+						FROM
+							tb_bill_acct_temp_package_rel t1
+						ORDER BY
+							t1.create_date DESC
+					) t2
+				GROUP BY
+					t2.sid
+			) t,
+			tb_ucpaas_user u,
+			tb_bill_acct_balance b,
+			tb_bill_acct_package_rel p,
+			tb_ucpaas_params p1,
+			tb_ucpaas_params p2
+		WHERE
+			u.sid = t.sid
+		AND b.sid = t.sid
+		AND p.sid = t.sid
+		AND t.`status` = p1.param_key
+		AND p1.param_type = 'change_package_status'
+		AND t.type = p2.param_key
+		AND p2.param_type = 'change_package_type'
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.`status` = #{status}
+		</if>
+		<if test="type != null">
+			AND t.type = #{type}
+		</if>
+		
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询套餐变更日志 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			(
+				SELECT
+					t2.*
+				FROM
+					(
+						SELECT
+							t1.*
+						FROM
+							tb_bill_acct_temp_package_rel t1
+						ORDER BY
+							t1.create_date DESC
+					) t2
+				GROUP BY
+					t2.sid
+			) t,
+			tb_ucpaas_user u
+		WHERE
+			u.sid = t.sid
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.`status` = #{status}
+		</if>
+		<if test="type != null">
+			AND t.type = #{type}
+		</if>
+	</select>
+	
+	<!-- 获取开发者信息 -->
+	<select id="developer" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			b.balance / ${money_rate} AS balance,
+			p.package_id,
+			(
+				SELECT
+					i.fee
+				FROM
+					tb_bill_fee_item_rel ir,
+					tb_bill_fee_item i
+				WHERE
+					ir.package_id = p.package_id
+				AND i.fee_id = ir.fee_id
+				AND i.fee_id LIKE '${event_id_1017}%'
+			) / ${money_rate} AS min_consumption
+		FROM
+			tb_ucpaas_user u,
+			tb_bill_acct_balance b,
+			tb_bill_acct_package_rel p
+		WHERE
+			b.sid = u.sid
+		AND p.sid = u.sid
+		AND u.sid = #{sid}
+	</select>
+	
+	<!-- 查看变更历史 -->
+	<select id="history" resultType="map">
+		SELECT
+			t.id,
+			t.old_package_id,
+			t.package_id AS new_package_id,
+			p1.param_value AS status_name,
+			p2.param_value AS type_name,
+			date_format(
+				t.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date
+		FROM
+			tb_bill_acct_temp_package_rel t,
+			tb_ucpaas_params p1,
+			tb_ucpaas_params p2
+		WHERE
+			t.`status` = p1.param_key
+		AND p1.param_type = 'change_package_status'
+		AND t.type = p2.param_key
+		AND p2.param_type = 'change_package_type'
+		AND t.sid = #{sid}
+		ORDER BY
+			t.update_date
+	</select>
+	
+	<!-- 添加变更日志 -->
+	<insert id="insertLog">
+		INSERT INTO tb_bill_acct_temp_package_rel (
+			sid,
+			old_package_id,
+			package_id,
+			create_date,
+			update_date,
+			`status`,
+			type
+		) SELECT
+			t.sid,
+			p.package_id,
+			t.old_package_id,
+			now(),
+			now(),
+			0,
+			3
+		FROM
+			tb_bill_acct_temp_package_rel t,
+			tb_bill_acct_package_rel p
+		WHERE
+			p.sid = t.sid
+		AND t.id = #{id}
+		AND t.`status` = 0
+		AND t.type = 2
+	</insert>
+	
+	<!-- 还原 -->
+	<update id="restore">
+		UPDATE tb_bill_acct_temp_package_rel t,
+		 tb_bill_acct_package_rel p
+		SET p.package_id = t.old_package_id,
+		 p.update_date = now()
+		WHERE
+			p.sid = t.sid
+		AND t.id = #{id}
+		AND t.`status` = 0
+		AND t.type = 2
+	</update>
+	
+</mapper> 

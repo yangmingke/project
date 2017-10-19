@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucpaas.commonservice.dao.ClientBalanceInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.ucpaas.commonservice.model.ClientBalanceInfo" >
+    <result column="uin" property="uin" jdbcType="INTEGER" />
+    <result column="sid" property="sid" jdbcType="VARCHAR" />
+    <result column="client_number" property="clientNumber" jdbcType="VARCHAR" />
+    <result column="balance" property="balance" jdbcType="BIGINT" />
+    <result column="enable_flag" property="enableFlag" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="valid_date" property="validDate" jdbcType="TIMESTAMP" />
+    <result column="vip_valid_date" property="vipValidDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    uin, sid, client_number, balance, enable_flag, create_time, valid_date, vip_valid_date, 
+    update_date
+  </sql>
+  
+<!--   根据clientNumber查询记录 -->
+<!-- enable_flag  0：冻结 1 正常 -->
+  <select id="selectByClientNumber" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_bill_client_balance_${uin_mod}
+    where client_number = #{clientNumber}
+  </select>
+  
+
+<!--  根据clientNumber更新记录  -->
+  <update id="updateByClientNumber" parameterType="com.ucpaas.commonservice.model.ClientBalanceInfo" >
+    update tb_bill_client_balance_${uin_mod}
+    <set >
+      <if test="uin != null" >
+        uin = #{uin,jdbcType=INTEGER},
+      </if>
+      <if test="sid != null" >
+        sid = #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null" >
+        balance = #{balance,jdbcType=BIGINT},
+      </if>
+      <if test="enableFlag != null" >
+        enable_flag = #{enableFlag,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validDate != null" >
+        valid_date = #{validDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="vipValidDate != null" >
+        vip_valid_date = #{vipValidDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where client_number = #{clientNumber}
+  </update>
+  
+  <!--  根据uin更新记录  -->
+  <update id="updateByUin" parameterType="com.ucpaas.commonservice.model.ClientBalanceInfo" >
+    update tb_bill_client_balance_${uin_mod}
+    <set >
+      <if test="sid != null" >
+        sid = #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="clientNumber != null" >
+        client_number = #{clientNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null" >
+        balance = #{balance,jdbcType=BIGINT},
+      </if>
+      <if test="enableFlag != null" >
+        enable_flag = #{enableFlag,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validDate != null" >
+        valid_date = #{validDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="vipValidDate != null" >
+        vip_valid_date = #{vipValidDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where uin = #{uin}
+  </update>
+  
+  
+<!-- 插入反向表信息   -->
+ <insert id="insert" parameterType="com.ucpaas.commonservice.model.ClientBalanceInfo" >
+    insert into tb_bill_client_balance_${uin_mod}
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="uin != null" >
+        uin,
+      </if>
+      <if test="sid != null" >
+        sid,
+      </if>
+      <if test="clientNumber != null" >
+        client_number,
+      </if>
+      <if test="balance != null" >
+        balance,
+      </if>
+      <if test="enableFlag != null" >
+        enable_flag,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="validDate != null" >
+        valid_date,
+      </if>
+      <if test="vipValidDate != null" >
+        vip_valid_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="uin != null" >
+        #{uin,jdbcType=INTEGER},
+      </if>
+      <if test="sid != null" >
+        #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="clientNumber != null" >
+        #{clientNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null" >
+        #{balance,jdbcType=BIGINT},
+      </if>
+      <if test="enableFlag != null" >
+        #{enableFlag,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validDate != null" >
+        #{validDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="vipValidDate != null" >
+        #{vipValidDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  
+ <!--  根据clientNumber给balance充值 	兼容rest2014双写版,2015-10-23添加  -->
+  <update id="chargeClientBalanceByClientNumber" parameterType="java.util.Map" >
+    update tb_bill_client_balance_${uin_mod}
+    <set >
+      <if test="balance != null" >
+        balance = balance 
+         <if test="chargeType != null and chargeType == 0 " >
+         	+
+         </if>
+         <if test="chargeType != null and chargeType == 1 " >
+         	-
+         </if>
+        #{balance},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where client_number = #{clientNumber}
+  </update> 
+  
+  
+  <delete id="deleteByUin" parameterType="com.ucpaas.commonservice.model.ClientBalanceInfo" >
+    delete from tb_bill_client_balance_${uin_mod}
+    where uin = #{uin,jdbcType=INTEGER}
+  </delete>
+  
+  
+  
+  
+  
+</mapper>

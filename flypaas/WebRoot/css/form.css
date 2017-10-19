@@ -1,0 +1,53 @@
+@charset "utf-8";
+/* CSS Document */
+input[type='text'],input[type='password'] { background: url("../images/ucp_bg.png") 0 -260px; border: none; height:44px; line-height:22px; line-height:44px\0; padding-left:10px; width: 353px; color:#aaa; font-size:12px; font-family:微软雅黑; }
+input[type='text']:focus,input[type='password']:focus { color:#333; background: url("../images/ucp_bg.png") 0 -808px no-repeat;}
+input[type='button'],input[type='submit'] { background: url("../images/ucp_bg.png") 0px -101px no-repeat; color:#fff; text-align:center; font-size:16px; font-weight:bold; font-family:微软雅黑;  height:50px; line-height:50px; width:160px; border:none; cursor:pointer; outline:none;}
+input[type='button']:hover,input[type='submit']:hover { background: url("../images/ucp_bg.png") 0px -999px no-repeat;}
+textarea {border:1px #c2c2c2 solid; background:#fff; border-radius:5px; width:569px; height:95px; padding: 10px 0px 0px 10px; color:#aaa; font-size:12px; resize:none; width:579px; height:105px;}
+textarea:focus { color: #333; border:1px #90b6e1 solid;}
+
+/*模拟单选*/
+form p.sort a { /*background:url("../images/ucp_bg.png") -121px -399px no-repeat;*/ background: #e8e8e8; display:inline-block; width:90px; height:41px; text-align:center; line-height:41px; margin-right:10px;color:#595959;}
+form p.sort a.active { background: #45afe1; color: #fff;}
+input[type='radio'] {display:inline-block; width:18px; height:18px; opacity:0; filter:alpha(opacity=0); cursor:pointer;}
+span.radio { display:inline-block; width:18px; height:18px; background:url("../images/radio_bg.png") 0 0 no-repeat; line-height:18px;}
+span.radio.checked { background:url("../images/radio_bg.png") 0 -22px no-repeat;}
+
+/*复选框*/
+input[type='checkbox'] {display:inline-block; width:14px; height:14px; opacity:0; filter:alpha(opacity=0); outline:none;}
+span.checkbox { display:inline-block; width:14px; height:14px; background:url("../images/checkbox_bg.png") 0 0 no-repeat; line-height:14px;}
+span.checkbox.checked { background:url("../images/checkbox_bg.png") 0 -16px no-repeat;}
+
+/*模拟下拉列表框*/
+div.select { float:left; display:inline; height:41px; line-height:41px; color:#595959; vertical-align: middle; cursor:pointer; position:relative;background: url("../images/ucp_bg.png") -163px -604px no-repeat; width: 159px; /*z-index: 11*/}
+div.select span { display:inline-block; font-size:14px; padding-left: 20px; color: #9a9a9a; }
+div.select ul {background:#f9f9f9; position:absolute; top:40px; left:-1px; border:1px #c6c6c6 solid; z-index:11; max-height:150px; overflow-y:scroll; overflow-x:hidden; min-height:41px;}
+div.select ul li {color:#9a9a9a; padding-left:20px; }
+div.select ul li:hover { background:#eef6ff; color:#9a9a9a;}
+div.select.parent { margin-right:20px; }
+
+/*表单验证*/
+form span.error { background:url("../images/error.png") left center no-repeat; color:#e76200; padding-left:25px; display:inline-block; height:16px; font-size:12px;}
+form .select_box span.error { line-height:18px; margin-top:11px; margin-left:10px;}
+form p { position:relative; margin-bottom: 26px;}
+form p.p_check{ margin-bottom:30px;}
+form label {text-align:right; width:60px; margin-right:20px; display:inline-block; font-size:14px; color:#595959;}
+form p span.tips {position:absolute; left:85px; top:46px; color:#aaa; font-size:12px;}
+form p span.correct { background: url("../images/ucp_bg.png") -482px -125px no-repeat; display: inline-block; width: 18px; height: 18px;}
+form .p_check span.tips { top:20px;}
+form .textarea span.tips { top:120px;}
+form .code input[type='text'] { background: url("../images/ucp_bg.png") -172px -211px no-repeat; width: 103px; height: 42px;}
+form .code input[type='text']:focus { background: url("../images/ucp_bg.png") -148px -900px no-repeat; width: 103px; height: 42px;}
+form .code img { margin-left:30px;}
+form .code a { width:36px; color:#7696b7; margin-right:45px; margin-top:5px; font-size:12px; float:right; display:inline;}
+form .select em.tips {color: #aaa; display: inline-block; font-size: 12px; font-style: normal; line-height: 20px; width: 300px;}
+
+
+/*模拟上传*/
+.file { position: relative; width:468px;}
+.file input.file_btn { background: url("../images/ucp_bg.png") -353px -450px no-repeat; width: 90px; height: 40px; line-height:40px; margin-left: 10px;}
+.file input.file_1 { opacity: 0; filter:alpha(opacity=0); position: absolute; left: 0px; top: 0px; display: inline-block; width: 468px; padding-left:10px; height: 44px; line-height: 44px; }
+.file input.choose_btn { background:url("../images/ucp_bg.png") 0px -757px; width:116px; padding-left:35px; height:42px; line-height:42px; color:#fff; position:absolute; top:0px; left:0px;}
+.file input.choose_btn:hover {  background:url("../images/ucp_bg.png") -224px -758px no-repeat; }
+.file input.choose { opacity:0;filter:alpha(opacity=0); position: absolute; left: 0px; top: 0px;}

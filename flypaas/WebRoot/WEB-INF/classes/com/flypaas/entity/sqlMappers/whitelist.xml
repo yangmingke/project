@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.TbSrvWhiteList">
+	
+	 
+	 <resultMap id="whiteResult" type="com.flypaas.entity.TbSrvWhiteList">
+		<id property="appSid" column="app_sid" />
+		<result property="whiteAddress" column="white_address" />
+		<result property="wType" column="w_type" />
+		<result property="brandId" column="brand_id" />
+	</resultMap>
+	
+	<insert id="addWhiteList" parameterType="whiteList" >
+	<![CDATA[
+		insert into
+		tb_srv_white_list(app_sid,white_address,w_type,brand_id) values(#{appSid},#{whiteAddress},#{wType},#{brandId})
+		]]>
+	</insert>
+	
+	<select id="getWhiteListById" parameterType="java.lang.String" resultMap="whiteResult">
+		select * from tb_srv_white_list where app_sid=#{id}
+	</select>
+	
+	<update id="updateWhiteList" parameterType="whiteList">
+		update tb_srv_white_list
+		<set>
+			<if test="whiteAddress!=null">
+				white_address = #{whiteAddress},
+			</if>
+			<if test="wType!=null">
+				w_type = #{wType},
+			</if>
+			<if test="brandId!=null">
+				brand_id = #{brandId}
+			</if>
+		</set>
+		where app_sid=#{appSid}
+	</update>
+	<delete id="deleteWhiteById" parameterType="java.lang.String">
+		delete from tb_srv_white_list where app_sid=#{appSid}
+	</delete>
+</mapper>

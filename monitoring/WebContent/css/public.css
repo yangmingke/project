@@ -1,0 +1,8 @@
+@charset "utf-8";
+/* 自定义样式 */
+
+/*图表样式*/
+.chart_box {background-color:#fff;}
+.chart_fullScreen {float:right;}
+.chart_selectDiv {text-align:center;}
+.chart_selectDiv input {margin:0 10px;}

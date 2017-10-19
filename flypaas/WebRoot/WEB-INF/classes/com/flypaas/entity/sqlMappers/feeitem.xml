@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.FeeItem">
+	
+	 
+	 <resultMap id="feeItemResult" type="com.flypaas.entity.FeeItem">
+		<id property="feeId" column="fee_id" />
+		<result property="feeName" column="fee_name" />
+		<result property="feeType" column="fee_type" />
+		<result property="fee" column="fee" />
+		<result property="feeDesc" column="fee_desc" />
+	</resultMap>
+	<select id="getFeeItemListById" parameterType="java.lang.String" resultMap="feeItemResult">
+		select * from tb_bill_fee_item where fee_id=#{id}
+	</select>
+	<select id="getFeeItemList" resultType="map">
+		SELECT p.package_name,p.package_describe,item.fee_desc,item.fee_name FROM 
+		tb_bill_package as p 
+		LEFT JOIN
+		tb_bill_fee_item_rel as itl
+		ON(p.package_id=itl.package_id)
+		LEFT JOIN
+		tb_bill_fee_item as item
+		ON(itl.fee_id=item.fee_id)
+	</select>
+	
+	<select id="getLowerCsm" parameterType="map" resultType="double">
+		SELECT TRUNCATE(i.fee/1000000,4) from tb_bill_fee_item i 
+		WHERE i.fee_id in(SELECT re.fee_id FROM tb_bill_fee_item_rel re WHERE re.package_id=#{pckId} and re.fee_id LIKE concat(#{lowerCsm},'%'))
+	</select>
+</mapper>

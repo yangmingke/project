@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsBillFlowMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsBillFlow" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="main_sid" property="mainSid" jdbcType="VARCHAR" />
+    <result column="balance" property="balance" jdbcType="DOUBLE" />
+    <result column="actual_fee" property="actualFee" jdbcType="BIGINT" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="adult_date" property="adultDate" jdbcType="TIMESTAMP" />
+    <result column="finsh_date" property="finshDate" jdbcType="TIMESTAMP" />
+    <result column="fee_name" property="feeName" jdbcType="VARCHAR" />
+    <result column="oper_user" property="operUser" jdbcType="VARCHAR" />
+    <result column="demo" property="demo" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="alipay_name" property="alipayName" jdbcType="VARCHAR" />
+    <result column="alipay_account" property="alipayAccount" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, main_sid, balance, actual_fee, create_date,adult_date,finsh_date, fee_name, oper_user, demo,status, alipay_name, alipay_account
+  </sql>
+  
+  <select id="queryBillFlow" resultType="Map" parameterType="java.lang.String">
+  	select 
+  		a.username,
+		f.id,
+		f.main_sid,
+		f.balance,
+		f.actual_fee,
+		f.create_date,
+		f.adult_date,
+		f.finsh_date,
+		f.fee_name,
+		f.oper_user,
+		f.demo,
+		f.status,
+		f.alipay_name,
+		f.alipay_account
+		FROM tb_rs_bill_flow f
+		left join tb_rs_account_info a
+		ON f.main_sid = a.net_sid
+		WHERE f.id = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <select id="queryAllBillFlow" resultType="Map" parameterType="Map">
+  	select 
+  		a.username,
+		f.id,
+		f.main_sid,
+		f.balance,
+		f.actual_fee,
+		f.create_date,
+		f.adult_date,
+		f.finsh_date,
+		f.fee_name,
+		f.oper_user,
+		f.demo,
+		f.status,
+		f.alipay_name,
+		f.alipay_account
+		FROM tb_rs_bill_flow f
+		left join tb_rs_account_info a
+		ON f.main_sid = a.net_sid
+		WHERE 1=1
+		<if test="datemin != null" >
+        	and f.create_date &gt; #{datemin,jdbcType=VARCHAR}
+	    </if>
+	    <if test="datemax != null" >
+	        and f.create_date &lt; date_add(str_to_date(#{datemax,jdbcType=VARCHAR},'%Y-%m-%d'),interval 1 day)
+	    </if>
+	    <if test="keyword != null" >
+	        and (a.username like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%') 
+	        	or
+	        	f.oper_user like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%'))
+	    </if> 
+	    <if test="status != null" >
+	        and f.status = #{status,jdbcType=VARCHAR}
+	    </if> 
+	    ORDER BY f.create_date DESC
+  		limit #{begin,jdbcType=INTEGER} , #{count,jdbcType=INTEGER};
+  </select>
+  
+  <select id="queryCount" resultType="java.lang.Integer" parameterType="Map">
+  	select 
+  		count(*)
+    FROM tb_rs_bill_flow f
+		left join tb_rs_account_info a
+		ON f.main_sid = a.net_sid
+		WHERE 1=1
+		<if test="datemin != null" >
+        	and f.create_date &gt; #{datemin,jdbcType=VARCHAR}
+	    </if>
+	    <if test="datemax != null" >
+	        and f.create_date &lt; date_add(str_to_date(#{datemax,jdbcType=VARCHAR},'%Y-%m-%d'),interval 1 day)
+	    </if>
+	    <if test="keyword != null" >
+	        and (a.username like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%') 
+	        	or
+	        	f.oper_user like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%'))
+	    </if> 
+	    <if test="status != null" >
+	        and f.status = #{status,jdbcType=VARCHAR}
+	    </if> 
+  </select>
+  
+  <select id="queryAllBillFlowBynetSid" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select 
+  	<include refid="Base_Column_List" />
+    from tb_rs_bill_flow
+    where main_sid = #{netSid,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_bill_flow
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tb_rs_bill_flow
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsBillFlow" >
+    insert into tb_rs_bill_flow (id, main_sid, balance, 
+      actual_fee, create_date, fee_name, 
+      oper_user, demo, alipay_name, alipay_account)
+    values (#{id,jdbcType=BIGINT}, #{mainSid,jdbcType=VARCHAR}, #{balance,jdbcType=INTEGER}, 
+      #{actualFee,jdbcType=BIGINT}, #{createDate,jdbcType=TIMESTAMP},#{adultDate,jdbcType=TIMESTAMP},
+      #{finshDate,jdbcType=TIMESTAMP}, #{feeName,jdbcType=VARCHAR}, 
+      #{operUser,jdbcType=VARCHAR}, #{demo,jdbcType=VARCHAR},#{status,jdbcType=VARCHAR},
+      #{alipayName,jdbcType=VARCHAR}, #{alipayAccount,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsBillFlow" >
+    insert into tb_rs_bill_flow
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="mainSid != null" >
+        main_sid,
+      </if>
+      <if test="balance != null" >
+        balance,
+      </if>
+      <if test="actualFee != null" >
+        actual_fee,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="adultDate != null" >
+        adult_date,
+      </if>
+      <if test="finshDate != null" >
+        finsh_date,
+      </if>
+      <if test="feeName != null" >
+        fee_name,
+      </if>
+      <if test="operUser != null" >
+        oper_user,
+      </if>
+      <if test="demo != null" >
+        demo,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+       <if test="alipayName != null" >
+        alipay_name,
+      </if>
+      <if test="alipayAccount != null" >
+        alipay_account,
+      </if>  
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="mainSid != null" >
+        #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null" >
+        #{balance,jdbcType=INTEGER},
+      </if>
+      <if test="actualFee != null" >
+        #{actualFee,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="adultDate != null" >
+        #{adultDate,jdbcType=TIMESTAMP},
+      </if>
+      
+      <if test="finshDate != null" >
+        #{finshDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="feeName != null" >
+        #{feeName,jdbcType=VARCHAR},
+      </if>
+      <if test="operUser != null" >
+        #{operUser,jdbcType=VARCHAR},
+      </if>
+      <if test="demo != null" >
+        #{demo,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="alipayName != null" >
+        #{alipayName,jdbcType=VARCHAR},
+      </if>
+      <if test="alipayAccount != null" >
+        #{alipayAccount,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsBillFlow" >
+    update tb_rs_bill_flow
+    <set >
+      <if test="mainSid != null" >
+        main_sid = #{mainSid,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null" >
+        balance = #{balance,jdbcType=INTEGER},
+      </if>
+      <if test="actualFee != null" >
+        actual_fee = #{actualFee,jdbcType=BIGINT},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="adultDate != null" >
+        adult_date = #{adultDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finshDate != null" >
+        finsh_date = #{finshDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="feeName != null" >
+        fee_name = #{feeName,jdbcType=VARCHAR},
+      </if>
+      <if test="operUser != null" >
+        oper_user = #{operUser,jdbcType=VARCHAR},
+      </if>
+      <if test="demo != null" >
+        demo = #{demo,jdbcType=VARCHAR},
+      </if>
+      <if test="alipayName != null" >
+        alipay_name = #{alipayName,jdbcType=VARCHAR},
+      </if>
+      <if test="alipayAccount != null" >
+        alipay_account = #{alipayAccount,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsBillFlow" >
+    update tb_rs_bill_flow
+    set main_sid = #{mainSid,jdbcType=VARCHAR},
+      balance = #{balance,jdbcType=INTEGER},
+      actual_fee = #{actualFee,jdbcType=BIGINT},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      adult_date = #{adultDate,jdbcType=TIMESTAMP},
+      finsh_date = #{finshDate,jdbcType=TIMESTAMP},
+      fee_name = #{feeName,jdbcType=VARCHAR},
+      oper_user = #{operUser,jdbcType=VARCHAR},
+      demo = #{demo,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      alipay_name = #{alipayName,jdbcType=VARCHAR},
+      alipay_account = #{alipayAccount,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

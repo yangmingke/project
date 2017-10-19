@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 审核管理-资质审核 -->
+<mapper namespace="qualification">
+
+	<!-- 分页查询资质 -->
+	<select id="query" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.mobile,
+			u.realname,
+			date_format(
+				u.oauth_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			u.oauth_status,
+			(SELECT a.audit_desc FROM tb_srv_audit a WHERE a.audited_id = u.sid AND a.audit_type = 1 LIMIT 1) AS audit_desc,
+			u.user_type
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type IN (1, 2)
+		AND u.super_sid=#{superSid}
+		AND u.oauth_status IN (2, 3, 4)
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+				OR u.mobile LIKE concat(#{text}, '%')
+				OR u.realname LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.oauth_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND u.oauth_date <= #{end_date} ]]>
+		</if>
+		<if test="oauth_status != null">
+			AND u.oauth_status = #{oauth_status}
+		</if>
+		ORDER BY
+			u.oauth_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询资质 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type IN (1, 2)
+		AND u.super_sid=#{superSid}
+		AND u.oauth_status IN (2, 3, 4)
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+				OR u.mobile LIKE concat(#{text}, '%')
+				OR u.realname LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.oauth_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND u.oauth_date <= #{end_date} ]]>
+		</if>
+		<if test="oauth_status != null">
+			AND u.oauth_status = #{oauth_status}
+		</if>
+	</select>
+	
+	<!-- 获取资质 -->
+	<select id="getQualification" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.mobile,
+			u.realname,
+			u.user_type,
+			p1.param_value AS user_type_name,
+			date_format(
+				u.oauth_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			u.oauth_status,
+			p2.param_value AS oauth_status_name,
+			u.address,
+			u.legal_person,
+			u.company_nbr,
+			u.web_site
+		FROM
+			tb_ucpaas_user u
+		LEFT JOIN tb_ucpaas_params p1 ON p1.param_key = u.user_type
+		AND p1.param_type = 'user_type'
+		LEFT JOIN tb_ucpaas_params p2 ON p2.param_key = u.oauth_status
+		AND p2.param_type = 'oauth_status'
+		WHERE
+			u.user_type IN (1, 2)
+		AND u.sid = #{sid}
+	</select>
+	
+	<!-- 获取证件 -->
+	<select id="getId" resultType="map">
+		SELECT
+			p1.param_value AS id_type_name,
+			p.id_nbr,
+			p.img_url
+		FROM
+			tb_ucpaas_user_pic p
+		LEFT JOIN tb_ucpaas_params p1 ON p1.param_key = p.id_type
+		AND p1.param_type = 'id_type'
+		WHERE
+			p.sid = #{sid}
+		AND p.`status` = 1
+		ORDER BY
+			p.id_type
+	</select>
+	
+	<!-- 审核 -->
+	<update id="audit">
+		UPDATE tb_ucpaas_user u
+		SET u.oauth_status = #{oauth_status}
+		WHERE
+			u.user_type IN (1, 2)
+		AND u.sid = #{sid}
+	</update>
+	
+</mapper> 

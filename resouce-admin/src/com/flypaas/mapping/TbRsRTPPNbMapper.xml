@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsRTPPNbMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsRTPP" >
+    <id column="nb_sid" property="nbSid" jdbcType="INTEGER" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="nb_ip" property="nbIp" jdbcType="VARCHAR" />
+    <result column="area" property="routeArea" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    nb_sid, ip, nb_ip,area
+  </sql>
+  
+  <select id="getNbList" resultType="java.lang.String" parameterType="Map">
+  	select nb_ip
+    from tb_rs_rtpp_nb
+    where ip = #{ip,jdbcType=VARCHAR}
+    and area = #{area,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="getNnbList" resultType="java.lang.String" parameterType="Map">
+  	select nnb_ip
+    from tb_rs_rtpp_nnb
+    where ip = #{ip,jdbcType=VARCHAR}
+    and area = #{area,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <delete id="deleteNb" parameterType="Map" >
+    delete from tb_rs_rtpp_nb
+    where ip = #{ip}
+    and area=#{area}
+  </delete>
+  
+  <delete id="deleteNnb" parameterType="Map" >
+    delete from tb_rs_rtpp_nnb
+    where ip = #{ip}
+    and area=#{area}
+  </delete>
+  
+  <insert id="insertNb" parameterType="Map" >
+    insert into tb_rs_rtpp_nb (ip, nb_ip,area)
+    values  
+    <foreach collection="neighborArray" item="nbIp" index="index" separator="," >  
+        (#{ip},#{nbIp},#{area})  
+    </foreach>  
+  </insert>
+  
+  <insert id="insertNnb" parameterType="Map" >
+    insert into tb_rs_rtpp_nnb (ip, nnb_ip,area)
+    values  
+    <foreach collection="notNeighborArray" item="nnbIp" index="index" separator="," >  
+        (#{ip},#{nnbIp},#{area})  
+    </foreach>  
+  </insert>
+  
+</mapper>

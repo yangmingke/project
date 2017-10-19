@@ -1,0 +1,11 @@
+@charset "utf-8";
+/* CSS Document */
+
+select[multiple="multiple"] {resize:auto;}
+input[disabled], select[disabled], textarea[disabled], input[readonly], select[readonly], textarea[readonly] {background-color: #eee;}
+/*表单验证信息*/
+label.error,span.error { background: url("../images/error.png") no-repeat scroll 0 0 rgba(0, 0, 0, 0); color: #E76200; display: inline-block; font-family: 黑体;  font-size: 12px; height: 27px; padding-left: 25px; width: auto;}
+/*表格无边样式*/
+.noEdge{border-collapse:collapse;  border-spacing:0;}
+.float_lf{float:left}
+.checkbox_label{cursor: pointer;}

@@ -1,0 +1,380 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- SR节点拓扑图查询 -->
+<mapper namespace="topology">
+
+	<!-- 删除邻居节点信息 -->
+	<select id="deleteNeighbors">
+		DELETE FROM network_monitor.node_neighbors
+		WHERE sr_id = #{sr_id}
+	</select>
+	
+	<!-- 删除邻居节点信息 -->
+	<select id="deleteNeighborsTemp">
+		DELETE FROM network_monitor.node_neighbors_temp
+		WHERE sr_id = #{sr_id}
+		or nbrid = #{sr_id}
+	</select>
+	
+	<!-- 邻居节点数量 -->
+	<select id="neighborsCount" resultType="map">
+		select count(*) totalCount
+		from network_monitor.node_neighbors
+		WHERE sr_id = #{sr_id}
+		or nbrid = #{sr_id}
+	</select>
+	
+	<!-- 临时邻居节点SRID -->
+	<select id="queryTopologyTempSrId" resultType="map">
+		select distinct sr_id from node_neighbors_temp
+	</select>
+	
+
+	<!-- 批量插入邻居节点信息 -->
+	<insert id="insertbatch" parameterType="java.util.List">
+		INSERT INTO network_monitor.node_neighbors
+		(sr_id, ifname, nbrid, nbrip, time)
+		VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			( #{item.sr_id}, #{item.ifname},#{item.nbrid},
+			inet_aton(#{item.nbrip}),unix_timestamp(NOW()))
+		</foreach>
+	</insert>
+	
+	<!-- 删除邻居节点信息 -->
+	<select id="deleteNeighborstemp">
+		DELETE FROM network_monitor.node_neighbors_temp
+		WHERE sr_id = #{sr_id}
+	</select>
+	
+	
+	<!-- 批量插入临时邻居节点信息 -->
+	<insert id="insertbatchtemp" parameterType="java.util.List">
+		INSERT INTO network_monitor.node_neighbors_temp
+		(sr_id, nbrid, time)
+		VALUES
+		<foreach collection="nodeList" item="item" index="index"
+			separator=",">
+			( #{sr_id},#{item.nbrid},unix_timestamp(NOW()))
+		</foreach>
+	</insert>
+	
+
+	<!-- 分页查询邻居关系 -->
+	<select id="query" resultType="map">
+			SELECT
+		s.sr_id,
+		s.sr_name,
+		d.sr_name AS dst_name,
+		CONVERT (
+		CONCAT(inet_ntoa(i.ifip), ''),
+		CHAR
+		) AS nbrip,
+		i.ifname ifname2,
+		n.nbrid,
+		CONVERT (
+		CONCAT(inet_ntoa(k.ifip), ''),
+		CHAR
+		) AS ifip,
+		n.ifname ifname,
+		from_unixtime(n.time, '%Y-%m-%d %H:%i:%S') AS time
+		FROM
+		network_monitor.node_neighbors n,
+		network_monitor.sr_node_info s,
+		network_monitor.sr_node_info d,
+		network_monitor.sr_node_interface i,
+    network_monitor.sr_node_interface k
+		WHERE
+		1 = 1
+		AND n.sr_id = s.sr_id
+		AND n.nbrid = d.sr_id
+		
+		AND i.ifip = n.nbrip
+		AND i.sr_id=n.nbrid
+		
+       AND k.sr_id=s.sr_id
+        AND k.ifname=n.ifname
+		AND from_unixtime(n.time, '%Y-%m-%d %H:%i') BETWEEN DATE_FORMAT(date_sub(now(), INTERVAL 1 MINUTE),'%Y-%m-%d %H:%i')
+        AND DATE_FORMAT(now(), '%Y-%m-%d %H:%i')
+		
+		<if test="sr_id != null">
+			AND (
+			s.sr_id = #{sr_id}
+			OR s.sr_name LIKE concat('%', #{sr_id}, '%')
+			)
+		</if>
+		<if test="level != null">
+			AND s.level = #{level}
+		</if>
+		<if test="mnos != null">
+			AND s.mnos = #{mnos}
+		</if>
+		ORDER BY
+		n.time DESC
+		${limit}
+	</select>
+
+	<!-- 分页查询邻居关系 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+		count(0) AS totalCount
+		FROM
+		network_monitor.node_neighbors n,
+		network_monitor.sr_node_info s,
+		network_monitor.sr_node_info d,
+		network_monitor.sr_node_interface i,
+    network_monitor.sr_node_interface k
+		WHERE
+		1 = 1
+		AND n.sr_id = s.sr_id
+		AND n.nbrid = d.sr_id
+		
+		AND i.ifip = n.nbrip
+		AND i.sr_id=n.nbrid
+		
+        AND k.sr_id=s.sr_id
+        AND k.ifname=n.ifname
+		AND from_unixtime(n.time, '%Y-%m-%d %H:%i') BETWEEN DATE_FORMAT(date_sub(now(), INTERVAL 1 MINUTE),'%Y-%m-%d %H:%i')
+        AND DATE_FORMAT(now(), '%Y-%m-%d %H:%i')
+
+		<if test="sr_id != null">
+			AND (
+			s.sr_id = #{sr_id}
+			OR s.sr_name LIKE concat('%', #{sr_id}, '%')
+			)
+		</if>
+		<if test="level != null">
+			AND s.level = #{level}
+		</if>
+		<if test="mnos != null">
+			AND s.mnos = #{mnos}
+		</if>
+	</select>
+
+	<!-- 查询SR节点关系图 绘制SR节点拓扑图 -->
+	<select id="queryTopology" resultType="map">
+		SELECT
+	src.sr_id AS src_sr_id,
+	src.sr_name AS src_sr_name,
+	src.lng AS sr_lng,
+	src.lat AS sr_lat,
+	src. LEVEL AS LEVEL,
+	dst.sr_id AS dst_sr_id,
+	dst.sr_name AS dst_sr_name,
+	dst.lng AS dst_sr_lng,
+	dst.lat AS dst_sr_lat,
+  n.ifname src_iframe,
+  i.ifname  dst_iframe
+FROM
+	network_monitor.node_neighbors n,
+	network_monitor.sr_node_info src,
+	network_monitor.sr_node_info dst,
+  sr_node_interface i
+WHERE
+	1 = 1
+AND n.sr_id = src.sr_id
+AND n.nbrid = dst.sr_id
+AND i.ifip = n.nbrip
+		<if test="(start_time != null and end_time != null)">
+			AND n.time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+	</select>
+	
+	<select id="queryTopologyTemp" resultType="map">
+		SELECT
+			src.sr_id AS src_sr_id,
+			src.sr_name AS src_sr_name,
+			src.lng AS sr_lng,
+			src.lat AS sr_lat,
+			src. LEVEL AS LEVEL,
+			dst.sr_id AS dst_sr_id,
+			dst.sr_name AS dst_sr_name,
+			dst.lng AS dst_sr_lng,
+			dst.lat AS dst_sr_lat,
+		  n.ifname src_iframe
+		FROM
+			network_monitor.node_neighbors_temp n,
+			network_monitor.sr_node_info src,
+			network_monitor.sr_node_info dst
+		WHERE
+			1 = 1
+		AND n.sr_id = src.sr_id
+		AND n.nbrid = dst.sr_id
+		<if test="(start_time != null and end_time != null)">
+			AND n.time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+	</select>
+	
+	<!-- 查询中国SR节点关系图 绘制SR节点拓扑图 -->
+	<select id="queryChinaTopology" resultType="map">
+		SELECT
+	src.sr_id AS src_sr_id,
+	src.sr_name AS src_sr_name,
+	src.lng AS sr_lng,
+	src.lat AS sr_lat,
+	src. LEVEL AS LEVEL,
+	dst.sr_id AS dst_sr_id,
+	dst.sr_name AS dst_sr_name,
+	dst.lng AS dst_sr_lng,
+	dst.lat AS dst_sr_lat,
+  n.ifname src_iframe,
+  i.ifname  dst_iframe
+FROM
+	network_monitor.node_neighbors n,
+	network_monitor.sr_node_info src,
+	network_monitor.sr_node_info dst,
+  sr_node_interface i
+WHERE
+	1 = 1
+AND n.sr_id = src.sr_id
+AND n.nbrid = dst.sr_id
+AND i.ifip = n.nbrip
+and (src.lng between 73.33 and 135.05)
+and (src.lat between 3.51 and 53.33)
+and (dst.lng between 73.33 and 135.05)
+and (dst.lat between 3.51 and 53.33) 
+		<if test="(start_time != null and end_time != null)">
+			AND n.time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+	</select>	
+	
+	<!-- 查询SR节点关系图 绘制SR节点拓扑图 -->
+	<select id="getDstIPs" resultType="map">
+		SELECT
+		CONVERT(CONCAT(inet_ntoa(n.nbrip),''),CHAR) AS nbrip,
+		FROM
+		network_monitor.node_neighbors n
+		WHERE
+		n.sr_id = #{sr_id}
+		AND n.nbrid = #{dst_sr_id}
+		<if test="(start_time != null and end_time != null)">
+			AND n.time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+	</select>
+	
+	<select id="queryChinaTopologyTemp" resultType="map">
+		SELECT
+			src.sr_id AS src_sr_id,
+			src.sr_name AS src_sr_name,
+			src.lng AS sr_lng,
+			src.lat AS sr_lat,
+			src. LEVEL AS LEVEL,
+			dst.sr_id AS dst_sr_id,
+			dst.sr_name AS dst_sr_name,
+			dst.lng AS dst_sr_lng,
+			dst.lat AS dst_sr_lat,
+		  	n.ifname src_iframe  
+		FROM
+			network_monitor.node_neighbors_temp n,
+			network_monitor.sr_node_info src,
+			network_monitor.sr_node_info dst  
+		WHERE
+			1 = 1
+		AND n.sr_id = src.sr_id
+		AND n.nbrid = dst.sr_id
+		and (src.lng between 73.33 and 135.05)
+		and (src.lat between 3.51 and 53.33)
+		and (dst.lng between 73.33 and 135.05)
+		and (dst.lat between 3.51 and 53.33) 
+		<if test="(start_time != null and end_time != null)">
+			AND n.time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+	</select>
+
+	<!-- 获取SR的所有接口IP -->
+	<select id="getNbrips" resultType="map">
+		SELECT
+		CONVERT(CONCAT(inet_ntoa(n.nbrip),''),CHAR) AS nbrip,
+		n.nbrid,
+		n.ifname,
+		i.sr_name AS dst_sr_name,
+		i.lng AS dst_sr_lng,
+		i.lat As dst_sr_lat
+		FROM network_monitor.node_neighbors n,
+		network_monitor.sr_node_info i
+		WHERE n.nbrid = i.sr_id
+		AND n.sr_id = #{sr_id}
+		<if test="(start_time != null and end_time != null)">
+			AND n.time BETWEEN unix_timestamp(#{start_time}) AND
+			unix_timestamp(#{end_time})
+		</if>
+	</select>
+
+	<!-- 获取SR节点间的所有接口IP -->
+	<select id="getNbripsBetweenSR" resultType="map">
+		SELECT
+		CONVERT(CONCAT(inet_ntoa(n.nbrip),''),CHAR) AS nbrip,
+		n.ifname
+		FROM network_monitor.node_neighbors n
+		WHERE n.sr_id = #{sr_id}
+		AND n.nbrid = #{dst_sr_id}
+	</select>
+
+	<!-- 获取SR的所有邻居 -->
+	<select id="getNeighbors" resultType="map">
+		SELECT
+		src.sr_id AS src_sr_id,
+		src.sr_name AS src_sr_name,
+		src.lng AS sr_lng,
+		src.lat AS sr_lat,
+		dst.sr_id AS dst_sr_id,
+		dst.sr_name AS dst_sr_name,
+		dst.lng AS dst_sr_lng,
+		dst.lat AS dst_sr_lat,
+		CONVERT(CONCAT(inet_ntoa(n.nbrip),''),CHAR) AS nbrip,
+		n.ifname AS ifname
+		FROM network_monitor.node_neighbors n,
+		network_monitor.sr_node_info src,
+		network_monitor.sr_node_info dst
+		WHERE n.sr_id = src.sr_id
+		AND n.nbrid = dst.sr_id
+		AND from_unixtime(n.time, '%Y-%m-%d %H:%i') BETWEEN DATE_FORMAT(date_sub(now(), INTERVAL 1 MINUTE),'%Y-%m-%d %H:%i')
+        AND DATE_FORMAT(now(), '%Y-%m-%d %H:%i')
+       <if test="sr_id!=null">
+       and src.sr_id=#{sr_id}
+       </if>
+       <if test="dst_id!=null">
+       and dst.sr_id=#{dst_id}
+       </if>
+	</select>
+	
+	<!-- 获取SR中国的所有邻居 -->
+	<select id="getNeighborsChina" resultType="map">
+		SELECT
+		src.sr_id AS src_sr_id,
+		src.sr_name AS src_sr_name,
+		src.lng AS sr_lng,
+		src.lat AS sr_lat,
+		dst.sr_id AS dst_sr_id,
+		dst.sr_name AS dst_sr_name,
+		dst.lng AS dst_sr_lng,
+		dst.lat AS dst_sr_lat,
+		CONVERT(CONCAT(inet_ntoa(n.nbrip),''),CHAR) AS nbrip,
+		n.ifname AS ifname
+		FROM network_monitor.node_neighbors n,
+		network_monitor.sr_node_info src,
+		network_monitor.sr_node_info dst
+		WHERE n.sr_id = src.sr_id
+		AND n.nbrid = dst.sr_id
+		and (src.lng between 73.33 and 135.05)
+		and (src.lat between 3.51 and 53.33)
+		and (dst.lng between 73.33 and 135.05)
+		and (dst.lat between 3.51 and 53.33) 
+		AND from_unixtime(n.time, '%Y-%m-%d %H:%i') BETWEEN DATE_FORMAT(date_sub(now(), INTERVAL 1 MINUTE),'%Y-%m-%d %H:%i')
+        AND DATE_FORMAT(now(), '%Y-%m-%d %H:%i')
+       <if test="sr_id!=null">
+       and src.sr_id=#{sr_id}
+       </if>
+       <if test="dst_id!=null">
+       and dst.sr_id=#{dst_id}
+       </if>
+	</select>
+</mapper> 

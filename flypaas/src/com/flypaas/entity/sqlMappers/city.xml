@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.City">
+	
+	 
+	 <resultMap id="cityResult" type="com.flypaas.entity.City">
+		<id property="id" column="id" />
+		<result property="provinceId" column="provinceId" />
+		<result property="name" column="name" />
+		<result property="ireaCode" column="ireaCode" />
+	</resultMap>
+	
+	<select id="getCityByPid"  parameterType="int"  resultMap="cityResult">
+		select * from tb_ucpaas_city where provinceId=#{provinceId}
+	</select>
+	<select id="getCityId" parameterType="int" resultMap="cityResult">
+		select * from tb_ucpaas_city where id=#{id}
+	</select>
+	
+</mapper>

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 策略管理-音频驱动适配-音频驱动适配清单 -->
+<mapper namespace="voiceDevice">
+	
+	<!-- 查询音频驱动适配清单 -->
+	<select id="query" resultType="map">
+		SELECT
+			l.id,
+			l.pv,
+			l.app_ver,
+			l.ver,
+			l.system_ver,
+			l.api_level,
+			l.phonebrand,
+			l.phonemodel,
+			l.imei,
+			date_format(
+				l.updatetime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS updatetime
+		FROM
+			t_voice_device_adapter_list l
+		WHERE
+			1 = 1
+		<if test="app_ver != null">
+			AND l.app_ver LIKE concat('%', #{app_ver}, '%')
+		</if>
+		<if test="system_ver != null">
+			AND l.system_ver LIKE concat('%', #{system_ver}, '%')
+		</if>
+		<if test="api_level != null">
+			AND l.api_level LIKE concat('%', #{api_level}, '%')
+		</if>
+		<if test="phonebrand != null">
+			AND l.phonebrand LIKE concat('%', #{phonebrand}, '%')
+		</if>
+		ORDER BY
+			l.updatetime DESC
+		${limit}
+	</select>
+	
+	<!-- 查询音频驱动适配清单：记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			t_voice_device_adapter_list l
+		WHERE
+			1 = 1
+		<if test="app_ver != null">
+			AND l.app_ver LIKE concat('%', #{app_ver}, '%')
+		</if>
+		<if test="system_ver != null">
+			AND l.system_ver LIKE concat('%', #{system_ver}, '%')
+		</if>
+		<if test="api_level != null">
+			AND l.api_level LIKE concat('%', #{api_level}, '%')
+		</if>
+		<if test="phonebrand != null">
+			AND l.phonebrand LIKE concat('%', #{phonebrand}, '%')
+		</if>
+	</select>
+	
+	<!-- 查看音频驱动适配清单 -->
+	<select id="view" resultType="map">
+		SELECT
+			l.id,
+			l.pv,
+			l.app_ver,
+			l.ver,
+			l.system_ver,
+			l.api_level,
+			l.phonebrand,
+			l.phonemodel,
+			l.imei,
+			l.recordsource,
+			l.recordchannel,
+			l.recordsamplerate,
+			l.playstreamtype,
+			l.playchannel,
+			l.playsamplerate,
+			l.speakermode,
+			l.earpiecemode,
+			l.callmode,
+			date_format(
+				l.createtime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS createtime,
+			date_format(
+				l.updatetime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS updatetime
+		FROM
+			t_voice_device_adapter_list l
+		WHERE
+			l.id = #{id}
+	</select>
+	
+	<!-- 添加音频驱动适配清单 -->
+	<insert id="insert">
+		INSERT INTO t_voice_device_adapter_list (
+			pv,
+			app_ver,
+			ver,
+			system_ver,
+			api_level,
+			phonebrand,
+			phonemodel,
+			imei,
+			recordsource,
+			recordchannel,
+			recordsamplerate,
+			playstreamtype,
+			playchannel,
+			playsamplerate,
+			speakermode,
+			earpiecemode,
+			callmode,
+			createtime
+		)
+		VALUES
+			(
+				#{pv},
+				#{app_ver},
+				#{ver},
+				#{system_ver},
+				#{api_level},
+				#{phonebrand},
+				#{phonemodel},
+				#{imei},
+				#{recordsource},
+				#{recordchannel},
+				#{recordsamplerate},
+				#{playstreamtype},
+				#{playchannel},
+				#{playsamplerate},
+				#{speakermode},
+				#{earpiecemode},
+				#{callmode},
+				now()
+			)
+	</insert>
+	
+	<!-- 修改音频驱动适配清单 -->
+	<update id="update">
+		UPDATE t_voice_device_adapter_list l
+		SET l.pv = #{pv},
+		l.app_ver = #{app_ver},
+		l.ver = #{ver},
+		l.system_ver = #{system_ver},
+		l.api_level = #{api_level},
+		l.phonebrand = #{phonebrand},
+		l.phonemodel = #{phonemodel},
+		l.imei = #{imei},
+		l.recordsource = #{recordsource},
+		l.recordchannel = #{recordchannel},
+		l.recordsamplerate = #{recordsamplerate},
+		l.playstreamtype = #{playstreamtype},
+		l.playchannel = #{playchannel},
+		l.playsamplerate = #{playsamplerate},
+		l.speakermode = #{speakermode},
+		l.earpiecemode = #{earpiecemode},
+		l.callmode = #{callmode}
+		WHERE
+			l.id = #{id}
+	</update>
+	
+	<!-- 删除音频驱动适配清单 -->
+	<delete id="delete">
+		DELETE l
+		FROM
+			t_voice_device_adapter_list l
+		WHERE
+			l.id = #{id}
+	</delete>
+	
+</mapper> 

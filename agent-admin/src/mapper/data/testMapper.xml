@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心-任务管理 -->
+<mapper namespace="test">
+
+<select  id="test1" resultType="map">
+
+	  SELECT o.* ,o.status as status, date_format(
+		o.create_date,
+		'%Y-%m-%d %H:%i:%S'
+		) AS create_date
+		,o.pay_id as pay_id
+		from
+		tb_srv_payment_order o,
+        tb_ucpaas_user u,
+        tb_ucpaas_client c
+        where  o.sid=u.sid and o.order_id=#{order_id} or o.sid=c.sid and o.order_id=#{order_id}  limit 1
+		
+</select>
+	
+
+	
+</mapper> 

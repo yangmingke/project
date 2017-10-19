@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.TbFlypaasUser">
+	
+	 
+	 <resultMap id="userResult" type="com.flypaas.entity.TbFlypaasUser">
+		<id property="sid" column="sid" />
+		<result property="userName" column="username" />
+		<result property="email" column="email" />
+		<result property="password" column="password" />
+		<result property="status" column="status" />
+		<result property="mobile" column="mobile" />
+		<result property="chatType" column="chat_type" />
+		<result property="chatNbr" column="chat_nbr" />
+		<result property="address" column="address" />
+		<result property="province" column="province" />
+		<result property="city" column="city" />
+		<result property="userType" column="user_type" />
+		<result property="national" column="national" />
+		<result property="realname" column="realname" />
+		<result property="idType" column="id_type" />
+		<result property="idNbr" column="id_nbr" />
+		<result property="orgId" column="org_id" />
+		<result property="oconType1" column="o_con_type1" />
+		<result property="oconNbr1" column="o_con_nbr1" />
+		<result property="oconType2" column="o_con_type2" />
+		<result property="oconNbr2" column="o_con_nbr2" />
+		<result property="oconType3" column="o_con_type3" />
+		<result property="oconNbr3" column="o_con_nbr3" />
+		<result property="legalPerson" column="legal_person" />
+		<result property="companyNbr" column="company_nbr" />
+		<result property="webSite" column="web_site" />
+		<result property="token" column="token"/>
+		<result property="createDate" column="create_date"/>
+		<result property="updateDate" column="update_date"/>
+		<result property="loginTimes" column="login_times"/>
+		<result property="guide" column="guide"/>
+		<result property="revisability" column="revisability"/>
+		<result property="oauthStatus" column="oauth_status"/>
+		<result property="oauthDate" column="oauth_date"/>
+		<result property="isContract" column="is_contract"/>
+		<result property="isHeavybuyer" column="is_heavybuyer"/>
+		<result property="authType" column="auth_type"/>
+		<result property="authId" column="auth_id"/>
+		<result property="isProxy" column="is_proxy"/>
+		<result property="superSid" column="super_sid"/>
+		<result property="agentUrl" column="agent_url"/>
+		<result property="agentLogo" column="agent_logo"/>
+	</resultMap>
+	<resultMap id="sidResult" type="com.flypaas.entity.TbFlypaasUser">
+		<id property="sid" column="sid" />
+	</resultMap>
+	<!-- 用户注册[第一步] -->
+	<insert id="insertUser" parameterType="user">
+	 <![CDATA[
+		insert into
+		tb_ucpaas_user(sid,token,email,status,user_type,create_date,random_nbr,channel_id,auth_type,auth_id,super_sid) 
+		values(#{sid},#{token},#{email},#{status},#{userType},#{createDate},#{randomNbr},#{channelId},#{authType},#{authId},#{superSid})
+		]]>
+ 	</insert>
+ 	
+ 	<!-- 登陆验证  -->
+	<select id="userLogin"  parameterType="user" resultMap="userResult">
+		select * from tb_ucpaas_user 
+		<where>
+			<if test="mobile!=null">
+				mobile = #{mobile}
+			</if>
+			<if test="email!=null">
+				and email = #{email}
+			</if>
+			<if test="password!=null">
+				and password = #{password}
+			</if>
+		</where>
+	</select>
+	<!-- 手机号码邮箱验证  -->
+	<select id="vMailandMobile"  parameterType="user" resultType="int">
+		select count(0) from tb_ucpaas_user 
+		<where>
+			<if test="mobile!=null">
+				mobile = #{mobile}
+			</if>
+			<if test="email!=null">
+				and email = #{email}
+			</if>
+		</where>
+		and user_type!='3'
+		and status!=0
+		limit 1
+	</select>
+	<!-- 查询帐号信息 -->
+	<select id="findUserById" parameterType="java.lang.String" resultMap="userResult">
+		select * from tb_ucpaas_user where sid=#{sid}
+	</select>
+	<!-- 查询帐号信息 -->
+	<select id="findUser"  parameterType="user" resultMap="userResult">
+		select * from tb_ucpaas_user 
+		<where>
+			<if test="mobile!=null">
+				mobile = #{mobile}
+			</if>
+			<if test="email!=null">
+				and email = #{email}
+			</if>
+			<if test="sid!=null">
+				and sid = #{sid}
+			</if>
+			<if test="authType!=null and authId!=null">
+				and auth_type = #{authType}
+				and auth_id = #{authId}
+			</if>
+		</where>
+		and user_type!='3' 
+		limit 1
+	</select>
+	
+	<!--更新帐号信息 -->
+	<update id="updateUser" parameterType="user">
+		update tb_ucpaas_user 
+		<set>
+			<if test="status!=null">
+				status = #{status},
+			</if>
+			<if test="email!=null">
+				email = #{email},
+			</if>
+			<if test="mobile!=null">
+				mobile = #{mobile},
+			</if>
+			<if test="chatType!=null">
+				chat_type = #{chatType},
+			</if>
+			<if test="chatNbr!=null">
+				chat_nbr = #{chatNbr},
+			</if>
+			<if test="address!=null">
+				address = #{address},
+			</if>
+			<if test="oconType1!=null">
+				o_con_type1 = #{oconType1},
+			</if>
+			<if test="oconNbr1!=null">
+				o_con_nbr1 = #{oconNbr1},
+			</if>
+			<if test="oconType2!=null">
+				o_con_type2 = #{oconType2},
+			</if>
+			<if test="oconNbr2!=null">
+				o_con_nbr2 = #{oconNbr2},
+			</if>
+			<if test="oconType3!=null">
+				o_con_type3 = #{oconType3},
+			</if>
+			<if test="oconNbr3!=null">
+				o_con_nbr3 = #{oconNbr3},
+			</if>
+			<if test="password!=null">
+				password = #{password},
+			</if>
+			<if test="realname!=null">
+				realname = #{realname},
+			</if>
+			<if test="province!=null">
+				province = #{province},
+			</if>
+			<if test="city!=null">
+				city = #{city},
+			</if>
+			<if test="loginTimes!=0">
+				login_times = #{loginTimes},
+			</if>
+			<if test="guide!=0">
+				guide = #{guide},
+			</if>
+			<if test="token!=null">
+				token = #{token},
+			</if>
+			<if test="idType!=null">
+				id_type = #{idType},
+			</if>
+			<if test="idNbr!=null">
+				id_nbr = #{idNbr},
+			</if>
+			<if test="orgId!=null">
+				org_id = #{orgId},
+			</if>
+			<if test="userType!=null">
+				user_type = #{userType},
+			</if>
+			<if test="updateDate!=null">
+				update_date = #{updateDate},
+			</if>
+			<if test="oauthStatus!=null">
+				oauth_status = #{oauthStatus},
+			</if>
+			<if test="legalPerson!=null">
+				legal_person = #{legalPerson},
+			</if>
+			<if test="companyNbr!=null">
+				company_nbr = #{companyNbr},
+			</if>
+			<if test="webSite!=null">
+				web_site = #{webSite},
+			</if>
+			<if test="userName!=null">
+				userName = #{userName},
+			</if>
+			<if test="revisability!=null">
+				revisability = #{revisability},
+			</if>
+			<if test="oauthDate!=null">
+				oauth_date = #{oauthDate},
+			</if>
+			<if test="isContract!=null">
+				is_contract = #{isContract},
+			</if>
+			<if test="authType!=null and authId!=null">
+				auth_type = #{authType},
+				auth_id = #{authId}
+			</if>
+		</set>
+		where sid=#{sid}
+ 	</update>
+ 	<select id="getUserCountByUserName" parameterType="java.lang.String" resultType="int">
+ 		select count(0) from tb_ucpaas_user where username=#{userName}
+ 	</select>
+ 	<select id="monitorHeartbeat" resultMap="userResult">
+ 		select * from tb_ucpaas_user limit 1 
+ 	</select>
+ 	
+ 	<select id="UserDaoImpl_queryRenewToken" resultType="string">
+ 		select token from tb_flypaas_token_renew where sid = #{sid}
+ 	</select>
+ 	<update id="UserDaoImpl_saveRenewToken">
+ 		 INSERT INTO tb_flypaas_token_renew (sid,token) VALUES (#{sid},#{token})  
+      	 ON DUPLICATE KEY UPDATE token = #{token};  
+ 	</update>
+ 	
+ 	
+ 	<!-- 获取需要修改密码的用户信息 -->
+ 	<select id="findeUpdatePasswordUser" resultMap="userResult">
+ 		SELECT
+			*
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type IN (1, 2)
+		AND u.`status` = 1
+		
+		<if test="sid != null">
+			AND u.sid = #{sid}
+		</if>
+		AND NOT EXISTS (
+			SELECT
+				1
+			FROM
+				tb_ucpaas_user_email e
+			WHERE
+				e.sid = u.sid
+			AND e.`status` = 1
+			AND e.template_id = #{template_id}
+		)
+ 	</select>
+ 	
+ 	<!-- 删除邮件日志 -->
+ 	<delete id="deleteMailLog">
+ 		DELETE e
+		FROM
+			tb_ucpaas_user_email e
+		WHERE
+			e.sid = #{sid}
+		AND e.template_id = #{template_id}
+ 	</delete>
+ 	
+ 	<!-- 添加邮件日志 -->
+ 	<insert id="addMailLog">
+ 		INSERT INTO tb_ucpaas_user_email (
+			template_id,
+			sid,
+			`from`,
+			`to`,
+			title,
+			`desc`,
+			remark,
+			`status`,
+			create_date
+		)
+		VALUES
+			(
+				#{template_id},
+				#{sid},
+				#{from},
+				#{to},
+				#{title},
+				#{desc},
+				#{remark},
+				#{status},
+				now()
+			)
+ 	</insert>
+ 	
+ 	<!-- 获取账务信息 -->
+ 	<select id="getFinanceInfo" resultType="map">
+ 		SELECT
+			u.mobile,
+			TRUNCATE (b.balance / 1000000, 4) AS balance,
+			TRUNCATE (r.money / 1000000, 0) AS remind_money,
+			p.package_name
+		FROM
+			tb_ucpaas_user u
+		INNER JOIN tb_bill_acct_balance b ON b.sid = u.sid
+		INNER JOIN tb_bill_acct_package_rel pr ON pr.sid = u.sid
+		INNER JOIN tb_bill_package p ON p.package_id = pr.package_id
+		LEFT JOIN tb_srv_remind r ON r.sid = u.sid
+		AND r.remind_type = 1
+		WHERE
+			u.sid = #{sid}
+		LIMIT 1
+ 	</select>
+ 	
+</mapper>

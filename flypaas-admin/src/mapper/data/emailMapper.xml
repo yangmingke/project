@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心-邮件管理 -->
+<mapper namespace="email">
+
+	<!-- 查询邮件 -->
+	<select id="query" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.username,
+			e.title,
+			e.`desc`,
+			e.remark,
+			e.`status` AS email_status,
+			date_format(
+				e.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date
+		FROM
+			tb_ucpaas_user u,
+			tb_ucpaas_user_email e
+		WHERE
+			e.sid = u.sid
+		AND e.template_id = 100005
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+				OR u.username LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND e.create_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND e.create_date <= #{end_date} ]]>
+		</if>
+		<if test="email_status != null">
+			AND e.`status` = #{email_status}
+		</if>
+		ORDER BY
+			e.create_date DESC
+		${limit}
+	</select>
+	
+	<!-- 查询开发者：记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_user u,
+			tb_ucpaas_user_email e
+		WHERE
+			e.sid = u.sid
+		AND e.template_id = 100005
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+				OR u.username LIKE concat('%',#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND e.create_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND e.create_date <= #{end_date} ]]>
+		</if>
+		<if test="email_status != null">
+			AND e.`status` = #{email_status}
+		</if>
+	</select>
+	
+	<!-- 获取邮件模板 -->
+	<select id="getTemplate" resultType="map">
+		SELECT
+			m.id,
+			m.frm,
+			m.fromnickname,
+			m.`subject`,
+			m.text
+		FROM
+			tb_ucpaas_mailprop m
+		WHERE
+			m.id = 100005
+	</select>
+	
+	<!-- 更新邮件模板 -->
+	<update id="updateTemplate">
+		UPDATE tb_ucpaas_mailprop m
+		SET m.`subject` = #{subject},
+		 m.text = #{text}
+		WHERE
+			m.id = 100005
+	</update>
+	
+	<!-- 删除老的日志 -->
+	<delete id="deleteLog">
+		DELETE
+		FROM
+			tb_ucpaas_user_email
+		WHERE
+			template_id = 100005
+	</delete>
+	
+	<!-- 获取用户信息 -->
+	<select id="getUserInfo" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.username
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type IN (1, 2)
+		AND u.`status` = 1
+		AND NOT EXISTS (
+			SELECT
+				1
+			FROM
+				tb_ucpaas_user_email e
+			WHERE
+				e.sid = u.sid
+			AND e.template_id = 100005
+		)
+		
+		<if test="sidArray != null">
+			AND u.sid IN
+			<foreach collection="sidArray" item="i" open="(" close=")" separator=",">
+				#{i}
+			</foreach>
+		</if>
+	</select>
+	
+ 	<!-- 添加邮件日志 -->
+ 	<insert id="addLog">
+ 		INSERT INTO tb_ucpaas_user_email (
+			template_id,
+			sid,
+			`from`,
+			`to`,
+			title,
+			`desc`,
+			remark,
+			`status`,
+			create_date
+		)
+		VALUES
+			(
+				#{template_id},
+				#{sid},
+				#{from},
+				#{to},
+				#{title},
+				#{desc},
+				#{remark},
+				#{status},
+				now()
+			)
+ 	</insert>
+	
+</mapper> 

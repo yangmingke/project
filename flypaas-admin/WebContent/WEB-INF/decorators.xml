@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/WEB-INF/content/decorators">
+
+	<!-- 需要装饰的目录或页面，有菜单 -->
+	<decorator name="main" page="main.jsp">
+		<pattern>/*/*</pattern>
+	</decorator>
+
+	<!-- 需要装饰的目录或页面，有菜单 特殊页面 -->
+	<decorator name="main_jquery" page="main_jquery.min.jsp">
+		<pattern>/ringAudit/query</pattern>
+		<pattern>/app/view</pattern>
+		<pattern>/notifyCallAudit/query</pattern>
+	</decorator>
+
+	<!-- 需要装饰的目录或页面，无菜单 -->
+	<decorator name="noMenuMain" page="noMenuMain.jsp">
+		<pattern>/</pattern>
+		<pattern>/index</pattern>
+	</decorator>
+
+	<!-- 弹层页面 -->
+	<decorator name="float" page="float.jsp">
+		<pattern>/msg/queryDeveloper</pattern>
+	</decorator>
+
+	<!-- 排除不需要装饰的目录或页面 -->
+	<excludes>
+		<pattern>/common/*</pattern>
+		<pattern>/js/*</pattern>
+		<pattern>/menu/*</pattern>
+		<pattern>/ueditor*</pattern>
+	</excludes>
+</decorators>

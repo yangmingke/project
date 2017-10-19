@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        ">
+
+	<!-- 采用注释的方式配置bean -->
+	<context:annotation-config />
+	<!-- 配置要扫描的包 -->
+	<context:component-scan base-package="com.flypaas.admin" />
+	<!-- 加载配置文件 -->
+	<bean id="configproperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="location" value="classpath:config/config_${spring.profiles.active}.properties" />
+	</bean>
+	<!-- 根据不同的运行环境加载配置文件 -->
+	<context:property-placeholder location="classpath:config/config_${spring.profiles.active}.properties" />
+
+	<!-- FreeMarker配置 -->
+	<bean id="freeMarkerConfiguration" class="org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean">
+		<property name="templateLoaderPath" value="classpath:template" />
+	</bean>
+	<!-- 缓存参数 -->
+	<bean class="com.flypaas.admin.util.FlypaasParamUtils" />
+
+	<!-- 邮件配置 -->
+	<bean id="javaMailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<property name="host" value="smtp.exmail.qq.com" />
+		<property name="port" value="25" />
+		<property name="username" value="yangmingke@flypaas.com" />
+		<property name="password" value="YmkRaieN19906110" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.transport.protocol">smtp</prop>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+				<prop key="mail.smtp.timeout">25000</prop>
+				<prop key="mail.debug">false</prop>
+			</props>
+		</property>
+	</bean>
+
+	<!-- 主库配置 -->
+	<!-- 配置DBCP数据库连接池 -->
+	<bean id="master_dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="url" value="${master.jdbc.url}" />
+		<property name="username" value="${master.jdbc.username}" />
+		<property name="password" value="${master.jdbc.password}" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="initialSize" value="10" />		<!-- 初始化连接 -->
+		<property name="maxTotal" value="150" />		<!-- 最大活动连接 -->
+		<property name="maxIdle" value="50" />			<!-- 最大空闲连接 -->
+		<property name="minIdle" value="10" />			<!-- 最小空闲连接 -->
+		<property name="maxWaitMillis" value="3000" />	<!-- 从池中取连接的最大等待时间，单位毫秒 -->
+
+		<property name="validationQuery" value="SELECT 1" />			<!-- 验证使用的SQL语句 -->
+		<property name="testWhileIdle" value="true" />					<!-- 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除 -->
+		<property name="testOnBorrow" value="false" />					<!-- 借出连接时不要测试，否则很影响性能 -->
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />	<!-- 每30秒运行一次空闲连接回收器 -->
+		<property name="minEvictableIdleTimeMillis" value="1800000" />	<!-- 池中的连接空闲30分钟后被回收 -->
+		<property name="numTestsPerEvictionRun" value="3" />			<!-- 在每次空闲连接回收器线程(如果有)运行时检查的连接数量 -->
+		<property name="removeAbandonedOnBorrow" value="true" />		<!-- 连接泄漏回收参数，当可用连接数少于3个时才执行 -->
+		<property name="removeAbandonedTimeout" value="180" />			<!-- 连接泄漏回收参数，180秒，泄露的连接可以被删除的超时值 -->
+	</bean>
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="master_sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="master_dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<property name="mapperLocations" value="classpath:mapper/**/*Mapper.xml" />
+	</bean>
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="master_sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="master_sqlSessionFactory" />
+	</bean>
+	<!-- 事务配置 -->
+	<bean id="master_transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="master_dataSource" />
+	</bean>
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="master_transactionManager" />
+
+	<!-- 统计库配置 -->
+	<!-- 配置DBCP数据库连接池 -->
+	<bean id="stat_dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="url" value="${stat.jdbc.url}" />
+		<property name="username" value="${stat.jdbc.username}" />
+		<property name="password" value="${stat.jdbc.password}" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="initialSize" value="3" />		<!-- 初始化连接 -->
+		<property name="maxTotal" value="20" />			<!-- 最大活动连接 -->
+		<property name="maxIdle" value="5" />			<!-- 最大空闲连接 -->
+		<property name="minIdle" value="1" />			<!-- 最小空闲连接 -->
+		<property name="maxWaitMillis" value="3000" />	<!-- 从池中取连接的最大等待时间，单位毫秒 -->
+
+		<property name="validationQuery" value="SELECT 1" />			<!-- 验证使用的SQL语句 -->
+		<property name="testWhileIdle" value="true" />					<!-- 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除 -->
+		<property name="testOnBorrow" value="false" />					<!-- 借出连接时不要测试，否则很影响性能 -->
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />	<!-- 每30秒运行一次空闲连接回收器 -->
+		<property name="minEvictableIdleTimeMillis" value="1800000" />	<!-- 池中的连接空闲30分钟后被回收 -->
+		<property name="numTestsPerEvictionRun" value="3" />			<!-- 在每次空闲连接回收器线程(如果有)运行时检查的连接数量 -->
+		<property name="removeAbandonedOnBorrow" value="true" />		<!-- 连接泄漏回收参数，当可用连接数少于3个时才执行 -->
+		<property name="removeAbandonedTimeout" value="180" />			<!-- 连接泄漏回收参数，180秒，泄露的连接可以被删除的超时值 -->
+	</bean>
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="stat_sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="stat_dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<property name="mapperLocations" value="classpath:mapper/**/*Mapper.xml" />
+	</bean>
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="stat_sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="stat_sqlSessionFactory" />
+	</bean>
+	<!-- 事务配置 -->
+	<bean id="stat_transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="stat_dataSource" />
+	</bean>
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="stat_transactionManager" />
+
+	<!-- 策略服务(CPS)配置 -->
+	<!-- 配置DBCP数据库连接池 -->
+	<bean id="cps_dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="url" value="${cps.jdbc.url}" />
+		<property name="username" value="${cps.jdbc.username}" />
+		<property name="password" value="${cps.jdbc.password}" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="initialSize" value="3" />		<!-- 初始化连接 -->
+		<property name="maxTotal" value="20" />			<!-- 最大活动连接 -->
+		<property name="maxIdle" value="5" />			<!-- 最大空闲连接 -->
+		<property name="minIdle" value="1" />			<!-- 最小空闲连接 -->
+		<property name="maxWaitMillis" value="3000" />	<!-- 从池中取连接的最大等待时间，单位毫秒 -->
+
+		<property name="validationQuery" value="SELECT 1" />			<!-- 验证使用的SQL语句 -->
+		<property name="testWhileIdle" value="true" />					<!-- 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除 -->
+		<property name="testOnBorrow" value="false" />					<!-- 借出连接时不要测试，否则很影响性能 -->
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />	<!-- 每30秒运行一次空闲连接回收器 -->
+		<property name="minEvictableIdleTimeMillis" value="1800000" />	<!-- 池中的连接空闲30分钟后被回收 -->
+		<property name="numTestsPerEvictionRun" value="3" />			<!-- 在每次空闲连接回收器线程(如果有)运行时检查的连接数量 -->
+		<property name="removeAbandonedOnBorrow" value="true" />		<!-- 连接泄漏回收参数，当可用连接数少于3个时才执行 -->
+		<property name="removeAbandonedTimeout" value="180" />			<!-- 连接泄漏回收参数，180秒，泄露的连接可以被删除的超时值 -->
+	</bean>
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="cps_sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="cps_dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<property name="mapperLocations" value="classpath:mapper/**/*Mapper.xml" />
+	</bean>
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="cps_sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="cps_sqlSessionFactory" />
+	</bean>
+	<!-- 事务配置 -->
+	<bean id="cps_transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="cps_dataSource" />
+	</bean>
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="cps_transactionManager" />
+
+</beans>

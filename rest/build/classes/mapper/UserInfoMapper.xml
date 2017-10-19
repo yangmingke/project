@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucpaas.commonservice.dao.UserInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.ucpaas.commonservice.model.UserInfo" >
+    <id column="sid" property="sid" jdbcType="VARCHAR" />
+    <result column="token" property="token" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="user_type" property="userType" jdbcType="CHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="oauth_status" property="oauthStatus" jdbcType="CHAR" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="chat_type" property="chatType" jdbcType="CHAR" />
+    <result column="chat_nbr" property="chatNbr" jdbcType="VARCHAR" />
+    <result column="province" property="province" jdbcType="INTEGER" />
+    <result column="city" property="city" jdbcType="INTEGER" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="national" property="national" jdbcType="CHAR" />
+    <result column="realname" property="realname" jdbcType="VARCHAR" />
+    <result column="id_type" property="idType" jdbcType="CHAR" />
+    <result column="id_nbr" property="idNbr" jdbcType="VARCHAR" />
+    <result column="org_id" property="orgId" jdbcType="VARCHAR" />
+    <result column="o_con_type1" property="oConType1" jdbcType="CHAR" />
+    <result column="o_con_nbr1" property="oConNbr1" jdbcType="VARCHAR" />
+    <result column="o_con_type2" property="oConType2" jdbcType="CHAR" />
+    <result column="o_con_nbr2" property="oConNbr2" jdbcType="VARCHAR" />
+    <result column="o_con_type3" property="oConType3" jdbcType="CHAR" />
+    <result column="o_con_nbr3" property="oConNbr3" jdbcType="VARCHAR" />
+    <result column="legal_person" property="legalPerson" jdbcType="VARCHAR" />
+    <result column="company_nbr" property="companyNbr" jdbcType="VARCHAR" />
+    <result column="web_site" property="webSite" jdbcType="VARCHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="login_times" property="loginTimes" jdbcType="INTEGER" />
+    <result column="guide" property="guide" jdbcType="INTEGER" />
+    <result column="revisability" property="revisability" jdbcType="CHAR" />
+    <result column="random_nbr" property="randomNbr" jdbcType="VARCHAR" />
+    <result column="oauth_date" property="oauthDate" jdbcType="TIMESTAMP" />
+    <result column="is_contract" property="isContract" jdbcType="TINYINT" />
+    <result column="is_heavybuyer" property="isHeavybuyer" jdbcType="TINYINT" />
+    <result column="channel_id" property="channelId" jdbcType="INTEGER" />
+    <result column="auth_type" property="authType" jdbcType="CHAR" />
+    <result column="auth_id" property="authId" jdbcType="VARCHAR" />
+    <result column="is_proxy" property="isProxy" jdbcType="TINYINT" />
+    <result column="intern_rate" property="internRate" jdbcType="TINYINT" />
+    <result column="user_tag" property="userTag" jdbcType="INTEGER" />
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List" >
+    sid, token, username, email, password, user_type, status, oauth_status, mobile, chat_type, 
+    chat_nbr, province, city, address, national, realname, id_type, id_nbr, org_id, o_con_type1, 
+    o_con_nbr1, o_con_type2, o_con_nbr2, o_con_type3, o_con_nbr3, legal_person, company_nbr, 
+    web_site, create_date, update_date, login_times, guide, revisability, random_nbr, 
+    oauth_date, is_contract, is_heavybuyer, channel_id, auth_type, auth_id, is_proxy, 
+    intern_rate, user_tag
+  </sql>
+
+<!--  根据sid查询用户信息 -->  
+<!--  用户状态：0:注册未激活,1:邮箱已激活, 5:锁定 6:关闭， -->
+  <select id="selectByMap" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_ucpaas_user
+    where 1=1
+    and sid = #{sid}
+    <if test="isEqual != null and isEqual == true" >
+    and status = #{status}
+    </if>
+    <if test="isEqual != null and isEqual == false" >
+    and status != #{status}
+    </if>
+    
+    
+  </select>
+
+
+<!--  根据sid更新用户信息 -->   
+  <update id="updateBySid" parameterType="com.ucpaas.commonservice.model.UserInfo" >
+    update tb_ucpaas_user
+    <set >
+      <if test="token != null" >
+        token = #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null" >
+        username = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null" >
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="userType != null" >
+        user_type = #{userType,jdbcType=CHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="oauthStatus != null" >
+        oauth_status = #{oauthStatus,jdbcType=CHAR},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="chatType != null" >
+        chat_type = #{chatType,jdbcType=CHAR},
+      </if>
+      <if test="chatNbr != null" >
+        chat_nbr = #{chatNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null" >
+        province = #{province,jdbcType=INTEGER},
+      </if>
+      <if test="city != null" >
+        city = #{city,jdbcType=INTEGER},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="national != null" >
+        national = #{national,jdbcType=CHAR},
+      </if>
+      <if test="realname != null" >
+        realname = #{realname,jdbcType=VARCHAR},
+      </if>
+      <if test="idType != null" >
+        id_type = #{idType,jdbcType=CHAR},
+      </if>
+      <if test="idNbr != null" >
+        id_nbr = #{idNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="orgId != null" >
+        org_id = #{orgId,jdbcType=VARCHAR},
+      </if>
+      <if test="oConType1 != null" >
+        o_con_type1 = #{oConType1,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr1 != null" >
+        o_con_nbr1 = #{oConNbr1,jdbcType=VARCHAR},
+      </if>
+      <if test="oConType2 != null" >
+        o_con_type2 = #{oConType2,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr2 != null" >
+        o_con_nbr2 = #{oConNbr2,jdbcType=VARCHAR},
+      </if>
+      <if test="oConType3 != null" >
+        o_con_type3 = #{oConType3,jdbcType=CHAR},
+      </if>
+      <if test="oConNbr3 != null" >
+        o_con_nbr3 = #{oConNbr3,jdbcType=VARCHAR},
+      </if>
+      <if test="legalPerson != null" >
+        legal_person = #{legalPerson,jdbcType=VARCHAR},
+      </if>
+      <if test="companyNbr != null" >
+        company_nbr = #{companyNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="webSite != null" >
+        web_site = #{webSite,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="loginTimes != null" >
+        login_times = #{loginTimes,jdbcType=INTEGER},
+      </if>
+      <if test="guide != null" >
+        guide = #{guide,jdbcType=INTEGER},
+      </if>
+      <if test="revisability != null" >
+        revisability = #{revisability,jdbcType=CHAR},
+      </if>
+      <if test="randomNbr != null" >
+        random_nbr = #{randomNbr,jdbcType=VARCHAR},
+      </if>
+      <if test="oauthDate != null" >
+        oauth_date = #{oauthDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isContract != null" >
+        is_contract = #{isContract,jdbcType=TINYINT},
+      </if>
+      <if test="isHeavybuyer != null" >
+        is_heavybuyer = #{isHeavybuyer,jdbcType=TINYINT},
+      </if>
+      <if test="channelId != null" >
+        channel_id = #{channelId,jdbcType=INTEGER},
+      </if>
+      <if test="authType != null" >
+        auth_type = #{authType,jdbcType=CHAR},
+      </if>
+      <if test="authId != null" >
+        auth_id = #{authId,jdbcType=VARCHAR},
+      </if>
+      <if test="isProxy != null" >
+        is_proxy = #{isProxy,jdbcType=TINYINT},
+      </if>
+      <if test="internRate != null" >
+        intern_rate = #{internRate,jdbcType=TINYINT},
+      </if>
+      <if test="userTag != null" >
+        user_tag = #{userTag,jdbcType=INTEGER},
+      </if>
+    </set>
+    where sid = #{sid,jdbcType=VARCHAR}
+  </update>
+  
+  
+  <!--  
+  根据密码，email或mobile查询用户信息,
+ email或mobile存放在username中,
+  内部测试demo登录定制接口，sdk调用,2015-09-21添加 
+  -->  
+  
+  <select id="selectByPwdUserName" resultMap="BaseResultMap" parameterType="com.ucpaas.commonservice.model.UserInfo" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_ucpaas_user
+    where 1=1
+    <if test="password != null" >
+       and password = #{password}
+    </if>
+    <if test="username != null" >
+       and (email = #{username} or mobile = #{username})
+       
+    </if>
+  </select>
+  
+  
+  
+</mapper>

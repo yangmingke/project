@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 公共业务 -->
+<mapper namespace="common">
+
+	<!-- 登录时查询用户 -->
+	<select id="findUserForLogin" resultType="map">
+		SELECT
+			a.sid,
+			a.`status`,
+			c.role_id AS roleId,
+			c.role_name AS roleName,
+			c.`status` AS roleStatus
+		FROM
+			tb_ucpaas_user a,
+			tb_ucpaas_user_role b,
+			tb_ucpaas_role c
+		WHERE
+			a.sid = b.sid
+		AND b.role_id = c.role_id
+		AND a.user_type = 3
+		AND c.role_id = 1
+		AND (
+			a.email = #{username}
+			OR (
+				a.mobile = #{username}
+			)
+		)
+		AND a.`password` = #{password}
+	</select>
+	
+	<!-- 更新登录信息 -->
+	<update id="updateLoginInfo">
+		UPDATE tb_ucpaas_user a
+		SET a.login_times = a.login_times + 1
+		WHERE
+			a.sid = #{sid}
+	</update>
+	
+	<!-- 添加操作日志 -->
+	<insert id="addLog">
+		INSERT INTO tb_ucpaas_oprate_log (
+			sid,
+			page_id,
+			page_url,
+			op_type,
+			op_desc,
+			ip,
+			create_date
+		)
+		VALUES
+			(#{sid}, #{page_id}, #{page_url}, #{op_type}, #{op_desc}, #{ip}, now())
+	</insert>
+	
+	<select id="hasTable" resultType="_boolean">
+		SELECT
+		
+		IF (count(0) > 0, TRUE, FALSE)
+		FROM
+			`information_schema`.`TABLES` `t`
+		WHERE
+			`t`.`TABLE_SCHEMA` = #{table_schema}
+		AND t.TABLE_NAME = #{table_name}
+	</select>
+	
+	<select id="queryRemontePath" resultType="string">
+		SELECT
+			f.remote_path
+		FROM
+			statistics.${table_name} f
+		WHERE
+			f.`status` = 1
+		AND f.remote_path IS NOT NULL
+		AND f.local_path = #{local_path}
+		LIMIT 1
+	</select>
+	
+	<!-- 获取数据库的当前时间 -->
+	<select id="getCurrentTime" resultType="string">
+		SELECT now()
+	</select>
+	
+	<!-- 查询在时间范围内存在的表格 -->
+	<select id="getExistTable" resultType="map">
+		SELECT
+			t.table_name
+		FROM
+			ucpaas_statistics.v_table t
+		WHERE
+			t.table_name IN
+		<foreach collection="list" item="i" open="(" close=")" separator=",">
+			#{i}
+		</foreach>
+	</select>
+	
+	<insert id="generatedGlobalId" useGeneratedKeys="true" keyProperty="id">  
+	    insert into tb_ucpaas_id() VALUES()
+	</insert> 
+	
+</mapper> 

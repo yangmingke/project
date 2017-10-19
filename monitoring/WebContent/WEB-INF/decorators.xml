@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/WEB-INF/content/decorators">
+
+	<!-- 需要装饰的目录或页面，有菜单 -->
+	<decorator name="main" page="main.jsp">
+		<pattern>/admin/index</pattern>
+	</decorator>
+
+	<!-- 需要装饰的目录或页面，无菜单 -->
+	<decorator name="noMenuMain" page="noMenuMain.jsp">
+		<pattern>/</pattern>
+	</decorator>
+
+	<!-- 排除不需要装饰的目录或页面 -->
+	<excludes>
+		<pattern>/common/*</pattern>
+		<pattern>/css/*</pattern>
+		<pattern>/images/*</pattern>
+		<pattern>/img/*</pattern>
+		<pattern>/font-awesome/*</pattern>
+		<pattern>/js/*</pattern>
+		<pattern>/index</pattern>
+	</excludes>
+</decorators>

@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 策略管理-音频驱动适配-音频驱动智能适配 -->
+<mapper namespace="voiceDeviceAuto">
+	
+	<!-- 查询音频驱动智能适配 -->
+	<select id="query" resultType="map">
+		SELECT
+			l.id,
+			l.phonebrand,
+			l.priority,
+			l.recordsource,
+			l.recordchannel,
+			l.recordsamplerate,
+			l.playstreamtype,
+			l.playchannel,
+			l.playsamplerate,
+			l.speakermode,
+			l.earpiecemode,
+			l.callmode,
+			date_format(
+				l.updatetime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS updatetime
+		FROM
+			t_voice_device_auto_adapter_list l
+		WHERE
+			1 = 1
+		<if test="phonebrand != null">
+			AND l.phonebrand LIKE concat('%', #{phonebrand}, '%')
+		</if>
+		ORDER BY
+			l.updatetime DESC
+		${limit}
+	</select>
+	
+	<!-- 查询音频驱动智能适配：记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			t_voice_device_auto_adapter_list l
+		WHERE
+			1 = 1
+		<if test="phonebrand != null">
+			AND l.phonebrand LIKE concat('%', #{phonebrand}, '%')
+		</if>
+	</select>
+	
+	<!-- 查看音频驱动智能适配 -->
+	<select id="view" resultType="map">
+		SELECT
+			l.id,
+			l.phonebrand,
+			l.priority,
+			l.recordsource,
+			l.recordchannel,
+			l.recordsamplerate,
+			l.playstreamtype,
+			l.playchannel,
+			l.playsamplerate,
+			l.speakermode,
+			l.earpiecemode,
+			l.callmode,
+			date_format(
+				l.createtime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS createtime,
+			date_format(
+				l.updatetime,
+				'%Y-%m-%d %H:%i:%S'
+			) AS updatetime
+		FROM
+			t_voice_device_auto_adapter_list l
+		WHERE
+			l.id = #{id}
+	</select>
+	
+	<!-- 添加、修改音频驱动智能适配之前查重 -->
+	<select id="check" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			t_voice_device_auto_adapter_list l
+		WHERE
+			l.phonebrand = #{phonebrand}
+		AND l.priority = #{priority}
+		<if test="id != null">
+			AND l.id != #{id}
+		</if>
+	</select>
+	
+	<!-- 添加音频驱动智能适配 -->
+	<insert id="insert">
+		INSERT INTO t_voice_device_auto_adapter_list (
+			phonebrand,
+			priority,
+			recordsource,
+			recordchannel,
+			recordsamplerate,
+			playstreamtype,
+			playchannel,
+			playsamplerate,
+			speakermode,
+			earpiecemode,
+			callmode,
+			createtime
+		)
+		VALUES
+			(
+				#{phonebrand},
+				#{priority},
+				#{recordsource},
+				#{recordchannel},
+				#{recordsamplerate},
+				#{playstreamtype},
+				#{playchannel},
+				#{playsamplerate},
+				#{speakermode},
+				#{earpiecemode},
+				#{callmode},
+				now()
+			)
+	</insert>
+	
+	<!-- 修改音频驱动智能适配 -->
+	<update id="update">
+		UPDATE t_voice_device_auto_adapter_list l
+		SET l.phonebrand = #{phonebrand},
+		l.priority = #{priority},
+		l.recordsource = #{recordsource},
+		l.recordchannel = #{recordchannel},
+		l.recordsamplerate = #{recordsamplerate},
+		l.playstreamtype = #{playstreamtype},
+		l.playchannel = #{playchannel},
+		l.playsamplerate = #{playsamplerate},
+		l.speakermode = #{speakermode},
+		l.earpiecemode = #{earpiecemode},
+		l.callmode = #{callmode}
+		WHERE
+			l.id = #{id}
+	</update>
+	
+	<!-- 删除音频驱动智能适配 -->
+	<delete id="delete">
+		DELETE l
+		FROM
+			t_voice_device_auto_adapter_list l
+		WHERE
+			l.id = #{id}
+	</delete>
+	
+</mapper> 

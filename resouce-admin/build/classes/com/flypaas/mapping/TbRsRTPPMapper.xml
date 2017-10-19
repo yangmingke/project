@@ -1,0 +1,526 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsRTPPMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsRTPP" >
+    <id column="rnode_id" property="rtppSid" jdbcType="INTEGER" />
+    <result column="net_sid" property="netSid" jdbcType="VARCHAR" />
+    <result column="from_ip" property="fromIp" jdbcType="VARCHAR" />
+    <result column="sign_ip" property="signIp" jdbcType="VARCHAR" />
+    <result column="media_ip" property="mediaIp" jdbcType="VARCHAR" />
+    <result column="ping_ip" property="pingIp" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="main_ip" property="mainIp" jdbcType="VARCHAR" />
+    <result column="operator" property="operator" jdbcType="CHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="net_level" property="netLevel" jdbcType="CHAR" />
+    <result column="city" property="zone" jdbcType="INTEGER" />
+    <result column="area" property="region" jdbcType="INTEGER" />
+    <result column="province" property="province" jdbcType="INTEGER" />
+    <result column="country" property="country" jdbcType="INTEGER"/>
+    <result column="continent" property="continent" jdbcType="INTEGER"/>
+    <result column="price" property="price" jdbcType="INTEGER" />
+    <result column="block_price" property="blockPrice" jdbcType="VARCHAR" />
+    <result column="is_to_line" property="isToLine" jdbcType="CHAR" />
+    <result column="to_ip" property="toIp" jdbcType="VARCHAR" />
+    <result column="bandwidth_limit" property="bandwidthLimit" jdbcType="INTEGER" />
+    <result column="concurrency_limit" property="concurrencyLimit" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="audit_date" property="auditDate" jdbcType="TIMESTAMP" />
+    <result column="areaid" property="routeArea" jdbcType="VARCHAR" />
+    <result column="is_bdr" property="isBdr" jdbcType="INTEGER"/>
+  </resultMap>
+  
+  <resultMap id="ResultMap" type="com.flypaas.model.vo.Resource_City" >
+    <id column="rnode_id" property="rtppSid" jdbcType="INTEGER" />
+    <result column="net_sid" property="netSid" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="main_ip" property="mainIp" jdbcType="VARCHAR" />
+    <result column="operator" property="operator" jdbcType="CHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="net_level" property="netLevel" jdbcType="CHAR" />
+    <result column="city" property="zone" jdbcType="INTEGER" />
+    <result column="area" property="region" jdbcType="INTEGER" />
+    <result column="province" property="province" jdbcType="INTEGER" />
+    <result column="country" property="country" jdbcType="INTEGER"/>
+    <result column="continent" property="continent" jdbcType="INTEGER"/>
+    <result column="price" property="price" jdbcType="INTEGER" />
+    <result column="block_price" property="blockPrice" jdbcType="VARCHAR" />
+    <result column="is_to_line" property="isToLine" jdbcType="CHAR" />
+    <result column="to_ip" property="toIp" jdbcType="VARCHAR" />
+    <result column="bandwidth_limit" property="bandwidthLimit" jdbcType="INTEGER" />
+    <result column="concurrency_limit" property="concurrencyLimit" jdbcType="INTEGER" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="audit_date" property="auditDate" jdbcType="TIMESTAMP" />
+    <result column="areaid" property="routeArea" jdbcType="VARCHAR" />
+    <result column="is_bdr" property="isBdr" jdbcType="INTEGER"/>
+    <association property="city"  javaType="com.flypaas.model.TbRsCity">
+    	<id column="id" property="id" jdbcType="INTEGER" />
+	    <result column="area" property="area" jdbcType="VARCHAR" />
+	    <result column="areaid" property="areaid" jdbcType="INTEGER" />
+	    <result column="province" property="province" jdbcType="VARCHAR" />
+	    <result column="provinceid" property="provinceid" jdbcType="INTEGER" />
+	    <result column="city" property="city" jdbcType="VARCHAR" />
+	    <result column="cityid" property="cityid" jdbcType="INTEGER" />
+	    <result column="continent" property="continent" jdbcType="VARCHAR" />
+	    <result column="continentid" property="continentid" jdbcType="INTEGER" />
+	    <result column="country" property="country" jdbcType="VARCHAR" />
+	    <result column="countryid" property="countryid" jdbcType="INTEGER" />
+    </association>
+  </resultMap>
+  
+  
+  <sql id="Base_Column_List" >
+    rnode_id, net_sid, name, ip, main_ip, operator, type, net_level, city, area,province,country, continent,price, 
+    block_price, is_to_line, to_ip, bandwidth_limit, concurrency_limit, status, create_date, 
+    update_date, audit_date,areaid,is_bdr,from_ip,sign_ip,media_ip,ping_ip
+  </sql>
+  
+  <select id="checkIp" resultMap="BaseResultMap" parameterType="java.lang.String">
+  	select 
+    <include refid="Base_Column_List" />
+    from tb_rs_rtpp
+    where ip = #{ip,jdbcType=VARCHAR}
+  </select>
+  
+   <select id="checkRTPP" resultMap="BaseResultMap" parameterType="com.flypaas.model.TbRsRTPP">
+  	select 
+    <include refid="Base_Column_List" />
+    from tb_rs_rtpp
+    where ip = #{ip,jdbcType=VARCHAR}
+    and areaid = #{routeArea,jdbcType=VARCHAR}
+  </select>
+  
+  
+  <select id="queryResourceFenYe" resultType="java.util.HashMap" parameterType="Map">
+  SELECT 
+  	tb_rs_rtpp.areaid routeArea,
+	tb_rs_city.*,
+    tb_rs_rtpp.*,
+    tb_rs_account_info.*
+		from tb_rs_city,tb_rs_rtpp,tb_rs_account_info
+			where tb_rs_city.countryid = tb_rs_rtpp.country  
+			and tb_rs_city.cityid = tb_rs_rtpp.city
+			and tb_rs_city.provinceid = tb_rs_rtpp.province
+			and tb_rs_city.continentid = tb_rs_rtpp.continent
+			and tb_rs_city.areaid = tb_rs_rtpp.area
+			and tb_rs_account_info.net_sid = tb_rs_rtpp.net_sid
+	<if test="netSid != null">
+    	and net_sid = #{netSid,jdbcType=VARCHAR}
+    </if>
+    <if test="status != null">
+    	and tb_rs_rtpp.status = #{status,jdbcType=CHAR}
+    </if>
+    <if test="keyword != null" >
+        and (tb_rs_rtpp.ip like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%')
+        or tb_rs_rtpp.name like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%')
+        or tb_rs_city.country like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%')
+        or tb_rs_city.city like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%')
+        or tb_rs_account_info.username like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%'))
+    </if>
+    limit #{begin,jdbcType=INTEGER} , #{count,jdbcType=INTEGER};
+  </select>
+  
+  <select id="queryAllRTPP" resultType="java.lang.String">
+  	select ip
+    from tb_rs_rtpp
+    where status != '2'
+  </select>
+  
+  <select id="queryResourceCount" resultType="java.lang.Integer" parameterType="Map">
+  	SELECT 
+	count(*)
+		from tb_rs_city,tb_rs_rtpp,tb_rs_account_info
+			where tb_rs_city.countryid = tb_rs_rtpp.country  
+			and tb_rs_city.cityid = tb_rs_rtpp.city
+			and tb_rs_city.provinceid = tb_rs_rtpp.province
+			and tb_rs_city.continentid = tb_rs_rtpp.continent
+			and tb_rs_city.areaid = tb_rs_rtpp.area
+			and tb_rs_account_info.net_sid = tb_rs_rtpp.net_sid
+    <if test="netSid != null">
+    	and net_sid = #{netSid,jdbcType=VARCHAR}
+    </if>
+    <if test="status != null">
+    	and tb_rs_rtpp.status = #{status,jdbcType=CHAR}
+    </if>
+    <if test="keyword != null" >
+        and (tb_rs_rtpp.ip like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%')
+        or tb_rs_rtpp.name like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%')
+        or tb_rs_city.country like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%')
+        or tb_rs_city.city like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%')
+        or tb_rs_account_info.username like CONCAT('%',#{keyword,jdbcType=VARCHAR},'%'))
+    </if>
+  </select>
+  
+  <select id="queryResourceById" resultType="java.util.HashMap" parameterType="java.lang.String">
+	SELECT
+		tb_rs_city.*, 
+		tb_rs_rtpp.*,tb_rs_rtpp.areaid as routeArea,tb_rs_rtpp.status  as rStatus,
+		tb_rs_account_info.*, 
+		tb_rs_isp.ispid,tb_rs_isp.name as ispName
+	FROM
+		tb_rs_city,
+		tb_rs_rtpp,
+		tb_rs_account_info,
+		tb_rs_isp
+	WHERE
+		tb_rs_city.countryid = tb_rs_rtpp.country
+	AND tb_rs_city.cityid = tb_rs_rtpp.city
+	AND tb_rs_city.provinceid = tb_rs_rtpp.province
+	AND tb_rs_city.continentid = tb_rs_rtpp.continent
+	AND tb_rs_city.areaid = tb_rs_rtpp.area
+	AND tb_rs_account_info.net_sid = tb_rs_rtpp.net_sid
+	AND tb_rs_isp.ispid = tb_rs_rtpp.operator
+	AND tb_rs_rtpp.rnode_id = #{rtppSid,jdbcType=INTEGER}
+  </select>
+  
+   <!-- 批量删除  物理删除 -->
+   <!-- 
+  <delete id="batchDelResource1" >
+    delete from tb_rs_rtpp
+    where rtpp_sid in
+    <foreach collection="array" item = "ip" open="(" separator="," close=")">  
+        #{checkedId}
+    </foreach> 
+  </delete> -->
+  
+  
+ <!--批量删除,逻辑删除-->  
+  <delete id="batchDelResource"  >  
+     delete from tb_rs_rtpp 
+     where ip in  
+     <foreach collection="array" item = "checkedId" open="(" separator="," close=")">  
+            #{checkedId}  
+     </foreach>    
+  </delete>
+  
+  
+  
+  <select id="queryResourceByIpOrName" resultMap="BaseResultMap"  parameterType="java.lang.String">
+  	select 
+    <include refid="Base_Column_List" />
+    from tb_rs_rtpp
+    where net_sid = #{netSid,jdbcType=VARCHAR} and name = #{name,jdbcType=VARCHAR} or ip = #{name,jdbcType=VARCHAR};
+  </select>
+  
+  
+  
+  
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_rtpp
+    where rnode_id = #{rtppSid,jdbcType=INTEGER}
+  </select>
+  
+  <delete id="deleteByPrimaryKey"  parameterType="java.lang.Integer" >
+    delete from tb_rs_rtpp
+    where rnode_id = #{rtppSid,jdbcType=INTEGER}
+  </delete>
+ 
+
+  <insert id="insert" parameterType="com.flypaas.model.TbRsRTPP" >
+    insert into tb_rs_rtpp (rnode_id, net_sid, name, 
+      ip, main_ip, operator, 
+      type, net_level, city, area,province, country,continent,
+      price, block_price, is_to_line, 
+      to_ip, bandwidth_limit, concurrency_limit, 
+      status, create_date, update_date, 
+      audit_date,is_bdr)
+    values (#{rtppSid,jdbcType=INTEGER}, #{netSid,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{ip,jdbcType=VARCHAR}, #{mainIp,jdbcType=VARCHAR}, #{operator,jdbcType=CHAR}, 
+      #{type,jdbcType=CHAR}, #{netLevel,jdbcType=CHAR}, #{zone,jdbcType=INTEGER}, #{region,jdbcType=INTEGER},#{province,jdbcType=INTEGER}, #{country,jdbcType=INTEGER},#{continent,jdbcType=INTEGER},
+      #{price,jdbcType=INTEGER}, #{blockPrice,jdbcType=VARCHAR}, #{isToLine,jdbcType=CHAR}, 
+      #{toIp,jdbcType=VARCHAR}, #{bandwidthLimit,jdbcType=INTEGER}, #{concurrencyLimit,jdbcType=INTEGER}, 
+      #{status,jdbcType=CHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{auditDate,jdbcType=TIMESTAMP},#{routeArea,jdbcType=VARCHAR},#{isBdr,jdbcType=INTEGER})
+  </insert>
+  
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsRTPP" >
+    insert into tb_rs_rtpp
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="rtppSid != null" >
+        rnode_id,
+      </if>
+      <if test="netSid != null" >
+        net_sid,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="ip != null" >
+        ip,
+      </if>
+      <if test="mainIp != null" >
+        main_ip,
+      </if>
+      <if test="operator != null" >
+        operator,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="netLevel != null" >
+        net_level,
+      </if>
+      <if test="zone != null" >
+        city,
+      </if>
+       <if test="province != null" >
+        province,
+      </if>
+      <if test="country != null" >
+        country,
+      </if>
+      <if test="continent != null" >
+        continent,
+      </if>
+      <if test="region != null" >
+        area,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="blockPrice != null" >
+        block_price,
+      </if>
+      <if test="isToLine != null" >
+        is_to_line,
+      </if>
+      <if test="toIp != null" >
+        to_ip,
+      </if>
+      <if test="bandwidthLimit != null" >
+        bandwidth_limit,
+      </if>
+      <if test="concurrencyLimit != null" >
+        concurrency_limit,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="auditDate != null" >
+        audit_date,
+      </if>
+      <if test="isBdr != null" >
+        is_bdr,
+      </if>
+      <if test="routeArea != null" >
+        areaid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="rtppSid != null" >
+        #{rtppSid,jdbcType=INTEGER},
+      </if>
+      <if test="netSid != null" >
+        #{netSid,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="mainIp != null" >
+        #{mainIp,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null" >
+        #{operator,jdbcType=CHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=CHAR},
+      </if>
+      <if test="netLevel != null" >
+        #{netLevel,jdbcType=CHAR},
+      </if>
+      <if test="zone != null" >
+        #{zone,jdbcType=INTEGER},
+      </if>
+      <if test="province != null" >
+        #{province,jdbcType=INTEGER},
+      </if>
+      <if test="country != null" >
+        #{country,jdbcType=INTEGER},
+      </if>
+      <if test="continent != null" >
+        #{continent,jdbcType=INTEGER},
+      </if>
+      <if test="region != null" >
+        #{region,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=INTEGER},
+      </if>
+      <if test="blockPrice != null" >
+        #{blockPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="isToLine != null" >
+        #{isToLine,jdbcType=CHAR},
+      </if>
+      <if test="toIp != null" >
+        #{toIp,jdbcType=VARCHAR},
+      </if>
+      <if test="bandwidthLimit != null" >
+        #{bandwidthLimit,jdbcType=INTEGER},
+      </if>
+      <if test="concurrencyLimit != null" >
+        #{concurrencyLimit,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditDate != null" >
+        #{auditDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="isBdr != null" >
+        #{isBdr,jdbcType=INTEGER},
+      </if>
+      <if test="routeArea != null" >
+        #{routeArea,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsRTPP" >
+    update tb_rs_rtpp
+    <set >
+      <if test="agentPrice != null" >
+        agent_price = #{agentPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="netSid != null" >
+        net_sid = #{netSid,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="ip != null" >
+        ip = #{ip,jdbcType=VARCHAR},
+      </if>
+      <if test="mainIp != null" >
+        main_ip = #{mainIp,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null" >
+        operator = #{operator,jdbcType=CHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=CHAR},
+      </if>
+      <if test="netLevel != null" >
+        net_level = #{netLevel,jdbcType=CHAR},
+      </if>
+      <if test="zone != null" >
+        city = #{zone,jdbcType=INTEGER},
+      </if>
+      <if test="country != null" >
+        country = #{country,jdbcType=INTEGER},
+      </if>
+      <if test="continent != null" >
+        continent = #{continent,jdbcType=INTEGER},
+      </if>
+      <if test="region != null" >
+        area = #{region,jdbcType=INTEGER},
+      </if>
+      <if test="province != null" >
+        province = #{province,jdbcType=INTEGER},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=INTEGER},
+      </if>
+      <if test="blockPrice != null" >
+        block_price = #{blockPrice,jdbcType=VARCHAR},
+      </if>
+      <if test="isToLine != null" >
+        is_to_line = #{isToLine,jdbcType=CHAR},
+      </if>
+      <if test="toIp != null" >
+        to_ip = #{toIp,jdbcType=VARCHAR},
+      </if>
+      <if test="bandwidthLimit != null" >
+        bandwidth_limit = #{bandwidthLimit,jdbcType=INTEGER},
+      </if>
+      <if test="concurrencyLimit != null" >
+        concurrency_limit = #{concurrencyLimit,jdbcType=INTEGER},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="auditDate != null" >
+        audit_date = #{auditDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="routeArea != null" >
+        areaid = #{routeArea,jdbcType=VARCHAR},
+      </if>
+      <if test="isBdr != null" >
+        is_bdr = #{isBdr,jdbcType=INTEGER},
+      </if>
+        from_ip = #{fromIp,jdbcType=INTEGER},
+        sign_ip = #{signIp,jdbcType=INTEGER},
+        media_ip = #{mediaIp,jdbcType=INTEGER},
+        ping_ip = #{pingIp,jdbcType=INTEGER}
+    </set>
+    where rnode_id = #{rtppSid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsRTPP" >
+    update tb_rs_rtpp
+    set net_sid = #{netSid,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      ip = #{ip,jdbcType=VARCHAR},
+      main_ip = #{mainIp,jdbcType=VARCHAR},
+      operator = #{operator,jdbcType=CHAR},
+      type = #{type,jdbcType=CHAR},
+      net_level = #{netLevel,jdbcType=CHAR},
+      city = #{zone,jdbcType=INTEGER},
+      area = #{region,jdbcType=INTEGER},
+      continent = #{continent,jdbcType=INTEGER},
+      province = #{province,jdbcType=INTEGER},
+      country = #{country,jdbcType=INTEGER},
+      price = #{price,jdbcType=INTEGER},
+      block_price = #{blockPrice,jdbcType=VARCHAR},
+      is_to_line = #{isToLine,jdbcType=CHAR},
+      to_ip = #{toIp,jdbcType=VARCHAR},
+      bandwidth_limit = #{bandwidthLimit,jdbcType=INTEGER},
+      concurrency_limit = #{concurrencyLimit,jdbcType=INTEGER},
+      status = #{status,jdbcType=CHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      audit_date = #{auditDate,jdbcType=TIMESTAMP},
+      areaid = #{routeArea,jdbcType=VARCHAR},
+      is_bdr = #{isBdr,jdbcType=INTEGER}
+    where rnode_id = #{rtppSid,jdbcType=INTEGER}
+  </update>
+  
+  <select id="queryOtherRTPP" resultType="java.lang.String"  parameterType="List">
+  	 select ip
+     from tb_rs_rtpp
+     <if test="list.size() > 0">
+     where ip not in
+		<foreach collection="list" item="ip" index="index"
+	        open="(" close=")" separator=",">
+	        #{ip}
+	    </foreach>
+    </if>
+  </select>
+</mapper>

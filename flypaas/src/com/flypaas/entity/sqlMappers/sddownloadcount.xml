@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.sDDownloadCount">
+
+<select id="getSDDownloadCount" resultType="map" parameterType="map">
+	select download_count from tb_flypaas_download_version where version_name_key=#{key} and version_status=2
+</select>
+
+<update id="updateSDDownloadCount" parameterType="map">
+	update tb_flypaas_download_version set download_count=download_count+1 where version_name_key=#{key} and version_status=2
+</update>
+
+<select id="getCountList" resultType="map">
+	SELECT * from tb_flypaas_download_version v LEFT JOIN tb_flypaas_params p on(v.version_name_key=p.param_key) WHERE v.version_status=2 order by p.param_order;
+</select>
+
+<!-- <select id="getSdkDesc" parameterType="java.lang.String" resultType="map">
+	select * from tb_flypaas_download_version where version_name_key=#{sdkId} and version_status!=3 and version_status!=1 order by version_index desc limit 4
+</select> -->
+
+<select id="getSdkDesc" parameterType="java.lang.String" resultType="map">
+	select * from tb_flypaas_download_version where version_name_key=#{sdkId} and version_status=2 order by update_date desc limit 1
+</select>
+
+<select id="getStatictisSdk" parameterType="map" resultType="map">
+	select * from statistics.tb_statistics_sdk_day where DATE_FORMAT(statistics_date,'%Y%m%d')=#{date} and type=#{type} and version=#{version}
+</select>
+
+<select id="getStatictisDemo" parameterType="map" resultType="map">
+	select * from statistics.tb_statistics_demo_day where DATE_FORMAT(statistics_date,'%Y%m%d')=#{date} and type=#{type} and version=#{version}
+</select>
+
+<insert id="addStatictisSdk" parameterType="map">
+	insert into statistics.tb_statistics_sdk_day(statistics_date,type,version,download_count)
+	values(#{date},#{type},#{version},1);
+</insert>
+
+<insert id="addStatictisDemo" parameterType="map">
+	insert into statistics.tb_statistics_demo_day(statistics_date,type,version,download_count)
+	values(#{date},#{type},#{version},1);
+</insert>
+
+<update id="updateStatictisSdk" parameterType="map">
+	update statistics.tb_statistics_sdk_day set download_count=download_count+1 where DATE_FORMAT(statistics_date,'%Y%m%d')=#{date} and type=#{type} and version=#{version}
+</update>
+
+<update id="updateStatictisDemo" parameterType="map">
+	update statistics.tb_statistics_demo_day set download_count=download_count+1 where DATE_FORMAT(statistics_date,'%Y%m%d')=#{date} and type=#{type} and version=#{version}
+</update>
+	
+</mapper>

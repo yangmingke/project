@@ -1,0 +1,65 @@
+@charset "utf-8";
+/* CSS Document */
+* { padding: 0; margin: 0 }
+img { border: none; vertical-align: middle; }
+body { max-width: 480px; margin: 0 auto; background: #fff; font: 14px/1.5 Microsoft YaHei; color: #333 }
+em { font-style: normal;color:#ff5d06; }
+ul, ol { list-style: none }
+a { text-decoration: none; color:#00B05F }
+input,textarea{font: 14px/1.5 Microsoft YaHei;}
+.clearfix:before, .clearfix:after { content: "."; display: table; height: 0; font-size: 0; line-height: 0; visibility: hidden }
+.clearfix:after { clear: both }
+.clearfix { *zoom:1}
+table { border-collapse: collapse }
+i { font-style: normal; }
+
+.luck {cursor: pointer; position: absolute; left: 0; top: 0; font-size: 1.2em; color: #313131;  border-radius: 5px; background: url("../../images/shave_bg1.png") right top no-repeat;background-size:100% 100%; }
+.luck span.money { color: #e83c3c; font-size: 4em; font-weight: bold; display: inline-block;margin-top:0.5em }
+.luck span.money { font-size: 4em;  -webkit-transition:font-size 0.2s ease-out;}  
+.luck span.money.money_none { font-size:1.5em; text-align:center;}
+.luck { font-size: 1.2em;  -webkit-transition:font-size 0.2s ease-out;}  
+@media only screen and (max-width: 1200px) { .luck{ font-size: 1.2em; }}  
+@media only screen and (max-width: 1100px) { .luck{ font-size: 1.2em; }}  
+@media only screen and (max-width: 1000px) { .luck{ font-size: 1.2em; }}  
+@media only screen and (max-width: 900px) {.luck{ font-size: 1.1em; }}  
+@media only screen and (max-width: 800px) { .luck{ font-size: 1.1em; }}  
+@media only screen and (max-width: 700px) { .luck{ font-size: 1em; }}  
+@media only screen and (max-width: 600px) { .luck{ font-size: 1em; }}  
+@media only screen and (max-width: 500px) { .luck{ font-size: 1em; }}  
+@media only screen and (max-width: 400px) { .luck{ font-size: 1em; }}  
+@media only screen and (max-width: 300px) { .luck{ font-size: 1em; }}  
+@media only screen and (max-width: 1200px) { .luck span.money{ font-size: 4em; }}  
+@media only screen and (max-width: 1100px) { .luck span.money{ font-size: 4em; },.luck span.money.money_none { font-size:1.5em;}}  
+@media only screen and (max-width: 1000px) { .luck span.money{ font-size: 4em; },.luck span.money.money_none { font-size:1.5em;}}  
+@media only screen and (max-width: 900px) { .luck span.money{ font-size: 3.9em; },.luck span.money.money_none { font-size:1.4em;}}  
+@media only screen and (max-width: 800px) { .luck span.money{ font-size: 3.9em; },.luck span.money.money_none { font-size:1.4em;}}  
+@media only screen and (max-width: 700px) { .luck span.money{ font-size: 3.8em; },.luck span.money.money_none { font-size:1.3em;}}  
+@media only screen and (max-width: 600px) { .luck span.money{ font-size: 3.8em; },.luck span.money.money_none { font-size:1.3em;}}  
+@media only screen and (max-width: 500px) { .luck span.money{ font-size: 3.8em; },.luck span.money.money_none { font-size:1.3em;}}  
+@media only screen and (max-width: 400px) { .luck span.money{ font-size: 3.8em; },.luck span.money.money_none { font-size:1.3em;}}  
+@media only screen and (max-width: 300px) { .luck span.money{ font-size: 3.8em; },.luck span.money.money_none { font-size:1.3em;}}  
+@media only screen and (max-width: 1200px) {.luck span.money.money_none { font-size:1.5em;}}  
+@media only screen and (max-width: 1100px) { .luck span.money.money_none { font-size:1.5em;}}  
+@media only screen and (max-width: 1000px) { .luck span.money.money_none { font-size:1.5em;}}  
+@media only screen and (max-width: 900px) { .luck span.money.money_none { font-size:1.4em;}}  
+@media only screen and (max-width: 800px) { .luck span.money.money_none { font-size:1.4em;}}  
+@media only screen and (max-width: 700px) { .luck span.money.money_none { font-size:1.3em;}}  
+@media only screen and (max-width: 600px) { .luck span.money.money_none { font-size:1.3em;}}  
+@media only screen and (max-width: 500px) { .luck span.money.money_none { font-size:1.3em;}}  
+@media only screen and (max-width: 400px) { .luck span.money.money_none { font-size:1.3em;}}  
+@media only screen and (max-width: 300px) { .luck span.money.money_none { font-size:1.3em;}} 
+
+
+.myCanvas { cursor: pointer; position: absolute; left: 0; top: 0; z-index:11; }
+
+/*main*/
+.main { background: #4498c7; padding-bottom: 160px; position: relative;}
+.shave_area{ width: 90%; margin: 0 5%;border:1px dashed #fff; border-radius:5px; position:relative }
+.shave_wrap { position: relative; width: 97%; margin: 1.5%; height: 12em; }
+#target { background: url("../images/shave_bg.png") 0 center repeat;}
+#myCanvas { border-radius: 5px; border-radius: 5px;}
+.link { margin: 20px 0px;}
+.link a { display: inline-block; margin: 0 1% 0 5%; width: 42%; border-radius: 4px;}
+.code { text-align: center; width: 100%; position: absolute; bottom: -10%;}
+.code img { width: 50%;}
+.footer{ text-align:center; font-size:13px; padding-top:30%;color:#888; background:#fff}

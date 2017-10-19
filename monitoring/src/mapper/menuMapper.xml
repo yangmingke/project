@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 菜单业务 -->
+<mapper namespace="menu">
+	
+	<!-- 查询菜单 -->
+	<select id="getRoleMenu" resultType="com.network.monitor.model.Menu">
+		SELECT
+			m.menu_id,
+			m.menu_name,
+			m.menu_url,
+			m.menu_class,
+			m.parent_id as parent_id_tmp,
+			m.level,
+			m.status
+		FROM
+			network_monitor_menu m
+		WHERE
+			m.menu_type = 1
+		AND m.`status` = 1
+		<if test="level != null">
+			<![CDATA[ AND m.`level` >= #{level} ]]>
+		</if>
+		ORDER BY
+			m.level,
+			m.parent_id,
+			m.sort
+	</select>
+</mapper>

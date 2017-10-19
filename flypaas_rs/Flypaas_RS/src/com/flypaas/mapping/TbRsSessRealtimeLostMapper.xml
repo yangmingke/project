@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.dao.TbRsSessRealtimeLostMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsSessRealtimeLost" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="time" property="time" jdbcType="TIMESTAMP" />
+    <result column="src_ip" property="srcIp" jdbcType="VARCHAR" />
+    <result column="src_port" property="srcPort" jdbcType="INTEGER" />
+    <result column="dest_ip" property="destIp" jdbcType="VARCHAR" />
+    <result column="dest_port" property="destPort" jdbcType="INTEGER" />
+    <result column="caller" property="caller" jdbcType="VARCHAR" />
+    <result column="callee" property="callee" jdbcType="VARCHAR" />
+    <result column="ssrc" property="ssrc" jdbcType="INTEGER" />
+    <result column="lostrate" property="lostrate" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, time, src_ip, src_port, dest_ip, dest_port, caller, callee, ssrc, lostrate
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_rs_sess_realtime_lost
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from tb_rs_sess_realtime_lost
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsSessRealtimeLost" >
+    insert into tb_rs_sess_realtime_lost (id, time, src_ip, 
+      src_port, dest_ip, dest_port, 
+      caller, callee, ssrc, 
+      lostrate)
+    values (#{id,jdbcType=BIGINT}, #{time,jdbcType=TIMESTAMP}, #{srcIp,jdbcType=VARCHAR}, 
+      #{srcPort,jdbcType=INTEGER}, #{destIp,jdbcType=VARCHAR}, #{destPort,jdbcType=INTEGER}, 
+      #{caller,jdbcType=VARCHAR}, #{callee,jdbcType=VARCHAR}, #{ssrc,jdbcType=INTEGER}, 
+      #{lostrate,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.flypaas.model.TbRsSessRealtimeLost" >
+    insert into tb_rs_sess_realtime_lost
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="time != null" >
+        time,
+      </if>
+      <if test="srcIp != null" >
+        src_ip,
+      </if>
+      <if test="srcPort != null" >
+        src_port,
+      </if>
+      <if test="destIp != null" >
+        dest_ip,
+      </if>
+      <if test="destPort != null" >
+        dest_port,
+      </if>
+      <if test="caller != null" >
+        caller,
+      </if>
+      <if test="callee != null" >
+        callee,
+      </if>
+      <if test="ssrc != null" >
+        ssrc,
+      </if>
+      <if test="lostrate != null" >
+        lostrate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="time != null" >
+        #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="srcIp != null" >
+        #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="srcPort != null" >
+        #{srcPort,jdbcType=INTEGER},
+      </if>
+      <if test="destIp != null" >
+        #{destIp,jdbcType=VARCHAR},
+      </if>
+      <if test="destPort != null" >
+        #{destPort,jdbcType=INTEGER},
+      </if>
+      <if test="caller != null" >
+        #{caller,jdbcType=VARCHAR},
+      </if>
+      <if test="callee != null" >
+        #{callee,jdbcType=VARCHAR},
+      </if>
+      <if test="ssrc != null" >
+        #{ssrc,jdbcType=INTEGER},
+      </if>
+      <if test="lostrate != null" >
+        #{lostrate,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.flypaas.model.TbRsSessRealtimeLost" >
+    update tb_rs_sess_realtime_lost
+    <set >
+      <if test="time != null" >
+        time = #{time,jdbcType=TIMESTAMP},
+      </if>
+      <if test="srcIp != null" >
+        src_ip = #{srcIp,jdbcType=VARCHAR},
+      </if>
+      <if test="srcPort != null" >
+        src_port = #{srcPort,jdbcType=INTEGER},
+      </if>
+      <if test="destIp != null" >
+        dest_ip = #{destIp,jdbcType=VARCHAR},
+      </if>
+      <if test="destPort != null" >
+        dest_port = #{destPort,jdbcType=INTEGER},
+      </if>
+      <if test="caller != null" >
+        caller = #{caller,jdbcType=VARCHAR},
+      </if>
+      <if test="callee != null" >
+        callee = #{callee,jdbcType=VARCHAR},
+      </if>
+      <if test="ssrc != null" >
+        ssrc = #{ssrc,jdbcType=INTEGER},
+      </if>
+      <if test="lostrate != null" >
+        lostrate = #{lostrate,jdbcType=CHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.flypaas.model.TbRsSessRealtimeLost" >
+    update tb_rs_sess_realtime_lost
+    set time = #{time,jdbcType=TIMESTAMP},
+      src_ip = #{srcIp,jdbcType=VARCHAR},
+      src_port = #{srcPort,jdbcType=INTEGER},
+      dest_ip = #{destIp,jdbcType=VARCHAR},
+      dest_port = #{destPort,jdbcType=INTEGER},
+      caller = #{caller,jdbcType=VARCHAR},
+      callee = #{callee,jdbcType=VARCHAR},
+      ssrc = #{ssrc,jdbcType=INTEGER},
+      lostrate = #{lostrate,jdbcType=CHAR}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 审核管理-保障金提现审核 -->
+<mapper namespace="securityExtraction">
+
+	<!-- 分页查询保障金提现 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.id,
+			u.sid,
+			u.email,
+			u.is_contract,
+			t.money/${money_rate} as money_fmt,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date_fmt,
+			t.status,
+			(SELECT a.audit_desc FROM tb_srv_audit a WHERE a.audited_id = t.id AND a.audit_type = 6 LIMIT 1) AS audit_desc,
+			b.id as bid,
+			b.balance/${money_rate} as balance_fmt
+		FROM
+			tb_ucpaas_security_relieve_applyfor t,
+			tb_ucpaas_user u,
+			tb_ucpaas_security_balance b
+		WHERE
+			t.sid = u.sid
+		AND t.security_id = b.security_id
+		
+		<if test="text != null">
+			AND (
+				t.sid LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.status = #{status}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询保障金提现 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(*) AS totalCount
+		FROM
+			tb_ucpaas_security_relieve_applyfor t,
+			tb_ucpaas_user u,
+			tb_ucpaas_security_balance b
+		WHERE
+			t.sid = u.sid
+		AND t.security_id = b.security_id
+		
+		<if test="text != null">
+			AND (
+				t.sid LIKE concat(#{text}, '%')
+				OR u.email LIKE concat(#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.status = #{status}
+		</if>
+	</select>
+	
+	<!-- 获取保障金提现 -->
+	<select id="getEntity" resultType="map">
+		SELECT
+			t.id,
+			b.id as bid,
+			b.balance/${money_rate} as balance_fmt,
+			u.sid,
+			u.email,
+			u.is_contract,
+			t.money/${money_rate} as money_fmt,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date_fmt,
+			t.status,
+			t.banknum,
+			t.bankaddr,
+			t.company,
+			a.audit_desc
+		FROM
+			tb_ucpaas_security_relieve_applyfor t
+			join tb_ucpaas_security_balance b on t.security_id = b.security_id
+			join tb_ucpaas_user u on  t.sid = u.sid 
+		LEFT JOIN tb_srv_audit a ON a.audited_id = t.id AND a.audit_type = 6
+		WHERE  t.id = #{id}
+	</select>
+	
+	<!-- 审核 -->
+	<update id="audit">
+		UPDATE tb_ucpaas_security_relieve_applyfor t
+		SET t.status = #{security_status},t.update_date = now()
+		WHERE t.id = #{id}
+	</update>
+	
+	<update id="extractionbalance">
+		UPDATE tb_ucpaas_security_balance t,
+		 	tb_ucpaas_security_relieve_applyfor b
+		SET t.balance = t.balance - b.money,t.relieve_type = 4
+		where t.security_id  = b.security_id and b.id = #{id}
+	</update>
+	
+	<insert id="addExtractionLog">
+		insert into tb_ucpaas_security_deduction_log(sid,charge,frm_account_type,frm_id,to_account_type,to_id,banknum,bankaddr,company,create_date)
+		select a.sid,money,1,b.id,3,#{id},a.banknum,a.bankaddr,a.company,now()
+		from tb_ucpaas_security_relieve_applyfor a,tb_ucpaas_security_balance b 
+		where a.id = #{id} and a.security_id =b.security_id
+	</insert>
+</mapper> 

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucpaas.commonservice.dao.AppClientInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.ucpaas.commonservice.model.AppClientInfo" >
+    <result column="uin" property="uin" jdbcType="INTEGER" />
+    <result column="sid" property="sid" jdbcType="VARCHAR" />
+    <result column="app_sid" property="appSid" jdbcType="VARCHAR" />
+    <result column="client_token" property="clientToken" jdbcType="VARCHAR" />
+    <result column="friendly_name" property="friendlyName" jdbcType="VARCHAR" />
+    <result column="client_number" property="clientNumber" jdbcType="VARCHAR" />
+    <result column="client_pwd" property="clientPwd" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="balance" property="balance" jdbcType="BIGINT" />
+    <result column="enable_flag" property="enableFlag" jdbcType="CHAR" />
+    <result column="charge_type" property="chargeType" jdbcType="CHAR" />
+    <result column="userid" property="userid" jdbcType="VARCHAR" />
+    <result column="is_show_nbr" property="isShowNbr" jdbcType="TINYINT" />
+    <result column="charge" property="charge" jdbcType="INTEGER" />
+    <result column="client_sid" property="clientSid" jdbcType="VARCHAR" />
+    <result column="client_type" property="clientType" jdbcType="CHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    uin, sid, app_sid, client_token, friendly_name, client_number, client_pwd, status, 
+    create_date, update_date, mobile, balance, enable_flag, charge_type, userid, is_show_nbr, 
+    charge, client_sid, client_type
+  </sql>
+  
+<!--  client状态  0:关闭，1:正常，2:充值未平账（正常），  -->
+  <select id="selectByMap" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    uin, sid, app_sid, client_token, friendly_name, client_number, client_pwd, status, 
+    create_date, update_date, mobile, balance, enable_flag, charge_type, userid, is_show_nbr, 
+    charge, client_sid, client_type
+    from tb_ucpaas_app_client
+    where 1=1
+    <if test="appSid != null and appSid != ''" >
+    	and app_sid = #{appSid}
+    </if>
+    <if test="mobile != null and mobile != ''" >
+    	and mobile = #{mobile}
+    </if>
+    <if test="friendlyName != null and friendlyName != ''" >
+    	and friendly_name = #{friendlyName}
+    </if>
+    	and status != 0
+    <if test="start != null and pageSize != null" >
+    	limit #{start},#{pageSize}
+    </if>
+  </select>
+
+<!-- 查询应用下子账号总数   -->
+  <select id="selectCountAppSid" resultType="java.lang.Integer" parameterType="java.lang.String" >
+    select count(app_sid) 
+    from tb_ucpaas_app_client 
+    where app_sid = #{appSid}
+  </select>
+  
+  
+  
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	version="2.0"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd">
+	<description><![CDATA[flypaas自定义标签]]></description>
+	<display-name>flypaas Tags</display-name>
+	<tlib-version>1.0</tlib-version>
+	<short-name>u</short-name>
+	<uri>/flypaas-tags</uri>
+
+	<tag>
+		<description><![CDATA[分页标签]]></description>
+		<name>page</name>
+		<tag-class>com.flypaas.tag.PageTag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description><![CDATA[分页查询容器PageContainer]]></description>
+			<name>page</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description><![CDATA[查询的表单id]]></description>
+			<name>formId</name>
+			<required>true</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description><![CDATA[是否使用ajax请求]]></description>
+			<name>ajax</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description><![CDATA[ajax请求结果呈现容器id]]></description>
+			<name>divId</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description><![CDATA[ajax结果的数据标示id]]></description>
+			<name>dataDivId</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<dynamic-attributes>false</dynamic-attributes>
+	</tag>
+	
+	
+	<tag>
+		<description><![CDATA[时间格式化标签]]></description>
+		<name>secondFmt</name>
+		<tag-class>com.flypaas.tag.SecondFmt</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description><![CDATA[秒数]]></description>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<attribute>
+			<description><![CDATA[格式 默认格式为hh:mm:ss 对应 00:00:00 ]]></description>
+			<name>fmt</name>
+			<required>false</required>
+			<rtexprvalue>false</rtexprvalue>
+		</attribute>
+		<dynamic-attributes>false</dynamic-attributes>
+	</tag>
+	
+	<tag>
+		<description><![CDATA[des3加密标签]]></description>
+		<name>des3</name>
+		<tag-class>com.flypaas.tag.Des3Tag</tag-class>
+		<body-content>JSP</body-content>
+		<attribute>
+			<description><![CDATA[需要加密的字符串]]></description>
+			<name>value</name>
+			<required>true</required>
+			<rtexprvalue>true</rtexprvalue>
+		</attribute>
+		<dynamic-attributes>false</dynamic-attributes>
+	</tag>
+</taglib>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.AppSmsNum">
+	
+	 
+	 <resultMap id="appSmsNumResult" type="com.flypaas.entity.AppSmsNum">
+		<id property="appSid" column="app_sid" />
+		<result property="smsNumber" column="sms_number" />
+		<result property="appName" column="app_name" />
+		<result property="status" column="status" />
+		<result property="effDate" column="eff_date" />
+		<result property="expDate" column="exp_date" />
+	</resultMap>
+	
+	<select id="getAppSmsNumBySid"  parameterType="java.lang.String"  resultMap="appSmsNumResult">
+		SELECT * FROM tb_flypaas_app_smsnum  
+		WHERE app_sid IN (SELECT app_sid FROM tb_flypaas_application WHERE sid=#{sid})
+	</select>
+
+	<insert id="addAppSmsNumber" parameterType="appSmsNum">
+		insert into tb_flypaas_app_smsnum(app_sid,sms_number,app_name,status,eff_date)
+		values(#{appSid},#{smsNumber},#{appName},#{status},#{effDate})
+	</insert>
+</mapper>

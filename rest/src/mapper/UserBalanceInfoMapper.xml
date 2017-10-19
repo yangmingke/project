@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucpaas.commonservice.dao.UserBalanceInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.ucpaas.commonservice.model.UserBalanceInfo" >
+    <id column="acct_id" property="acctId" jdbcType="BIGINT" />
+    <result column="sid" property="sid" jdbcType="VARCHAR" />
+    <result column="balance" property="balance" jdbcType="BIGINT" />
+    <result column="enable_flag" property="enableFlag" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="valid_date" property="validDate" jdbcType="TIMESTAMP" />
+    <result column="vip_valid_date" property="vipValidDate" jdbcType="TIMESTAMP" />
+    <result column="credit_balance" property="creditBalance" jdbcType="BIGINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    acct_id, sid, balance, enable_flag, create_time, valid_date, vip_valid_date, credit_balance
+  </sql>
+  
+  
+  <update id="updateBySid" parameterType="com.ucpaas.commonservice.model.UserBalanceInfo" >
+    update tb_bill_acct_balance
+    <set >
+   	   <if test="acctId != null" >
+        acct_id = #{acctId,jdbcType=BIGINT},
+       </if>
+      <if test="sid != null" >
+        sid = #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="balance != null" >
+        balance = #{balance,jdbcType=BIGINT},
+      </if>
+      <if test="enableFlag != null" >
+        enable_flag = #{enableFlag,jdbcType=CHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="validDate != null" >
+        valid_date = #{validDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="vipValidDate != null" >
+        vip_valid_date = #{vipValidDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creditBalance != null" >
+        credit_balance = #{creditBalance,jdbcType=BIGINT},
+      </if>
+    </set>
+    where sid = #{sid}
+  </update>
+  
+<!--  根据用户sid查询用户余额记录  -->
+  <select id="selectBySid" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_bill_acct_balance
+    where sid = #{sid}
+  </select>
+  
+  
+</mapper>

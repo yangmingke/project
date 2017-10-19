@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.AcctBalance">
+	
+	 
+	 <resultMap id="acctBalanceResult" type="com.flypaas.entity.AcctBalance">
+		<id property="acctId" column="acct_id" />
+		<result property="sid" column="sid" />
+		<result property="balance" column="balance" />
+		<result property="enableFlag" column="enable_flag" />
+		<result property="createTime" column="create_time" />
+		<result property="validDate" column="valid_date" />
+		<result property="vipValidDate" column="vip_valid_date" />
+		<result property="creditBalance" column="credit_balance" />
+	</resultMap>
+	
+	<select id="getAcctBalance"  parameterType="java.lang.String"  resultType="acctbalance">
+		select TRUNCATE(b.balance / 1000000, 4) as balance,TRUNCATE(b.credit_balance / 1000000, 4) as creditBalance  from tb_bill_acct_balance b  where sid=#{sid}
+	</select>
+	<insert id="addAcctBalance" parameterType="acctbalance">
+		insert tb_bill_acct_balance(sid,balance,enable_flag,create_time,valid_date,vip_valid_date) values(#{sid},#{balance},#{enableFlag},#{createTime},#{validDate},#{vipValidDate});
+	</insert>
+	<update id="updateAcctBalance" parameterType="acctbalance">
+		update tb_bill_acct_balance set balance=balance+#{balance} where sid=#{sid}
+	</update>
+	<select id="getAcct"  parameterType="java.lang.String"  resultMap="acctBalanceResult">
+		select * from tb_bill_acct_balance where sid=#{sid}
+	</select>
+</mapper>

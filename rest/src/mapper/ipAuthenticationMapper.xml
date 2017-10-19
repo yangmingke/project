@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="ipAuthentication" >
+
+
+<!-- uin分配存储过程 -->
+  <select id="listIps" resultType="java.util.Map"  >
+   	select * from voice_ucms_user
+  </select>
+</mapper>

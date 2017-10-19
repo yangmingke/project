@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.flypaas.entity.Ring">
+	
+	<resultMap id="ringMap" type="com.flypaas.entity.Ring" >
+		<id property="id" column="id"/>
+		<result property="sid" column="sid" />
+		<result property="appSid" column="app_sid" />
+		<result property="type" column="type" />
+		<result property="fileName" column="file_name" />
+		<result property="createDate" column="create_date" />
+		<result property="updateDate" column="update_date" />
+		<result property="auditStatus" column="audit_status" />
+		<result property="uploadStatus" column="upload_status" />
+		<result property="appName" column="app_Name" />
+		<result property="content" column="content" />
+		<result property="contentType" column="content_type" />
+		<result property="userFileName" column="user_file_name" />
+	</resultMap>
+
+	<select id="getRing" parameterType="ring" resultMap="ringMap">
+		select r.*,a.app_name from tb_flypaas_call_ring r,tb_flypaas_application a 
+		where r.app_sid=a.app_sid and a.status!='3' and r.audit_status!=4 and r.sid=#{sid} 
+		<if test="appName!=null and appName!=''">
+			and (a.app_name=#{appName} or r.app_sid=#{appName})
+		</if>
+	</select>
+	<select id="getRingByIdSid" parameterType="ring" resultMap="ringMap">
+		select r.*,a.app_name from tb_flypaas_call_ring r,tb_flypaas_application a
+		where r.app_sid=a.app_sid and r.sid=#{sid} and r.id=#{id}
+	</select>
+	<insert id="addRing" parameterType="ring">
+		insert into tb_flypaas_call_ring(sid,app_sid,type,file_name,create_date,update_date,audit_status,upload_status,content_type,content,user_file_name)
+		values(#{sid},#{appSid},#{type},#{fileName},#{createDate},#{updateDate},#{auditStatus},#{uploadStatus},#{contentType},#{content},#{userFileName})
+	</insert>
+	
+	<select id="getRingByInfo" parameterType="ring" resultMap="ringMap">
+		select * from tb_flypaas_call_ring 
+		where app_sid=#{appSid} and sid=#{sid} and type=#{type} and audit_status!=4 limit 1
+	</select>
+	
+	<update id="updateRing" parameterType="ring">
+		update tb_flypaas_call_ring 
+		<set>
+			<if test="fileName!=null and fileName!=''">
+				file_name=#{fileName},
+			</if>
+			<if test="updateDate!=null and updateDate!=''">
+				update_date=#{updateDate},
+			</if>
+			<if test="auditStatus!=null and auditStatus!=''">
+				audit_status=#{auditStatus},
+			</if>
+			<if test="uploadStatus!=null and uploadStatus!=''">
+				upload_status=#{uploadStatus},
+			</if>
+			<if test="content!=null and content!=''">
+				content=#{content},
+			</if>
+			<if test="contentType!=null and contentType!=''">
+				content_type=#{contentType},
+			</if>
+			<if test="userFileName!=null and userFileName!=''">
+				user_file_name=#{userFileName} 
+			</if>
+		</set>
+		 where sid=#{sid} and app_sid=#{appSid} and id=#{id}
+	</update>
+	<delete id="deleteRing" parameterType="ring">
+		update tb_flypaas_call_ring set audit_status=4 where id=#{id} and sid=#{sid}
+	</delete>
+	
+	
+	<select id="ringServiceImpl_count" resultType="map">
+		select  count(*) as totalCount
+		from tb_flypaas_call_ring r,tb_flypaas_application a 
+		where r.app_sid=a.app_sid and a.status!='3' and r.audit_status!=4 and r.sid=#{sid} 
+		<if test="null != text">
+			and (a.app_name=#{text} or r.id=#{text})
+		</if>
+	</select>
+	<select id="ringServiceImpl_query" resultType="map">
+		select r.*,a.app_name 
+		from tb_flypaas_call_ring r,tb_flypaas_application a 
+		where r.app_sid=a.app_sid and a.status!='3' and r.audit_status!=4 and r.sid=#{sid} 
+		<if test="null != text">
+			and (a.app_name=#{text} or r.id=#{text})
+		</if>
+		order by r.update_date desc
+		${limit}
+	</select>
+</mapper>

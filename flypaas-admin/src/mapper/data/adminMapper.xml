@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 信息管理-管理员中心 -->
+<mapper namespace="admin">
+
+	<!-- 获取管理员资料 -->
+	<select id="getAdmin" resultType="map">
+		SELECT
+			a.sid,
+			a.email,
+			a.mobile,
+			a.realname,
+			c.role_id,
+			c.role_name
+		FROM
+			tb_ucpaas_user a,
+			tb_ucpaas_user_role b,
+			tb_ucpaas_role c
+		WHERE
+			a.sid = b.sid
+		AND b.role_id = c.role_id
+		AND a.user_type = 3
+		AND a.sid = #{sid}
+	</select>
+	
+	<!-- 添加、修改管理员之前查重 -->
+	<select id="checkAdmin" resultType="map">
+		SELECT
+			u.email,
+			u.mobile
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type = 3
+		AND (u.email = #{email} OR u.mobile = #{mobile})
+		<if test="sid != null">
+			AND u.sid != #{sid}
+		</if>
+	</select>
+	
+	<!-- 修改管理员资料 -->
+	<update id="updateAdmin">
+		UPDATE tb_ucpaas_user a
+		SET a.email = #{email},
+			a.realname = #{realname},
+			a.mobile = #{mobile},
+			
+			<if test="password != null">
+			a.password = #{password},
+			</if>
+			a.update_date = now()
+		WHERE
+			a.user_type = 3
+		AND a.sid = #{sid}
+	</update>
+	
+	<!-- 修改密码 -->
+	<update id="savePassword">
+		UPDATE tb_ucpaas_user a
+		SET a.`password` = #{newPassword},
+		 a.update_date = now()
+		WHERE
+			a.user_type = 3
+		AND a.sid = #{sid}
+		AND a.`password` = #{password}
+	</update>
+	
+	<!-- 分页查询管理员 -->
+	<select id="query" resultType="map">
+		SELECT
+			u.sid,
+			u.email,
+			u.mobile,
+			r.role_name,
+			u.realname,
+			date_format(
+				u.create_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS create_date,
+			u.`status`
+		FROM
+			tb_ucpaas_user u,
+			tb_ucpaas_user_role ur,
+			tb_ucpaas_role r
+		WHERE
+			u.sid = ur.sid
+		AND ur.role_id = r.role_id
+		AND u.user_type = 3
+		AND u.`status` = 1
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR u.mobile LIKE concat('%', #{text}, '%')
+				OR u.realname LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="role_id != null">
+			AND r.role_id = #{role_id}
+		</if>
+		ORDER BY
+			u.create_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询管理员 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_user u,
+			tb_ucpaas_user_role ur,
+			tb_ucpaas_role r
+		WHERE
+			u.sid = ur.sid
+		AND ur.role_id = r.role_id
+		AND u.user_type = 3
+		AND u.`status` = 1
+		
+		<if test="text != null">
+			AND (
+				u.sid LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+				OR u.mobile LIKE concat('%', #{text}, '%')
+				OR u.realname LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="role_id != null">
+			AND r.role_id = #{role_id}
+		</if>
+	</select>
+	
+	<!-- 添加管理员 -->
+	<insert id="insertAdmin">
+		INSERT INTO tb_ucpaas_user (
+			sid,
+			email,
+			realname,
+			mobile,
+			PASSWORD,
+			user_type,
+			create_date,
+			STATUS
+		)
+		VALUES
+			(#{sid}, #{email}, #{realname}, #{mobile}, #{password}, 3, now(), 1)
+	</insert>
+	
+	<!-- 添加管理员角色 -->
+	<insert id="insertAdminRole">
+		INSERT INTO tb_ucpaas_user_role (sid, role_id)
+		VALUES
+			(#{sid}, #{role_id})
+	</insert>
+	
+	<!-- 修改管理员角色 -->
+	<update id="updateAdminRole">
+		UPDATE tb_ucpaas_user_role r
+		SET r.role_id = #{role_id}
+		WHERE
+			r.sid = #{sid}
+	</update>
+	
+	<!-- 修改管理员状态 -->
+	<update id="updateStatus">
+		UPDATE tb_ucpaas_user u
+		SET u.`status` = #{status}
+		WHERE
+			u.user_type = 3
+		AND u.sid = #{sid}
+	</update>
+	
+	<!-- 删除管理员角色 -->
+	<delete id="deleteAdminRole">
+		DELETE ur
+		FROM
+			tb_ucpaas_user_role ur
+		WHERE
+			ur.sid = #{sid}
+	</delete>
+	
+	<!-- 发送短信验证码之前对手机号码查重 -->
+	<select id="checkMobile" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_user u
+		WHERE
+			u.user_type = 3
+		AND u.mobile = #{mobile}
+	</select>
+	
+</mapper> 

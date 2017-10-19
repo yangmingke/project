@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.ucpaas.commonservice.dao.TestClientInfoMapper" >
+  <resultMap id="BaseResultMap" type="com.ucpaas.commonservice.model.TestClientInfo" >
+    <id column="uin" property="uin" jdbcType="INTEGER" />
+    <result column="client_sid" property="clientSid" jdbcType="VARCHAR" />
+    <result column="client_token" property="clientToken" jdbcType="VARCHAR" />
+    <result column="friendly_name" property="friendlyName" jdbcType="VARCHAR" />
+    <result column="client_number" property="clientNumber" jdbcType="VARCHAR" />
+    <result column="client_pwd" property="clientPwd" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="CHAR" />
+    <result column="app_sid" property="appSid" jdbcType="VARCHAR" />
+    <result column="sid" property="sid" jdbcType="VARCHAR" />
+    <result column="charge" property="charge" jdbcType="INTEGER" />
+    <result column="charge_type" property="chargeType" jdbcType="CHAR" />
+    <result column="client_type" property="clientType" jdbcType="CHAR" />
+    <result column="create_date" property="createDate" jdbcType="TIMESTAMP" />
+    <result column="update_date" property="updateDate" jdbcType="TIMESTAMP" />
+    <result column="mobile" property="mobile" jdbcType="VARCHAR" />
+    <result column="is_show_nbr" property="isShowNbr" jdbcType="TINYINT" />
+    <result column="is_call_fr" property="isCallFr" jdbcType="TINYINT" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    uin, client_sid, client_token, friendly_name, client_number, client_pwd, status, 
+    app_sid, sid, charge, charge_type, client_type, create_date, update_date, mobile, 
+    is_show_nbr, is_call_fr
+  </sql>
+  
+  <select id="selectByClientNumber" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_ucpaas_test_client
+    where client_number = #{clientNumber}
+  </select>
+  
+<!--   查询子账号集合 -->
+  <select id="selectListByMap" resultMap="BaseResultMap" parameterType="java.util.Map" >
+    select 
+    <include refid="Base_Column_List" />
+    from tb_ucpaas_test_client
+    where 1=1
+    <if test="appSid != null" >
+    and app_sid = #{appSid}
+    </if>
+    <if test="sid != null" >
+    and sid = #{sid}
+    </if>
+  </select>
+  
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from tb_ucpaas_test_client
+    where uin = #{uin,jdbcType=INTEGER}
+  </delete>
+
+
+<!-- 根据clientnumber更新测试子账号 -->
+  <update id="updateByClientNumber" parameterType="com.ucpaas.commonservice.model.TestClientInfo" >
+    update tb_ucpaas_test_client
+    <set >
+      <if test="uin != null" >
+      	uin = #{uin,jdbcType=INTEGER},
+      </if>
+      <if test="clientSid != null" >
+        client_sid = #{clientSid,jdbcType=VARCHAR},
+      </if>
+      <if test="clientToken != null" >
+        client_token = #{clientToken,jdbcType=VARCHAR},
+      </if>
+      <if test="friendlyName != null" >
+        friendly_name = #{friendlyName,jdbcType=VARCHAR},
+      </if>
+      <if test="clientPwd != null" >
+        client_pwd = #{clientPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=CHAR},
+      </if>
+      <if test="appSid != null" >
+        app_sid = #{appSid,jdbcType=VARCHAR},
+      </if>
+      <if test="sid != null" >
+        sid = #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="charge != null" >
+        charge = #{charge,jdbcType=INTEGER},
+      </if>
+      <if test="chargeType != null" >
+        charge_type = #{chargeType,jdbcType=CHAR},
+      </if>
+      <if test="clientType != null" >
+        client_type = #{clientType,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mobile != null" >
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="isShowNbr != null" >
+        is_show_nbr = #{isShowNbr,jdbcType=TINYINT},
+      </if>
+      <if test="isCallFr != null" >
+        is_call_fr = #{isCallFr,jdbcType=TINYINT},
+      </if>
+    </set>
+    where client_number = #{clientNumber}
+  </update>
+  
+  <insert id="insert" parameterType="com.ucpaas.commonservice.model.TestClientInfo" >
+    insert into tb_ucpaas_test_client
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="uin != null" >
+        uin,
+      </if>
+      <if test="clientSid != null" >
+        client_sid,
+      </if>
+      <if test="clientToken != null" >
+        client_token,
+      </if>
+      <if test="friendlyName != null" >
+        friendly_name,
+      </if>
+      <if test="clientNumber != null" >
+        client_number,
+      </if>
+      <if test="clientPwd != null" >
+        client_pwd,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="appSid != null" >
+        app_sid,
+      </if>
+      <if test="sid != null" >
+        sid,
+      </if>
+      <if test="charge != null" >
+        charge,
+      </if>
+      <if test="chargeType != null" >
+        charge_type,
+      </if>
+      <if test="clientType != null" >
+        client_type,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="mobile != null" >
+        mobile,
+      </if>
+      <if test="isShowNbr != null" >
+        is_show_nbr,
+      </if>
+      <if test="isCallFr != null" >
+        is_call_fr,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="uin != null" >
+        #{uin,jdbcType=INTEGER},
+      </if>
+      <if test="clientSid != null" >
+        #{clientSid,jdbcType=VARCHAR},
+      </if>
+      <if test="clientToken != null" >
+        #{clientToken,jdbcType=VARCHAR},
+      </if>
+      <if test="friendlyName != null" >
+        #{friendlyName,jdbcType=VARCHAR},
+      </if>
+      <if test="clientNumber != null" >
+        #{clientNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="clientPwd != null" >
+        #{clientPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=CHAR},
+      </if>
+      <if test="appSid != null" >
+        #{appSid,jdbcType=VARCHAR},
+      </if>
+      <if test="sid != null" >
+        #{sid,jdbcType=VARCHAR},
+      </if>
+      <if test="charge != null" >
+        #{charge,jdbcType=INTEGER},
+      </if>
+      <if test="chargeType != null" >
+        #{chargeType,jdbcType=CHAR},
+      </if>
+      <if test="clientType != null" >
+        #{clientType,jdbcType=CHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="mobile != null" >
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="isShowNbr != null" >
+        #{isShowNbr,jdbcType=TINYINT},
+      </if>
+      <if test="isCallFr != null" >
+        #{isCallFr,jdbcType=TINYINT},
+      </if>
+    </trim>
+  </insert>
+  
+  
+</mapper>

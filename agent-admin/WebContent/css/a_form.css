@@ -1,0 +1,49 @@
+@charset "utf-8";
+/* CSS Document */
+input[type='text'],input[type='password'] { color:#595959; font-family:黑体; font-size:14px; background:url("../images/a_ucp_bg.png") 0 -184px no-repeat; padding-left:3px; width:355px; height:46px; line-height:46px;}
+input.txt_127[type='text'],input.txt_127[type='password'] { background:url("../images/a_ucp_bg.png") -183px -237px no-repeat; padding-left:3px; width:124px; height:44px; line-height:44px;}
+input.txt_177[type='text'],input.txt_177[type='password'] { background:url("../images/a_ucp_bg.png") 0px -237px no-repeat; padding-left:3px; width:174px; height:44px; line-height:44px;}
+input.txt_227[type='text'],input.txt_227[type='password'] { background:url("../images/a_ucp_bg.png") -212px -51px no-repeat; padding-left:3px; width:224px; height:44px; line-height:44px;}
+input.txt_250[type='text'],input.txt_250[type='password'] { background:url("../images/a_ucp_bg.png") 0px -427px no-repeat; padding-left:3px; width:247px; height:44px; line-height:44px;}
+input.txt_358[type='text'],input.txt_358[type='password'] { background:url("../images/a_ucp_bg.png") 0px -186px no-repeat; padding-left:3px; width:355px; height:44px; line-height:44px;}
+
+input[type='text'],input[type='password'] { color:#595959; font-family:黑体; font-size:14px; background:url("../images/a_ucp_bg.png") 0 -184px no-repeat; padding-left:10px; width:348px; height:46px; line-height:46px;}
+
+input[type='text']:focus,textarea:focus { color:#333;}
+input[type='button'],input[type='submit'] { background: url("../images/a_ucp_bg.png") -162px -283px no-repeat; color:#fff; text-align:center; font-size:14px; height:45px; line-height:45px; width:126px; border:none; font-family:黑体; cursor:pointer; outline:none;}
+textarea {border:1px #c2c2c2 solid; background:#fff; border-radius:5px; width:569px; height:95px; padding: 10px 0px 0px 10px; color:#aaa; font-family:黑体; font-size:14px;}
+
+/*复选框*/
+input[type='checkbox'] {display:inline-block; width:14px; height:14px; opacity:0; filter:alpha(opacity=0);}
+span.checkbox { display:inline-block; width:14px; height:14px; background:url("../images/checkbox_bg.png") 0 0 no-repeat; line-height:14px;}
+span.checkbox.checked { background:url("../images/checkbox_bg.png") 0 -16px no-repeat;}
+
+/*模拟下拉列表框*/
+.select_box { margin-bottom: 15px; margin-left: 16px;}
+.select_box,.select_box label {  float: left; display: inline; font-size: 14px; line-height: 36px; color: #595959;}
+.select_box label { width: 70px; margin-right: 25px;}
+div.select { float:left; display:inline; height:36px; line-height:36px; color:#595959; vertical-align: middle; cursor:pointer; position:relative;background: url("../images/a_ucp_bg.png") 0px -285px no-repeat; width: 159px; height: 41px; line-height: 41px;}
+div.select span { display:inline-block; font-family:黑体; font-size:14px; margin: 0 0px 0 3px; width:112px; height:41px; overflow:hidden; text-overflow:ellipsis; white-space:normal;}
+div.select ul {background:#f9f9f9; position:absolute; top:40px; left:-1px; border:1px #c6c6c6 solid; z-index:11; min-width:159px; max-height:200px; overflow-y:scroll;}
+div.select ul li {color:#595959; padding-left:20px; line-height: 30px; }
+div.select ul li:hover { background:#e7e7e7; color:#595959;}
+div.select.parent { margin-right:20px; }
+div.select.sel_221 { background: url("../images/a_ucp_bg.png") 0 -333px no-repeat; width: 221px;}
+div.select.sel_221 ul  { min-width:221px;}
+div.select.sel_221 span { width:174px;}
+div.select.sel_280{ background: url("../images/a_ucp_bg.png") 0 -377px no-repeat; width: 280px;}
+div.select.sel_280 ul  { min-width:280px;}
+div.select.sel_280 span { width:233px;}
+
+/*单选框*/
+input[type='radio'] {display:inline-block; width:18px; height:18px; opacity:0; filter:alpha(opacity=0); cursor:pointer;}
+span.radio { display:inline-block; width:18px; height:18px; background:url("../images/radio_bg.png") 0 0 no-repeat; line-height:18px;}
+span.radio.checked { background:url("../images/radio_bg.png") 0 -22px no-repeat;}
+
+/*模拟上传*/
+.file { position: relative; width:548px;}
+.file input.file_btn { background: url("../images/ucp_bg.png") -353px -450px no-repeat; width: 90px; height: 40px; line-height:40px; margin-left: 10px;}
+.file input.file_1 { opacity: 0; filter:alpha(opacity=0); position: absolute; left: 78px; top: 0px; display: inline-block; width: 460px; padding-left:10px; height: 44px; line-height: 44px; }
+.file input.choose_btn { background:url("../images/ucp_bg.png") 0px -757px; width:116px; padding-left:35px; height:42px; line-height:42px; color:#fff; position:absolute; top:0px; left:0px;}
+.file input.choose_btn:hover {  background:url("../images/ucp_bg.png") -224px -758px no-repeat; }
+.file input.choose { opacity:0;filter:alpha(opacity=0); position: absolute; left: 0px; top: 0px;}

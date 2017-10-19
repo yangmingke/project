@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>	
+	<!-- 开发模式下打印详细的错误信息 -->
+	<constant name="struts.ui.theme" value="simple"/>
+	<!-- 指定允许上传的文件最大字节数。默认值是2097152(2M) 限制最大30M-->
+    <constant name="struts.multipart.maxSize" value="31457280"/>
+    
+    <!-- action默认用的 package配置 -->
+	<constant name="struts.convention.default.parent.package" value="defaultPck" />
+	
+    <package name="defaultPck" extends="convention-default">
+		<interceptors>
+			<interceptor-stack name="flypaasStack">
+				<interceptor-ref name="defaultStack">
+					<!-- 解决exception-mapping后控制台无法打印异常信息问题 -->
+					<param name="exception.logEnabled">true</param>
+					<param name="exception.logLevel">error</param>
+				</interceptor-ref>
+			</interceptor-stack>
+		</interceptors>
+		<default-interceptor-ref name="flypaasStack" />
+		
+		<default-action-ref name="notFound" />
+		
+   		<global-results>
+	    	<result name="sysEx">/page/error/500.jsp</result>
+	    </global-results>
+	    
+		<global-exception-mappings>
+			<exception-mapping result="sysEx" exception="java.lang.Exception" />
+			<exception-mapping result="sysEx" exception="java.sql.SQLException"/>
+            <exception-mapping result="sysEx" exception="org.springframework.jdbc.BadSqlGrammarException"/>	
+		</global-exception-mappings>
+		
+		<action name="notFound">
+			<result>/page/error/404.jsp</result>
+		</action>
+	</package>
+    
+</struts>    

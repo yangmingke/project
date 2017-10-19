@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 审核管理-短信模板审核 -->
+<mapper namespace="smsAudit">
+
+	<!-- 分页查询短信模板 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.template_id,
+			t.`name`,
+			t.sign,
+			t.content,
+			app.app_name,
+			u.email,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			t.`status`,
+			cast(t.type as signed) as type_fmt,
+			(SELECT a.audit_desc FROM tb_srv_audit a WHERE a.audited_id = t.template_id AND a.audit_type = 3 LIMIT 1) AS audit_desc
+		FROM
+			tb_srv_sms_template t,
+			tb_ucpaas_application app,
+			tb_ucpaas_user u
+		WHERE
+			app.app_sid = t.app_sid
+		AND u.sid = app.sid
+		AND t.`status` IN (1, 2, 3)
+		
+		<if test="text != null">
+			AND (
+				t.template_id LIKE concat('%', #{text}, '%')
+				OR t.`name` LIKE concat('%', #{text}, '%')
+				OR t.`sign` LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.`status` = #{status}
+		</if>
+		ORDER BY
+			t.update_date DESC
+		${limit}
+	</select>
+	
+	<!-- 分页查询短信模板 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_srv_sms_template t,
+			tb_ucpaas_application app,
+			tb_ucpaas_user u
+		WHERE
+			app.app_sid = t.app_sid
+		AND u.sid = app.sid
+		AND t.`status` IN (1, 2, 3)
+		
+		<if test="text != null">
+			AND (
+				t.template_id LIKE concat('%', #{text}, '%')
+				OR t.`name` LIKE concat('%', #{text}, '%')
+				OR t.`sign` LIKE concat('%', #{text}, '%')
+				OR u.email LIKE concat('%', #{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND t.update_date >= #{start_date}
+		</if>
+		<if test="end_date != null">
+			<![CDATA[ AND t.update_date <= #{end_date} ]]>
+		</if>
+		<if test="status != null">
+			AND t.`status` = #{status}
+		</if>
+	</select>
+	
+	<!-- 获取短信模板 -->
+	<select id="getSmsAudit" resultType="map">
+		SELECT
+			t.template_id,
+			t.`name`,
+			t.sign,
+			t.content,
+			app.app_name,
+			u.sid,
+			u.email,
+			cast(t.type as signed) as type_fmt,
+			date_format(
+				t.update_date,
+				'%Y-%m-%d %H:%i:%S'
+			) AS update_date,
+			t.`status`,
+			(
+				SELECT
+					k.word
+				FROM
+					tb_ucpaas_filter_keyword k
+				WHERE
+					t.content LIKE concat('%', k.word, '%')
+				LIMIT 1
+			) AS keyword
+		FROM
+			tb_srv_sms_template t
+		LEFT JOIN tb_ucpaas_application app ON app.app_sid = t.app_sid
+		LEFT JOIN tb_ucpaas_user u ON u.sid = app.sid
+		WHERE
+			t.template_id = #{template_id}
+	</select>
+	
+	<!-- 审核 -->
+	<update id="audit">
+		UPDATE tb_srv_sms_template t
+		SET t.`status` = #{status}
+		WHERE
+			t.template_id = #{template_id}
+	</update>
+	
+</mapper> 
