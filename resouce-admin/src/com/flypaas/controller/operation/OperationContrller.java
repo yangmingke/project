@@ -31,6 +31,21 @@ public class OperationContrller{
 	@Autowired
 	OperationService operationServiceImpl;
 	
+	@RequestMapping("/queryNodeConcurrent")
+	@ResponseBody
+	public Map<String, Object> queryNodeConcurrent(HttpServletRequest request, HttpServletResponse response){
+		String date = request.getParameter("date");
+		if(StrUtil.isEmpty(date)){
+			Calendar cal=Calendar.getInstance();
+			Date time=cal.getTime();
+			date = new SimpleDateFormat("yyyy-MM-dd").format(time);
+		}
+		Map<String, Object> model = operationServiceImpl.queryNodeConcurrent(date);
+		model.put("date", date);
+		return model;
+	}
+	
+	
 	@RequestMapping("/queryPaketLoss")
 	@ResponseBody
 	public Map queryPacketLoss(HttpServletRequest request, HttpServletResponse response){

@@ -170,14 +170,14 @@
     <div class="form-group" style="text-align: center;padding-top: 40px;">
       <div class="field">
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <button id="back" class="button bg-main icon-undo" type="button" onclick="back()"> 返回</button>
+        <button id="back" class="button bg-main icon-undo" type="button" onclick="back('${routeDomain}')"> 返回</button>
       </div>
     </div>      
   </div>
 </div>
 <script type="text/javascript">
-	function back(){
-		$('body').load('/route/queryDomain');
+	function back(routeDomain){
+		$('body').load('/route/queryDomain?concurrent=RTPP_CONCURR_ZSET_' +routeDomain);
 	}
 	
 	function showBlockPrice(){

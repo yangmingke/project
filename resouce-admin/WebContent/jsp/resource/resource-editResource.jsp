@@ -375,6 +375,14 @@
 			       </c:choose>    
 		       </td>
 		    </tr>
+		    <tr>
+		       <th class="text-right">
+		       	  <label>备注：</label>
+		       </th>
+		       <td colspan="3">
+		          <textarea name="note" class="input" style="height:150px; border:1px solid #ddd;" id="note">${tbRsRTPP.note}</textarea>
+		       </td>
+		    </tr>
 	    </table>
     </form>
     <div class="form-group" style="text-align: center;padding-top: 40px;">
@@ -436,7 +444,7 @@
 			window.wxc.xcConfirm("请输入正确的节点IP地址格式", window.wxc.xcConfirm.typeEnum.info);
 			return false;
 		}
-		if(fromIp !="" && !fromIpReg.test(fromIp)){
+		if(fromIp !="" && !fromIpReg.test(fromIp) && fromIp != "0.0.0.0"){
 			window.wxc.xcConfirm("请输入正确的tcp来源IP格式", window.wxc.xcConfirm.typeEnum.info);
 			return false;
 		}
@@ -444,7 +452,7 @@
 			window.wxc.xcConfirm("请输入正确的收发媒体IP格式", window.wxc.xcConfirm.typeEnum.info);
 			return false;
 		}
-		if(pingIp !="" && !pingIpReg.test(pingIp)){
+		if(pingIp !="" && !pingIpReg.test(pingIp) && pingIp !="0.0.0.0"){
 			window.wxc.xcConfirm("请输入正确的探测UPDping包IP格式", window.wxc.xcConfirm.typeEnum.info);
 			return false;
 		}

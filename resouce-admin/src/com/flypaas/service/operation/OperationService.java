@@ -23,5 +23,7 @@ public interface OperationService {
 	public Map queryPacketLossResource(String destIp, String date);
 
 	public Map<String, Object> querySessionPacketLoss(String dateTime, String userSid, String appSid, String cookie);
+
+	public Map<String, Object> queryNodeConcurrent(String date);
 	
 }

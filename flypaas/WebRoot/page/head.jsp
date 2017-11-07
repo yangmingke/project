@@ -8,12 +8,7 @@
 			<c:if test="${user.agentUrl == null}">
 				<a href="<%=path%>/index">
 			</c:if>
-			<c:if test="${user.agentLogo!=null}"> 
-				<img src="<%=path%>/page/images/${user.agentLogo}" alt="用户通讯开放平台"/>
-			</c:if>
-			<c:if test="${user.agentLogo == null}">
 				<img src="<%=path%>/page/images/logo.png" alt="用户通讯开放平台"/>
-			</c:if>
 			</a>
 		</div>
 		<div class="nav">

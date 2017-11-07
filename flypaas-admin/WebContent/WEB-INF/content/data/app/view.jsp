@@ -103,7 +103,14 @@
 			<tbody>
 				<tr>
 					<th>节点最高单价</th>
-					<th>${data.app.node_max_price} 分/KB</th>
+					<th>
+						<s:if test="data.app.node_max_price==0">
+							无限制
+						</s:if>
+						<s:else>
+							${data.app.node_max_price} 分/GB
+						</s:else>
+					</th>
 				</tr>
 			</tbody>
 		</table>

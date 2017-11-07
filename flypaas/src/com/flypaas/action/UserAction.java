@@ -3,10 +3,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import javax.servlet.http.Cookie;
@@ -312,6 +310,8 @@ public class UserAction extends BaseAction {
 					url = user.getAgentUrl().contains("http://") || user.getAgentUrl().contains("https://")? user.getAgentUrl() : "http://" + user.getAgentUrl();
 				}
 				Cookie cookie = new Cookie(SysConfig.getInstance().getProperty("return_url"),url);
+				cookie.setPath("/");
+				cookie.setMaxAge(60*60*24);
 				response.addCookie(cookie);
 				return errorCode;
 			}

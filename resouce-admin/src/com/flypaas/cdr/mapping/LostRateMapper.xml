@@ -55,7 +55,7 @@
   <select id="queryPaketLoss" resultMap="BaseResultMap" parameterType="Map" >
 	SELECT *
 		FROM t_rs_sess_realtime_lost_${date}
-		where src_ip = #{ip}
+		where dest_ip = #{ip}
   </select>
   
   <sql id="Base_Column_List" >

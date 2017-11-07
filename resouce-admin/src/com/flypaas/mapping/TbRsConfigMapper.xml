@@ -35,4 +35,9 @@
     where t_key = #{tKey,jdbcType=VARCHAR}
   </delete>
   
+  <select id="getConfigByKey" parameterType="String" resultType="String">
+  	select t_value from tb_rs_config
+  	where t_key = #{0}
+  </select>
+  
 </mapper>

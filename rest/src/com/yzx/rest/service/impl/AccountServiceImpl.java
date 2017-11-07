@@ -324,7 +324,7 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 
 	
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public ListResp createSession(String version, String accountSid, String Authorization,String sig, SessionInfo sessionInfo) {
 		ListResp listResp = new ListResp();
@@ -336,12 +336,14 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 		String policy = sessionInfo.getPolicy();
 		String hopNum = sessionInfo.getHopNum();
 		String routeNum = sessionInfo.getRouteNum();
+		String maxPrice = sessionInfo.getMaxPrice();
 		String protocol = sessionInfo.getProtocol();
 		String srcIp = sessionInfo.getSrcIp();
 		String srcPort = sessionInfo.getSrcPort();
 		String dstIp = sessionInfo.getDstIp();
 		String dstPort = sessionInfo.getDstPort();
 		String switchFlag = sessionInfo.getSwitchFlag();
+		String oneSide = sessionInfo.getOneSide();
 		SessionInfo serverStatus = sessionInfo.getServerStatus();
 		List srcApList = sessionInfo.getSrcApList();
 		List dstApList = sessionInfo.getDstApList();
@@ -354,17 +356,6 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 			listResp.setRespCode(Consts.C102101, Consts.applyRoute, appId, "");
 			return listResp;
 		}
-		/*if (StringUtils.isEmpty(cookie)) {
-			listResp.setRespCode(Consts.C106000, Consts.applyRoute, appId, "");
-			return listResp;
-		}else{
-			try {
-				String ip = InetAddress.getLocalHost().getHostAddress();
-				cookie = ip+"@"+cookie+"@"+ Consts.cookie_suffix;
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			}
-		}*/
 		if (StringUtils.isEmpty(srcIp)) {
 			listResp.setRespCode(Consts.C106001, Consts.applyRoute, appId, "");
 			return listResp;
@@ -381,9 +372,7 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 			listResp.setRespCode(Consts.C106004, Consts.applyRoute, appId, "");
 			return listResp;
 		}
-		if(StringUtils.isEmpty(policy)){
-			policy = "1";
-		}else{
+		if(StringUtils.isNotEmpty(policy)){
 			if(!checkNonnegNum(policy)){
 				listResp.setRespCode(Consts.C106005, Consts.applyRoute, appId, "");
 				return listResp;
@@ -394,16 +383,16 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 				return listResp;
 			}
 		}
-		if(StringUtils.isEmpty(hopNum)){
-			hopNum = "0";
-		}else if(!checkNonnegNum(hopNum)){
+		if(StringUtils.isNotEmpty(hopNum) && !checkNonnegNum(hopNum)){
 			listResp.setRespCode(Consts.C106006, Consts.applyRoute, appId, "");
 			return listResp;
 		}
-		if(StringUtils.isEmpty(routeNum)){
-			routeNum = "1";
-		}else if(!checkPosNum(routeNum) || Integer.valueOf(routeNum) > 2){
+		if(StringUtils.isNotEmpty(routeNum) && (!checkPosNum(routeNum) || Integer.valueOf(routeNum) > 2)){
 			listResp.setRespCode(Consts.C106007, Consts.applyRoute, appId, "");
+			return listResp;
+		}
+		if(StringUtils.isNotEmpty(maxPrice) && !checkNonnegNum(maxPrice)){
+			listResp.setRespCode(Consts.C106017, Consts.applyRoute, appId, "");
 			return listResp;
 		}
 		if(StringUtils.isEmpty(protocol)){
@@ -506,9 +495,42 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 				if(StringUtils.isNotEmpty(notifyUrl)){
 					notifyUrl = JsonUtils.json2URLCode(sessionInfo.getNotifyUrl()); 
 				}
+				Map<String, Object> app = getAppMap(appId);
+				if(StringUtils.isEmpty(policy)){
+					Integer route_policy = (Integer) app.get("route_policy");
+					if(route_policy == null){
+						policy = "1";
+					}else{
+						policy = String.valueOf(route_policy);
+					}
+				}
+				if(StringUtils.isEmpty(hopNum)){
+					Integer max_hop_num = (Integer) app.get("max_hop_num");
+					if(max_hop_num == null){
+						hopNum = "0";
+					}else{
+						hopNum = String.valueOf(max_hop_num);
+					}
+				}
+				if(StringUtils.isEmpty(routeNum)){
+					Integer route_num = (Integer) app.get("route_num");
+					if(route_num == null){
+						routeNum = "1";
+					}else{
+						routeNum = String.valueOf(route_num);
+					}
+				}
+				if(StringUtils.isEmpty(maxPrice)){
+					Integer node_max_price = (Integer) app.get("node_max_price");
+					if(node_max_price == null){
+						maxPrice = "0";
+					}else{
+						maxPrice = String.valueOf(node_max_price);
+					}
+				}
 				StringBuffer para= new StringBuffer();
 				para.append("?sid=").append(accountSid).append("&appid=").append(appId).append("&policy=").append(policy)
-				.append("&hopnum=").append(hopNum).append("&routenum=").append(routeNum).append("&protocol=")
+				.append("&hopnum=").append(hopNum).append("&routenum=").append(routeNum).append("&maxprice=").append(maxPrice).append("&protocol=")
 				.append(protocol).append("&srcinfo=").append(srcinfo).append("&dstinfo=").append(dstinfo)
 				.append("&udpportnum=").append(udpPortNum).append("&vflag=").append(vflag).append("&area=").append(routeArea);
 				if(StringUtils.isNotEmpty(notifyUrl)){
@@ -516,6 +538,9 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 				}
 				if(StringUtils.isNotEmpty(switchFlag)){
 					para.append("&switch=").append(switchFlag);
+				}
+				if(StringUtils.isNotEmpty(oneSide)){
+					para.append("&oneSide=").append(oneSide);
 				}
 				if(serverStatus != null){
 					String serverStatusJson = JsonUtils.toJson(serverStatus);
@@ -538,24 +563,32 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 						return listResp;
 					}
 					List RouteList = new ArrayList();
-					String sessionId = (String) map.get("sessionid");
-					listResp.setSessionId(sessionId);
-					String direct = String.valueOf(map.get("direct"));
-					listResp.setDirect(direct.split("[.]")[0]);
-					List<Map> tempList = (List) map.get("routes");
-					listResp.setRouteSize(tempList.size());
-					for(Map tempMap : tempList){
-						SessionInfo temp = new SessionInfo();
-						double drouteid = (double) tempMap.get("routeid");
-						Integer routeid = (int)drouteid;
-						temp.setRouteid(routeid.toString());
-						temp.setSrcApIp(tempMap.get("srcapip").toString());
-						temp.setSrcApPort(tempMap.get("srcapport").toString());
-						temp.setDstApIp(tempMap.get("dstapip").toString());
-						temp.setDstApPort(tempMap.get("dstapport").toString());
-						RouteList.add(temp);
+					if(map.get("sessionid") != null){
+						String sessionId = (String) map.get("sessionid");
+						listResp.setSessionId(sessionId);
 					}
-					listResp.setSessionInfo(RouteList);
+					if(map.get("direct") != null){
+						String direct = String.valueOf(map.get("direct")).split("[.]")[0];
+						if(!"-1".equals(direct)){
+							listResp.setDirect(direct);
+						}
+					}
+					if(map.get("routes") != null){
+						List<Map> tempList = (List) map.get("routes");
+						listResp.setRouteSize(tempList.size());
+						for(Map tempMap : tempList){
+							SessionInfo temp = new SessionInfo();
+							double drouteid = (double) tempMap.get("routeid");
+							Integer routeid = (int)drouteid;
+							temp.setRouteid(routeid.toString());
+							temp.setSrcApIp(tempMap.get("srcapip").toString());
+							temp.setSrcApPort(tempMap.get("srcapport").toString());
+							temp.setDstApIp(tempMap.get("dstapip").toString());
+							temp.setDstApPort(tempMap.get("dstapport").toString());
+							RouteList.add(temp);
+						}
+						listResp.setSessionInfo(RouteList);
+					}
 					listResp.setRespCode(Consts.C000000, Consts.applyRoute, appId, "");
 					// 确保HTTP响应内容全部被读出或者内容流被关闭
 					EntityUtils.consume(entity);
@@ -1861,27 +1894,6 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 		}
 		return listResp;
 	}
-	public static String base64Encode(String str) throws Exception{
-		byte[] binaryData = str.getBytes();
-        String code = Base64.encodeBase64String(binaryData); //encryptBASE64(byteArray); 
-        return code.replace("/", "-");//解决URL参数带/问题。
-	}
-	
-	public String getRouteArea(String appId){
-		String route_area;
-		List<Object[]> paramList = new ArrayList<Object[]>();
-		paramList.add(new Object[]{"string", appId});
-		List<Map<String, Object>> list = DBCommService.getInstance().queryForList(SqlCode.QUERY_APP_BY_ID, paramList,Consts.CON_MASTER);
-		if(list == null || list.isEmpty()){
-			return Consts.default_area;
-		}
-		Map app = list.get(0);
-		route_area = (String) app.get("route_area");
-		if(route_area == null || "".equals(route_area)){
-			route_area = Consts.default_area;
-		}
-		return route_area;
-	}
 
 	@Override
 	public ListResp applySDKID(String version, String accountSid, String auth, String sig, SDK sdk) {
@@ -1911,6 +1923,85 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 		return closeClient(version, accountSid, auth, sig, client);
 	}
 	
+	@Override
+	public ListResp findSDKIDs(String version, String accountSid, String auth, String sig, SDK sdk) {
+		ListResp listResp = new ListResp();
+		Client client = new Client();
+		client.setAppId(sdk.getAppId());
+		client.setStart(sdk.getStart());
+		client.setLimit(sdk.getLimit()
+				);
+		String appId = client.getAppId();
+		long time1 = new Date().getTime();
+		try {
+			String start = client.getStart();
+			String limit = client.getLimit();
+			if (StringUtils.isEmpty(start)) {
+				start = "0";
+			}
+			if (StringUtils.isEmpty(limit)) {
+				limit = "10";
+			}
+			if (Integer.parseInt(limit) > 100) {
+				listResp.setRespCode(Consts.C103115, Consts.findClients, appId, "");
+				return listResp;
+			}
+			if (!checkNum(start) || !checkNum(limit)) {
+				listResp.setRespCode(Consts.C100002, Consts.findClients, appId, "");
+				return listResp;
+			}
+			if (StringUtils.isEmpty(appId)) {
+				listResp.setRespCode(Consts.C102100, Consts.findClients, appId, "");
+				return listResp;
+			}
+			if (!checkStr(appId)) {
+				listResp.setRespCode(Consts.C102101, Consts.findClients, appId, "");
+				return listResp;
+			}
+			version = changeVersion(version);
+			String code = checkAuth(messgeContext, logger, auth, sig, accountSid, version, appId);
+			if (code.equals(Consts.C000000)) {
+				String result = serviceManager.clientList(appId, Integer.parseInt(start), Integer.parseInt(limit));
+				JSONObject jsonObject = JSONObject.fromObject(result);
+				if (jsonObject == null) {
+					logger.warn("HTTP状态码不等于200");
+					listResp.setRespCode(Consts.C100500, Consts.findClients, appId, "");
+				} else {
+					int retCode = jsonObject.getInt("resultcode");
+					if (retCode == 0) {// 0：成功，其他失败
+						listResp.setRespCode(Consts.C000000, Consts.findClients, appId, "");
+						JSONArray jsonArr = jsonObject.getJSONArray("result");
+						if (jsonArr != null && jsonArr.size() > 0) {
+							listResp.setCount(jsonArr.size());
+							List<SDK> list = new ArrayList<SDK>();
+							for (int i = 0; i < jsonArr.size(); i++) {
+								JSONObject jsonObjSec = JSONObject.fromObject(jsonArr.get(i));
+								SDK SDKtemp = new SDK();
+								SDKtemp.setSDKID(jsonObjSec.getString("client_number"));
+								SDKtemp.setCreateDate(jsonObjSec.getString("create_date"));
+								list.add(SDKtemp);
+							}
+							listResp.setRespCode(Consts.C000000, Consts.findClients, appId, "");
+							listResp.setSdks(list);
+						}
+					} else if (retCode == -100) {
+						listResp.setRespCode(Consts.C100699, Consts.findClients, appId, "");
+					} else {
+						listResp.setRespCode(Consts.C100007, Consts.findClients, appId, "");
+					}
+				}
+			} else {
+				listResp.setRespCode(code, Consts.findClients, appId, "");
+			}
+		} catch (Exception e) {
+			logger.error(e);
+			listResp.setRespCode(Consts.C100699, Consts.findClients, appId, "");
+		}
+		long time2 = new Date().getTime();
+		logger.info("查找子账号列表请求时长" + (time2 - time1));
+		return listResp;
+	}
+
 	public String changeVersion(String version){
 		String cversion = SysConfig.getInstance().getProperty("new_version");
 		if(version.equals(cversion)){//新版本号换旧版本号以调用旧版本号方法
@@ -1919,5 +2010,34 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 			version = cversion;//使用新版本号调用旧版本号号方法，使其报版本错误的提示
 		}
 		return version;
+	}
+
+	public static String base64Encode(String str) throws Exception{
+		byte[] binaryData = str.getBytes();
+		String code = Base64.encodeBase64String(binaryData); //encryptBASE64(byteArray); 
+		return code.replace("/", "-");//解决URL参数带/问题。
+	}
+	
+	public String getRouteArea(String appId){
+		String route_area;
+		List<Object[]> paramList = new ArrayList<Object[]>();
+		paramList.add(new Object[]{"string", appId});
+		List<Map<String, Object>> list = DBCommService.getInstance().queryForList(SqlCode.QUERY_APP_BY_ID, paramList,Consts.CON_MASTER);
+		if(list == null || list.isEmpty()){
+			return Consts.default_area;
+		}
+		Map<String, Object> app = list.get(0);
+		route_area = (String) app.get("route_area");
+		if(route_area == null || "".equals(route_area)){
+			route_area = Consts.default_area;
+		}
+		return route_area;
+	}
+	
+	public Map<String, Object> getAppMap(String appId){
+		List<Object[]> paramList = new ArrayList<Object[]>();
+		paramList.add(new Object[]{"string", appId});
+		List<Map<String, Object>> list = DBCommService.getInstance().queryForList(SqlCode.QUERY_APP_BY_ID, paramList,Consts.CON_MASTER);
+		return list.get(0);
 	}
 }

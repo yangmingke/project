@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.flypaas.cdr.dao.NodeConcurrenceMapper" >
+  <resultMap id="BaseResultMap" type="com.flypaas.model.TbRsNodeConcurrence" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="ip" property="ip" jdbcType="VARCHAR" />
+    <result column="datetime" property="datetime" jdbcType="TIMESTAMP" />
+    <result column="datetimeStr" property="datetimeStr" jdbcType="TIMESTAMP" />
+    <result column="concurrence" property="concurrence" jdbcType="BIGINT" />
+  </resultMap>
+  <insert id="insert" parameterType="com.flypaas.model.TbRsNodeConcurrence" >
+    insert into tb_rs_node_concurrence_${month} (ip, datetime,concurrence)
+    values (#{ip,jdbcType=VARCHAR}, #{datetime,jdbcType=TIMESTAMP},#{concurrence,jdbcType=BIGINT})
+  </insert>
+  <select id="queryNodeConcurrent" parameterType="Map" resultMap="BaseResultMap">
+  	select ip,
+  		   concurrence,
+  		   DATE_FORMAT(datetime,'%H:%i') datetimeStr
+    from tb_rs_node_concurrence_${month} 
+    where DATE_FORMAT(datetime,'%Y%m%d') = #{date}
+  </select>
+  <select id="createTable"  useCache="false" statementType="CALLABLE"> 
+    <![CDATA[ 
+    call create_tb_rs_node_concurrence_time();
+    ]]>
+ </select>
+</mapper>

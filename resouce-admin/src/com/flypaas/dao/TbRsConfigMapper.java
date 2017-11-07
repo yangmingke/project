@@ -13,4 +13,6 @@ public interface TbRsConfigMapper {
 	public int addConfig(TbRsConfig tbRsConfig);
 
 	public int delConfigByKey(TbRsConfig tbRsConfig);
+
+	public String getConfigByKey(String string);
 }

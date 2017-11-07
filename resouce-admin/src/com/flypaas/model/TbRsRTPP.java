@@ -63,7 +63,7 @@ public class TbRsRTPP {
     
     private int isBdr;
     
-	
+	private String note;
 
 	public int getIsBdr() {
 		return isBdr;
@@ -304,5 +304,13 @@ public class TbRsRTPP {
 
 	public void setPingIp(String pingIp) {
 		this.pingIp = pingIp;
+	}
+
+	public String getNote() {
+		return note;
+	}
+
+	public void setNote(String note) {
+		this.note = note;
 	}
 }

@@ -401,7 +401,7 @@ span.tips { color: #a3a3a3; font-size: 12px;}
 .set_box input[type='text'] { min-width: 520px; float: left; display: inline;}
 .set_box .select { width: 98px; margin-left: 550px;}
 .edit_verify dd { padding: 0px 25px 0px 25px;}
-.set_box1 { margin: 50px 0px 0px 0px;}
+.set_box1 { margin: 0px 0px 0px 0px;}
 .set_box1 ul { margin-bottom: 30px; width: 100%; float: left; display: inline;}
 .set_box1 ul li { color: #4c4c4c; font-style: 14px;line-height: 38px; }
 .set_box1 ul li.set_tit { float: left; display: inline; width: 113px; margin-right: 28px; text-align: right;}

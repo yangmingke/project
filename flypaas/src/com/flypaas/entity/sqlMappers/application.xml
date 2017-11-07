@@ -31,6 +31,10 @@
 		<id property="fileTimeout" column="file_timeout" />
 		<id property="oauthFileUrl" column="oauth_file_url" />
 		<id property="oauthAppId" column="oauth_app_id" />
+		<id property="nodeMaxPrice" column="node_max_price" />
+		<id property="routePolicy" column="route_policy" />
+		<id property="routeNum" column="route_num" />
+		<id property="maxHopNum" column="max_hop_num" />
 	</resultMap>
 	
 	<sql id="getApp">
@@ -112,6 +116,18 @@
 			<if test="oauthAppId!=null">
 				oauth_app_id = #{oauthAppId},
 			</if>
+			<!-- <if test="routePolicy!=null">
+				route_policy = #{routePolicy},
+			</if>
+			<if test="nodeMaxPrice!=null">
+				node_max_price = #{nodeMaxPrice},
+			</if>
+			<if test="maxHopNum!=null">
+				max_hop_num = #{maxHopNum},
+			</if>
+			<if test="routeNum!=null">
+				route_num = #{routeNum},
+			</if> -->
 		</set>
 		where app_sid=#{appSid} and sid=#{sid}
  	</update>

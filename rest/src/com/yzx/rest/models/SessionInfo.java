@@ -35,6 +35,8 @@ public class SessionInfo extends BaseInfo{
 	private String dstApPort;
 	private String notifyUrl;
 	private String switchFlag;
+	private String maxPrice;
+	private String oneSide;
 	private Integer lost;
 	private SessionInfo serverStatus;
 	
@@ -207,5 +209,17 @@ public class SessionInfo extends BaseInfo{
 	}
 	public void setLost(Integer lost) {
 		this.lost = lost;
+	}
+	public String getMaxPrice() {
+		return maxPrice;
+	}
+	public void setMaxPrice(String maxPrice) {
+		this.maxPrice = maxPrice;
+	}
+	public String getOneSide() {
+		return oneSide;
+	}
+	public void setOneSide(String oneSide) {
+		this.oneSide = oneSide;
 	}
 }

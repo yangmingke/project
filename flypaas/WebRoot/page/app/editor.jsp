@@ -149,6 +149,123 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 				<div class="edit_box edit_advanced">
 					<h1>高级配置</h1>
 					<div class="edit_ctn">
+						<%-- <div class="edit_field">
+							<dl>
+								<dt>路由策略</dt>
+								<dd class="dd_nobg">
+									<div class="select">
+										<span class="select_txt" id="route_policy">质量优先<i>&nbsp;</i></span>
+										<ul>
+										<s:if test="routePolicyList!=null" >
+											<s:iterator value="routePolicyList" var="p">
+												<s:if test="#p.paramKey!=0">
+													<li <s:if test="app.routePolicy==#p.paramKey">class="selected"</s:if> value="${p.paramKey}"><s:property value="#p.paramValue" /></li>
+													<s:if test="app.routePolicy==#p.paramKey">
+														<script type="text/javascript">
+															var routePolicy = "${app.routePolicy}";
+															var key = "${p.paramKey}";
+															var value="${p.paramValue}";
+															if(routePolicy==key){
+																$("#route_policy").html(value+"<i>&nbsp;</i>");
+															}
+														</script>
+													</s:if>
+												</s:if>
+											</s:iterator>
+										</s:if>
+										</ul>
+										<input type="hidden" name="app.routePolicy" value="${app.routePolicy }" id="routePolicy"/>
+										<span id="routePolicy_error"  class="error" style="display:none"></span>
+									</div>
+								</dd>						
+							</dl>
+						</div>
+						<div class="edit_field">
+							<dl>
+								<dt>会话路由数</dt>
+								<dd class="dd_nobg">
+									<div class="select">
+										<span class="select_txt" id="route_num">1条<i>&nbsp;</i></span>
+										<ul>
+										<s:if test="routeNumList!=null" >
+											<s:iterator value="routeNumList" var="p">
+												<s:if test="#p.paramKey!=0">
+													<li <s:if test="app.routeNum==#p.paramKey">class="selected"</s:if> value="${p.paramKey}"><s:property value="#p.paramValue" /></li>
+													<s:if test="app.routeNum==#p.paramKey">
+														<script type="text/javascript">
+															var routeNum = "${app.routeNum}";
+															var key = "${p.paramKey}";
+															var value="${p.paramValue}";
+															if(routeNum==key){
+																$("#route_num").html(value+"<i>&nbsp;</i>");
+															}
+														</script>
+													</s:if>
+												</s:if>
+											</s:iterator>
+										</s:if>
+										</ul>
+										<input type="hidden" name="app.routeNum" value="${app.routeNum}" id="routeNum"/>
+										<span id="routeNum_error"  class="error" style="display:none"></span>
+									</div>
+								</dd>						
+							</dl>
+						</div>
+						<div class="edit_field edit_verify">
+							<dl>
+								<dt>节点最高单价</dt>
+								<dd>
+									<h2>
+										<input type="checkbox" id="maxPriceCk" <s:if test="app.nodeMaxPrice!=null && app.nodeMaxPrice > 0">checked="checked"</s:if>/>
+										开启
+										<span class="tips">限制节点单跳最高单价（分/GB），默认无限制</span>
+									</h2>
+									<div class="set_box set_box1">
+										<ul>
+											<li class="set_tit">
+												节点最高单价
+											</li>
+											<li class="set_ctn">
+												<input type="text" name="app.nodeMaxPrice" id="nodeMaxPrice" 
+												onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" 
+												onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+												<s:if test="app.nodeMaxPrice!=null && app.nodeMaxPrice > 0"> value="${app.nodeMaxPrice }" </s:if>/>
+												<span>（分/GB）</span>
+												<span id="nodeMaxPrice_error" class="error" style="display:none;"></span>
+											</li>
+										</ul>	
+									</div>
+									<div class="clear"></div>
+								</dd>
+							</dl>
+						</div>
+						<div class="edit_field edit_verify">
+							<dl>
+								<dt>路由最大跳数</dt>
+								<dd>
+									<h2>
+										<input type="checkbox" id="maxHopNumCk" <s:if test="app.maxHopNum!=null && app.maxHopNum > 0">checked="checked"</s:if>/>
+										开启
+										<span class="tips">限制路由最大跳数，默认无限制</span>
+									</h2>
+									<div class="set_box set_box1">
+										<ul>
+											<li class="set_tit">
+												路由最大跳数
+											</li>
+											<li class="set_ctn">
+												<input type="text" name="app.maxHopNum" id="maxHopNum" 
+												onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" 
+												onafterpaste="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}"
+												<s:if test="app.maxHopNum!=null && app.maxHopNum > 0"> value="${app.maxHopNum }" </s:if>/>
+												<span id="maxHopNum_error" class="error" style="display:none;"></span>
+											</li>
+										</ul>	
+									</div>
+									<div class="clear"></div>
+								</dd>
+							</dl>
+						</div> --%>
 						<div class="edit_field">
 									<dl>
 										<dt>回调地址功能配置</dt>
@@ -391,6 +508,25 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 					$(this).parents("dd").not(".dd_nobg").css("padding-bottom","0px");
 				}
 			});
+			
+			$('#maxPriceCk').click(function(){
+				if($(this).attr("checked")==undefined){
+					$("#nodeMaxPrice").val("");
+				}
+			});
+			
+			$('#maxHopNumCk').click(function(){
+				if($(this).attr("checked")==undefined){
+					$("#maxHopNum").val("");
+				}
+			});
+			
+			$('#routeNumCk').click(function(){
+				if($(this).attr("checked")==undefined){
+					$("#routeNum").val("");
+				}
+			});
+			
 			$("#znyzck").click(function(){
 				if($(this).attr("checked")=="checked"){
 					$("#znyzckid").val("<u:des3 value='1'/>");

@@ -92,7 +92,13 @@
 				<tbody>
 					<tr>
 						<th>会话路由数</th>
-						<th><input type="text" id="route_num" name="route_num" value="${data.app.route_num}" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')"/>条</th>
+						<th>
+							<%-- <input type="text" id="route_num" name="route_num" value="${data.app.route_num}" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')"/>条 --%>
+							<select class="developer_select" name="route_num">
+								<option value="1" <s:if test="data.app.route_num == 1">selected="selected"</s:if>>1条</option>
+								<option value="2" <s:if test="data.app.route_num == 2">selected="selected"</s:if>>2条</option>
+							</select>
+						</th>
 					</tr>
 				</tbody>
 			</table>
@@ -114,7 +120,7 @@
 				<tbody>
 					<tr>
 						<th>节点最高单价</th>
-						<th><input type="text" id="node_max_price" name="node_max_price" value="${data.app.node_max_price}" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')"/>分/KB</th>
+						<th><input type="text" id="node_max_price" name="node_max_price" value="${data.app.node_max_price}" onkeyup="this.value=this.value.replace(/[^0-9]/g,'')"/>分/GB</th>
 					</tr>
 				</tbody>
 			</table>

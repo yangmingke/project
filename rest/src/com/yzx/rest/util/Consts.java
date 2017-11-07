@@ -170,7 +170,7 @@ public class Consts{
     public static final String C100013="100013";//没有测试子账号
     public static final String C100014="100014";//金额过大,不要超过12位数字
     public static final String C100016="100016";//钱包不可用(被冻结/已注销)
-//    public static final String C100017="100017";//余额已注销
+    //public static final String C100017="100017";//余额已注销
     public static final String C100018="100018";//通话时长需大于60秒
     public static final String C100699="100699";//系统内部错误
     public static final String C100019="100019";//应用餘額不足
@@ -198,7 +198,7 @@ public class Consts{
     public static final String C101112="101112";//主账户ID为空
     public static final String C101113="101113";//请求包头Authorization参数中账户ID跟请求地址中的账户ID不一致
     public static final String C101114="101114";//请求地址Sig参数为空
-    public static final String C101115="101115";//请求token校验失败
+    public static final String C101115="101115";//请求Authorization与sig不匹配
     public static final String C101116="101116";//主账号sig加密串不匹配
     public static final String C101117="101117";//主账号token不存在
     public static final String C101118="101118";//主账户/密码错误或者不存在新demo
@@ -349,24 +349,24 @@ public class Consts{
     public static final String C109="109";//109：该通道类型没有第三方通道
     public static final int MAX_NUMBER=12;//
     //路由申请释放
-    public static final String C106000="C106000";//会话cookie为空
-    public static final String C106001="C106001";//来源方的公网IP为空
-    public static final String C106002="C106002";//来源方的公网IP格式不匹配
-    public static final String C106003="C106003";//目的方的公网IP为空
-    public static final String C106004="C106004";//目的方的公网IP格式不匹配
-    public static final String C106005="C106005";//不存在的资源申请路由策略
-    public static final String C106006="C106006";//非法最大跳数限制
-    public static final String C106007="C106007";//非法请求的路由数
-    public static final String C106008="C106008";//不存在的协议类型
-    public static final String C106009="C106009";//账户余额不足
-    public static final String C106010="C106010";//请求参数错误，或cookie对应会话未释放
-    public static final String C106011="C106011";//请求参数srcApList格式错误
-    public static final String C106012="C106012";//请求参数dstApList格式错误
-    public static final String C106013="C106013";//请求参数udpportnum格式错误
-    public static final String C106014="C106014";//请求参数vflag格式错误
-    public static final String C106015="C106015";//用户钱包状态异常
-    public static final String C106016="C106016";//请求参数switchFlag格式错误
-    
+    public static final String C106000="106000";//会话cookie为空
+    public static final String C106001="106001";//来源方的公网IP为空
+    public static final String C106002="106002";//来源方的公网IP格式不匹配
+    public static final String C106003="106003";//目的方的公网IP为空
+    public static final String C106004="106004";//目的方的公网IP格式不匹配
+    public static final String C106005="106005";//不存在的资源申请路由策略
+    public static final String C106006="106006";//非法最大跳数限制
+    public static final String C106007="106007";//非法请求的路由数
+    public static final String C106008="106008";//不存在的协议类型
+    public static final String C106009="106009";//账户余额不足
+    public static final String C106010="106010";//请求参数错误，或cookie对应会话未释放
+    public static final String C106011="106011";//请求参数srcApList格式错误
+    public static final String C106012="106012";//请求参数dstApList格式错误
+    public static final String C106013="106013";//请求参数udpportnum格式错误
+    public static final String C106014="106014";//请求参数vflag格式错误
+    public static final String C106015="106015";//用户钱包状态异常
+    public static final String C106016="106016";//请求参数switchFlag格式错误
+    public static final String C106017="106017";//非法最高节点单价限制
   //method
     public final static String INTFACE_M_ACCOUNTINFO = "m:accountInfo";
     public final static String INTFACE_M_GET_SQL = "m:getSql";

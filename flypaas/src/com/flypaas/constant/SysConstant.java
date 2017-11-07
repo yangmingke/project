@@ -76,6 +76,10 @@ public class SysConstant {
 	public static final String INDUSTRY="industry" ;
 	//应用类型
 	public static final String APP_KIND="app_kind" ;
+	//路由策略
+	public static final String ROUTE_POLICY = "route_policy";
+	//路由策略
+	public static final String ROUTE_NUM = "route_num";
 	//充值类型
 	public static final String RECHARGE_TYPE="recharge_type" ;
 	//回调函数功能数据字典标示

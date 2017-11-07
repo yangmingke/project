@@ -31,6 +31,7 @@
     <result column="audit_date" property="auditDate" jdbcType="TIMESTAMP" />
     <result column="areaid" property="routeArea" jdbcType="VARCHAR" />
     <result column="is_bdr" property="isBdr" jdbcType="INTEGER"/>
+    <result column="note" property="note" jdbcType="VARCHAR"/>
   </resultMap>
   
   <resultMap id="ResultMap" type="com.flypaas.model.vo.Resource_City" >
@@ -59,6 +60,7 @@
     <result column="audit_date" property="auditDate" jdbcType="TIMESTAMP" />
     <result column="areaid" property="routeArea" jdbcType="VARCHAR" />
     <result column="is_bdr" property="isBdr" jdbcType="INTEGER"/>
+    <result column="note" property="note" jdbcType="VARCHAR"/>
     <association property="city"  javaType="com.flypaas.model.TbRsCity">
     	<id column="id" property="id" jdbcType="INTEGER" />
 	    <result column="area" property="area" jdbcType="VARCHAR" />
@@ -78,7 +80,7 @@
   <sql id="Base_Column_List" >
     rnode_id, net_sid, name, ip, main_ip, operator, type, net_level, city, area,province,country, continent,price, 
     block_price, is_to_line, to_ip, bandwidth_limit, concurrency_limit, status, create_date, 
-    update_date, audit_date,areaid,is_bdr,from_ip,sign_ip,media_ip,ping_ip
+    update_date, audit_date,areaid,is_bdr,from_ip,sign_ip,media_ip,ping_ip,note
   </sql>
   
   <select id="checkIp" resultMap="BaseResultMap" parameterType="java.lang.String">
@@ -475,6 +477,9 @@
       </if>
       <if test="isBdr != null" >
         is_bdr = #{isBdr,jdbcType=INTEGER},
+      </if>
+      <if test="note != null" >
+        note = #{note,jdbcType=VARCHAR},
       </if>
         from_ip = #{fromIp,jdbcType=INTEGER},
         sign_ip = #{signIp,jdbcType=INTEGER},

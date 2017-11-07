@@ -57,7 +57,9 @@ public class AppAction extends BaseAction{
 	private List<Application> appList;
 	private List<Params> cbfunList ;
 	private List<Params> appKindList;
+	private List<Params> routePolicyList;
 	private List<Params> cloudList ;
+	private List<Params> routeNumList;
 	private List<TbSrvCallback> cbInfoList ;
 	private List<Client> clientList;
 	private List<TestNumber> testNumList;
@@ -194,6 +196,8 @@ public class AppAction extends BaseAction{
 		appKindList = getParams(SysConstant.APP_KIND);
 		paramsList = getParams(SysConstant.INDUSTRY);
 		cloudList = getParams(SysConstant.PARAMS_KEY);
+		routePolicyList = getParams(SysConstant.ROUTE_POLICY);
+		routeNumList = getParams(SysConstant.ROUTE_NUM);
 		//功能
 		cbfunList = getParams(SysConstant.CALLBACKFUN);
 		//回调
@@ -298,7 +302,18 @@ public class AppAction extends BaseAction{
 		}
 		String sid = getSessionUser().getSid();
 		app.setSid(sid);
-		
+		/*if(StrUtil.isEmpty(app.getMaxHopNum())){
+			app.setMaxHopNum("0");;
+		}
+		if(StrUtil.isEmpty(app.getRouteNum())){
+			app.setRouteNum("1");;
+		}
+		if(StrUtil.isEmpty(app.getRoutePolicy())){
+			app.setRoutePolicy("1");;
+		}
+		if(StrUtil.isEmpty(app.getNodeMaxPrice())){
+			app.setNodeMaxPrice("0");;
+		}*/
 		appService.updateApp(app, whiteListStr, cbfunStr, cbfunurlStr, cbfunmethodStr, response, validFile,type);
 		//刷新redis
 		RefreshRedis.updateApp(app.getAppSid(),sid);
@@ -619,6 +634,18 @@ public class AppAction extends BaseAction{
 	}
 	public void setValidFileFileName(String validFileFileName) {
 		this.validFileFileName = validFileFileName;
+	}
+	public List<Params> getRoutePolicyList() {
+		return routePolicyList;
+	}
+	public void setRoutePolicyList(List<Params> routePolicyList) {
+		this.routePolicyList = routePolicyList;
+	}
+	public List<Params> getRouteNumList() {
+		return routeNumList;
+	}
+	public void setRouteNumList(List<Params> routeNumList) {
+		this.routeNumList = routeNumList;
 	}
 	
 	

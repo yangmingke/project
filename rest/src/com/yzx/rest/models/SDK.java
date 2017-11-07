@@ -11,6 +11,8 @@ public class SDK extends BaseInfo{
 	private String SDKID;
 	private String appId;
 	private String createDate;
+	private String start;
+	private String limit;
 	public String getSDKID() {
 		return SDKID;
 	}
@@ -28,5 +30,17 @@ public class SDK extends BaseInfo{
 	}
 	public void setCreateDate(String createDate) {
 		this.createDate = createDate;
+	}
+	public String getStart() {
+		return start;
+	}
+	public void setStart(String start) {
+		this.start = start;
+	}
+	public String getLimit() {
+		return limit;
+	}
+	public void setLimit(String limit) {
+		this.limit = limit;
 	}
 }

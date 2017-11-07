@@ -28,7 +28,10 @@ public class Application implements Serializable {
 	private Date auditDate;
 	private String paramValue;
 	private String brand;
-	
+	private String maxHopNum;
+	private String routeNum;
+	private String routePolicy;
+	private String nodeMaxPrice;
 	private Integer callFr;
 	private String ckKey;
 	private String ckCallbackUrl;
@@ -227,6 +230,30 @@ public class Application implements Serializable {
 	}
 	public void setOauthAppId(String oauthAppId) {
 		this.oauthAppId = oauthAppId;
+	}
+	public String getMaxHopNum() {
+		return maxHopNum;
+	}
+	public void setMaxHopNum(String maxHopNum) {
+		this.maxHopNum = maxHopNum;
+	}
+	public String getRouteNum() {
+		return routeNum;
+	}
+	public void setRouteNum(String routeNum) {
+		this.routeNum = routeNum;
+	}
+	public String getRoutePolicy() {
+		return routePolicy;
+	}
+	public void setRoutePolicy(String routePolicy) {
+		this.routePolicy = routePolicy;
+	}
+	public String getNodeMaxPrice() {
+		return nodeMaxPrice;
+	}
+	public void setNodeMaxPrice(String nodeMaxPrice) {
+		this.nodeMaxPrice = nodeMaxPrice;
 	}
 	
 }

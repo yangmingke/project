@@ -123,6 +123,8 @@ public class UserServiceImpl extends DaoCenter implements UserService {
 	public synchronized void activaUser(TbFlypaasUser user) {
 		String sid = user.getSid();
 		user.setStatus(UserConstant.STATUS_1);
+		user.setOauthStatus(UserConstant.AUTH_STATUS_3);
+		user.setUserType(UserConstant.USER_TYPE_2);
 		//生成测试应用
 		String appSid = StrUtil.getUUID();
 		addApp(appSid,sid);

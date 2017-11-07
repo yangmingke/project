@@ -363,4 +363,19 @@ public interface AccountService {
 	@Consumes({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
 	public ListResp dropSDKID(@PathParam("version") String version,@PathParam("accountSid") String accountSid,@HeaderParam("Authorization") String auth,
 			@QueryParam("sig") String sig,SDK sdk);
+	
+	/**
+	 * 子账号分页查询接口（公共接口）
+	 * @param version
+	 * @param accountSid
+	 * @param auth
+	 * @param sig
+	 * @param client
+	 * @return
+	 */
+	@POST
+    @Path("/SDKIDList")
+	@Consumes({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
+	public ListResp findSDKIDs(@PathParam("version") String version,@PathParam("accountSid") String accountSid,@HeaderParam("Authorization") String auth,
+			@QueryParam("sig") String sig,SDK sdk);
 }

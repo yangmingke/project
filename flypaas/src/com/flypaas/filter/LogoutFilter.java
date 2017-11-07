@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.flypaas.entity.TbFlypaasUser;
 import com.flypaas.utils.StrUtil;
@@ -99,8 +101,7 @@ public class LogoutFilter implements Filter  {
 
 	public void doFilter(ServletRequest req, ServletResponse resp,
 			FilterChain chain) throws IOException, ServletException {
-		
-
+		Log log = LogFactory.getLog(LogoutFilter.class);
 		HttpServletRequest request = (HttpServletRequest) req;
 		HttpServletResponse  response = (HttpServletResponse ) resp;
         String requstURI = request.getRequestURI();
@@ -115,6 +116,7 @@ public class LogoutFilter implements Filter  {
 		Object u = session.getAttribute("user");
 		if(u==null){
 			String return_url = StrUtil.getCookiValue(request, SysConfig.getInstance().getProperty("return_url"));
+			log.info("cookie中取得“return_url”的值为:" + return_url);
 			response.sendRedirect(StringUtils.isEmpty(return_url) ? "/noLogin" : return_url);
 			return;
 		}else{

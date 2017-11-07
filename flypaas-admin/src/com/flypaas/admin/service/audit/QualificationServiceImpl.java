@@ -89,7 +89,7 @@ public class QualificationServiceImpl implements QualificationService {
 			templateParams.put("developer_email", params.get("email"));
 			templateParams.put("reason", params.get("audit_desc"));
 			msgService.sendMsg(sid, MsgType.system_msg, templateId, templateParams);// 发送消息
-			RedisUtils.flushDeveloperCache(sid);// 刷新前台缓存信息 by yangmingke
+			RedisUtils.flushDeveloperCache(sid);// 刷新前台缓存信息 
 			data.put("result", "success");
 			data.put("msg", msg + "成功");
 		} else {

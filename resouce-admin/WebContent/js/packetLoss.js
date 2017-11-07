@@ -11,9 +11,9 @@ function init(){
 	$.post("/operation/queryPaketLoss",{"ip":$('#ip').val(),"date":$('#dateTime').val()},function(data){
 		var json = eval("("+data+")");
 		createMap(json);
-		if(json.today == json.date){
+		/*if(json.today == json.date){
 			ref();
-		}
+		}*/
 	});
 }
 

@@ -10,6 +10,12 @@ public class SysConstant {
 	public static final String sidBaseString="ucp2014_sid"+StrUtil.getRandom4();
 	public static final String tokenBaseString="ucp2014_token"+StrUtil.getRandom4();
 	
+	//RTPC的IP
+	public static final String RTPP_RTPC_IP="rtpp_rtpc_ip";
+	
+	//RTPC的IP
+		public static final String RTPP_RTPC_PORT="10088";
+	
 	//邮箱验证
 	public static final String V_MIAL_TYPE="1";
 	

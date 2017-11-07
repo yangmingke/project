@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.flypaas.constant.RouterConstant;
-import com.flypaas.model.RouteAnalysis;
 import com.flypaas.service.route.RouteService;
 import com.flypaas.util.PageContainer;
 import com.flypaas.util.StrUtil;

@@ -12,10 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.flypaas.cdr.dao.LostRateMapper;
+import com.flypaas.cdr.dao.NodeConcurrenceMapper;
 import com.flypaas.dao.TbRsRTPPMapper;
+import com.flypaas.model.TbRsNodeConcurrence;
 import com.flypaas.model.TbRsSessRealtimeLost;
 import com.flypaas.service.operation.OperationService;
 import com.flypaas.util.JsonUtil;
+import com.flypaas.util.StrUtil;
 
 /**
 * @author 作者 yangmingke:
@@ -30,10 +33,27 @@ public class OperationServiceImpl implements OperationService{
 	LostRateMapper lostRateMapper;
 	@Autowired
 	TbRsRTPPMapper tbRsRTPPMapper;
+	@Autowired
+	NodeConcurrenceMapper nodeConcurrenceMapper;
 	
 	@Override
 	public List<String> queryAllRTPP(){
-		return tbRsRTPPMapper.queryAllRTPP();
+		LinkedList<String> ipAddressList = new LinkedList<String>();
+		List<String> tempList = tbRsRTPPMapper.queryAllRTPP();
+		for(String ip : tempList){//升序去重
+			int i = 0;
+			for(String ipAddress : ipAddressList){
+				if(StrUtil.firstIpAddressIsLess(ip, ipAddress)){
+					ipAddressList.add(i,ip);
+					break;
+				}
+				i++;
+			}
+			if(ipAddressList.size() == i){
+				ipAddressList.addLast(ip);
+			}
+		}
+		return ipAddressList;
 	}
 	
 	@Override
@@ -127,6 +147,35 @@ public class OperationServiceImpl implements OperationService{
 		model.put("resultList", analysisResultList);//用于列表显示
 		model.put("resultJson", JsonUtil.toJsonStr(analysisResultList));//用于画曲线图
 		return model;
+	}
+
+	@Override
+	public Map<String, Object> queryNodeConcurrent(String date) {
+		date = date.replaceAll("-", "");
+		Map<String, String> para = new HashMap<String, String> ();
+		para.put("date", date);
+		para.put("month", date.substring(0, 6));
+		List<TbRsNodeConcurrence> nodeConcurrenceList = nodeConcurrenceMapper.queryNodeConcurrent(para);
+		Map<String,List> nodesData = new HashMap<String,List>();
+		List<String> timeList = new ArrayList<String>();
+		for(TbRsNodeConcurrence tbRsNodeConcurrence : nodeConcurrenceList){
+			String time = tbRsNodeConcurrence.getDatetimeStr();
+			if(!timeList.contains(time)){
+				timeList.add(time);
+			}
+			String ip = tbRsNodeConcurrence.getIp();
+			if(nodesData.containsKey(ip)){
+				nodesData.get(ip).add(tbRsNodeConcurrence);
+			}else{
+				List NodeConcurrence = new ArrayList();
+				NodeConcurrence.add(tbRsNodeConcurrence);
+				nodesData.put(ip, NodeConcurrence);
+			}
+		}
+		Map<String, Object> result = new HashMap();
+		result.put("nodeData", nodesData);
+		result.put("time", timeList);
+		return result;
 	}
 	
 	
