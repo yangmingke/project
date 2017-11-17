@@ -95,14 +95,17 @@
 		window.history.go(-1);
 	}
 	function apply_ench(){
+		$("button").attr("disabled", true); 
 		var balance = Number($('#balance').val());
 		var actualFee = Number($('#actualFee').val());
 		if(balance < actualFee){
 			 $("#actualFeeTips").text("“提款金额”不能大于“账户余额”");
+			 $("button").attr("disabled", false); 
 			return false;
 		}
 		if(actualFee == 0){
 			 $("#actualFeeTips").text("“提款金额”不能为0");
+			 $("button").attr("disabled", false); 
 			return false;
 		}
 		$('#dataForm').submit();

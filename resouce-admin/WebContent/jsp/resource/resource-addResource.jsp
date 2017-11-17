@@ -270,6 +270,7 @@
 
 //--------------------------------------------提交表单---------------------------------------------------//		
 	$('#addBtn').click(function(){
+		$("button").attr("disabled", true); 
 		//ip地址正则表达式
 		var ip = /^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$/g;
 		//var ip1 = /^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$/g;
@@ -284,18 +285,22 @@
 		
 		if(netSid=="" || netName==""){
 			window.wxc.xcConfirm("请选择资源方", window.wxc.xcConfirm.typeEnum.info);
+			$("button").attr("disabled", false); 
 			return false;
 		}
 		if(!nameReg.test(name)){
 			window.wxc.xcConfirm("节点名称只能输入字母、数字、 ‘.' 、‘_'", window.wxc.xcConfirm.typeEnum.info);
+			$("button").attr("disabled", false); 
 			return false;
 		}
 		if(name==""){
 			window.wxc.xcConfirm("节点名称不能为空", window.wxc.xcConfirm.typeEnum.info);
+			$("button").attr("disabled", false); 
 			return false;
 		}
 		if(!ip.test(ipId)){
 			window.wxc.xcConfirm("请输入正确的节点IP地址格式", window.wxc.xcConfirm.typeEnum.info);
+			$("button").attr("disabled", false); 
 			return false;
 		}
 		if(toIpId!=""){
@@ -305,16 +310,19 @@
 				var tempIp = toIpIdList[i];
 				if(!ipReg.test(tempIp)){
 					window.wxc.xcConfirm("请输入正确格式的专线IP", window.wxc.xcConfirm.typeEnum.info);
+					$("button").attr("disabled", false); 
 					return false;
 				}
 			}
 		}
 		if(price == ""){
 			window.wxc.xcConfirm("价格不能为空", window.wxc.xcConfirm.typeEnum.info);
+			$("button").attr("disabled", false); 
 			return false;
 		}
 		if(routeArea==""){
 			window.wxc.xcConfirm("路由区域不能为空", window.wxc.xcConfirm.typeEnum.info);
+			$("button").attr("disabled", false); 
 			return false;
 		}
 		/*$.post("/resourceController/checkIp.action",{"ip":ipId},function(data){
@@ -327,6 +335,7 @@
 			contentType: "application/x-www-form-urlencoded; charset=utf-8",
 			success : function(data) { 
 	        	var json = eval("("+data+")");
+	        	$("button").attr("disabled", false); 
 	        	if(json == 0){
 	        		window.wxc.xcConfirm("添加失败", window.wxc.xcConfirm.typeEnum.info);
 	        	}
@@ -342,6 +351,7 @@
 	        	}
 	        },
 	        error:function(code){   
+	        	$("button").attr("disabled", false); 
 	        	window.wxc.xcConfirm("Sorry.服务器出错", window.wxc.xcConfirm.typeEnum.info);
 	        }   
 		});

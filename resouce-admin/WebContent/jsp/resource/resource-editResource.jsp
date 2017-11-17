@@ -379,8 +379,8 @@
 		       <th class="text-right">
 		       	  <label>备注：</label>
 		       </th>
-		       <td colspan="3">
-		          <textarea name="note" class="input" style="height:150px; border:1px solid #ddd;" id="note">${tbRsRTPP.note}</textarea>
+		       <td>
+		          <textarea name="note" class="input" style="height:80px; border:1px solid #ddd;" id="note">${tbRsRTPP.note}</textarea>
 		       </td>
 		    </tr>
 	    </table>
