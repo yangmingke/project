@@ -52,12 +52,15 @@
 			</li>
 			 --%>
 			 
-			<li>
+			<%-- <li>
 				<input type="text" name="sale_name" value="<s:property value="#parameters.sale_name"/>" maxlength="40" placeholder="销售经理" class="txt_127" />
-			</li>
+			</li> --%>
             <li>
 				<input type="submit" value="查 询" class="search"/>
 			</li>
+			 <li>
+           		<a href="javascript:;" onclick="addDeveloper()">创建开发者</a>
+            </li>
            </ul>
       </form>
       </div>
@@ -152,6 +155,13 @@
 									| <a href="javascript:;" onclick="setProxy(this, '${sid}', 0)">取消为代理商</a>
 						      	</s:if>
 						   	</span> --%>
+				      	</span>
+				      	<span>
+					      	<span name="isProxy_0" ${is_proxy==0 && status == 1? "" : "style='display:none;'"}>
+						      	<s:if test="menuId_131">
+									| <a href="javascript:;" onclick="createApp('${sid}','${username}')">创建应用</a>
+						      	</s:if>
+						    </span>
 				      	</span>
 					</td>
 			      </tr>
@@ -266,6 +276,14 @@ function notice(sid){
 //主账号
 function mainAccount(sid){
 	location.href="${ctx}/developer/mainAccount?sid=" + sid;
+}
+//创建开发者
+function addDeveloper(){
+	location.href="${ctx}/developer/createView";
+}
+//创建应用
+function createApp(sid,username){
+	location.href="${ctx}/app/createAppView?sid=" +sid+"&username="+encodeURI(encodeURI(username)) ;
 }
 </script>
 </body>

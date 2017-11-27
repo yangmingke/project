@@ -209,4 +209,27 @@
 			app.app_sid = #{app_sid}
 	</update>
 	
+	<!-- add -->
+	<insert id="add">
+	 <![CDATA[
+		insert into
+		tb_ucpaas_application(app_sid,sid,app_kind,app_name,industry,is_ivr,is_tts,is_show_nbr,
+		status,create_date,update_date,app_type,sms_msg_nbr,audit_date,is_voicecodenbr_status,
+		is_officernbr_status,call_fr,ck_key,ck_callback_url,ck_enddate,ck_way,ck_num,brand,oauth_file_url,oauth_app_id) 
+		values(#{appSid},#{sid},#{appKind},#{appName},#{industry},#{isIvr},#{isTts},#{isShowNbr}
+		,#{status},#{createDate},#{updateDate},#{appType},#{smsMsgNbr},#{auditDate},#{isVoicecodenbrStatus}
+		,#{isOfficernbrStatus},#{callFr},#{ckKey},#{ckCallbackUrl},#{ckEnddate},#{ckWay},#{ckNum},#{brand},#{oauthFileUrl},#{oauthAppId})
+		]]>
+ 	</insert>
+ 	
+ 	<select id="appNameOfDeveloperExist" resultType="Map">
+		select count(*) totalCount from tb_ucpaas_application where app_name=#{appName} and sid=#{sid} and status!='3'
+	</select>
+	
+	<insert id="addWhiteList">
+	<![CDATA[
+		insert into
+		tb_srv_white_list(app_sid,white_address,w_type,brand_id) values(#{appSid},#{whiteAddress},#{wType},#{brandId})
+		]]>
+	</insert>
 </mapper> 

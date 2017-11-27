@@ -203,4 +203,7 @@
 		where sid=#{sid} 
 	</update>
 
+	<insert id="addAcctBalance">
+		insert tb_bill_acct_balance(sid,balance,enable_flag,create_time,valid_date,vip_valid_date) values(#{sid},#{balance},#{enableFlag},#{createTime},#{validDate},#{vipValidDate});
+	</insert>
 </mapper> 

@@ -1,5 +1,8 @@
 package com.flypaas.admin.service.data;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +20,7 @@ import com.flypaas.admin.constant.SysConstant;
 import com.flypaas.admin.dao.MasterDao;
 import com.flypaas.admin.model.PageContainer;
 import com.flypaas.admin.service.LogService;
+import com.flypaas.admin.util.StrUtils;
 import com.flypaas.admin.util.cache.RedisUtils;
 
 /**
@@ -122,5 +126,73 @@ public class AppServiceImpl implements AppService {
 		}
 		logService.add(LogType.update, "信息管理-应用管理：设置品牌", params, data);
 		return data;
+	}
+
+	@Override
+	public Map<String, Object> createView(Map<String, String> params) throws UnsupportedEncodingException {
+		Map<String, Object> data = new HashMap<String, Object>();
+		data.put("sid", params.get("sid"));
+		data.put("username", URLDecoder.decode(params.get("username"), "utf-8"));
+		
+		List<Map<String, Object>> appKindList = dao.getSearchList("params.queryParamsByType","app_kind");
+		data.put("appKindList", appKindList);
+		
+		List<Map<String, Object>> industryList = dao.getSearchList("params.queryParamsByType","industry");
+		data.put("industryList", industryList);
+		
+		return data;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public Map<String, Object> create(Map params) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		int appCount = dao.getSearchSize("app.appNameOfDeveloperExist", params);
+		if(appCount > 0){
+			data.put("result", "fail");
+			data.put("msg", "应用名称已被占用！创建失败");
+			return data;
+		}
+		String uuid = StrUtils.getUUID();
+		params.put("appSid", uuid);
+		params.put("createDate", new Date());
+		params.put("updateDate", new Date());
+		params.put("appType", AppConstant.APP_TYPE);
+		params.put("status", AppConstant.STATUS_1);
+		params.put("callFr", 0);
+		params.put("ckNum", 0);
+		params.put("brand", AppConstant.APP_BRAND);
+		int count = addApp(params);
+		if(count == 0){
+			data.put("result", "fail");
+			data.put("msg", "创建失败，请联系管理员");
+			return data;
+		}
+		data.put("result", "success");
+		data.put("msg", "创建成功");
+		return data;
+	}
+
+	private int addApp(Map<String, Object> params) {
+		//应用
+		int count = dao.insert("app.add", params);
+		//白名单
+		String uuid = (String) params.get("appSid");
+		String whiteListStr = (String) params.get("whiteListStr");
+		if(whiteListStr!=null && whiteListStr.length()>0){
+			createWhiteList(uuid,whiteListStr);
+		}
+		return count;
+	}
+
+	private void createWhiteList(String appSid,String whiteListStr){
+		Map<String, Object> whiteList = new HashMap<String, Object>();
+		whiteList.put("appSid", appSid);
+		whiteList.put("whiteAddress", whiteListStr);
+		whiteList.put("wType", AppConstant.WHITE_TYPE);
+		whiteList.put("createDate", new Date());
+		whiteList.put("ipdateDate", new Date());
+		whiteList.put("status", AppConstant.CHECK_STATUS);
+		dao.insert("app.addWhiteList", whiteList);
 	}
 }

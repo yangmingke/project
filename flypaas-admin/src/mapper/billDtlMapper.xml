@@ -23,4 +23,8 @@
 		update tb_srv_remind set status = 0 where sid=#{sid} and remind_type=1
 	</update>
 	
+	<insert id="addPayOrder" useGeneratedKeys="true" keyProperty="orderId">
+		insert tb_srv_payment_order(sid,pay_id,charge,charge_type,status,create_date,pay_date,account_type,app_sid) values(#{sid},#{payId},#{charge},#{chargeType},#{status},#{createDate},#{payDate},#{accountType},#{appSid})
+	</insert>
+	
 </mapper> 

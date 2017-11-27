@@ -27,6 +27,7 @@ import com.flypaas.admin.util.web.StrutsUtils;
 @Results({
 	@Result(name = "query", location = "/WEB-INF/content/data/app/query.jsp") ,
 	@Result(name = "view", location = "/WEB-INF/content/data/app/view.jsp"),
+	@Result(name = "createView", location = "/WEB-INF/content/data/app/create.jsp") ,
 	@Result(name = "update", location = "/WEB-INF/content/data/app/update.jsp")
 })
 public class AppAction extends BaseAction {
@@ -81,6 +82,7 @@ public class AppAction extends BaseAction {
 		return "update";
 	}
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Action("/app/updateApp") 
 	public String updateApp() {
 		StrutsUtils.setAttribute("RING_BASE", ConfigUtils.ring_base_path);
@@ -114,4 +116,27 @@ public class AppAction extends BaseAction {
 		StrutsUtils.renderJson(data);
 	}
 
+	/**
+	 * 创建应用页面
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException 
+	 */
+	@Action("/app/createAppView")
+	public String createAppView() throws UnsupportedEncodingException {
+		data = appService.createView(StrutsUtils.getFormData());
+		return "createView";
+	}
+	
+	/**
+	 * 创建应用
+	 * 
+	 * @return
+	 * @throws UnsupportedEncodingException 
+	 */
+	@Action("/app/createApp")
+	public void createApp(){
+		data = appService.create(StrutsUtils.getFormData());
+		StrutsUtils.renderJson(data);
+	}
 }

@@ -350,4 +350,150 @@
 		update_date = now()
 		where sid = #{sid}
 	</update>
+	
+	<!-- 查找开发者 -->
+	<select id="findeUserByEmail" resultType="map">
+		select * from tb_ucpaas_user 
+		<where>
+			<!-- <if test="mobile!=null">
+				mobile = #{mobile}
+			</if> -->
+			<if test="email!=null">
+				and email = #{email}
+			</if>
+			<if test="sid!=null">
+				and sid = #{sid}
+			</if>
+			<if test="authType!=null and authId!=null">
+				and auth_type = #{authType}
+				and auth_id = #{authId}
+			</if>
+		</where>
+		and user_type!='3' 
+		limit 1
+	</select>
+	<!-- 创建开发者 -->
+	<insert id="insertDeveloper">
+	 <![CDATA[
+		insert into
+		tb_ucpaas_user(sid,token,email,status,user_type,create_date,random_nbr,channel_id,auth_type,auth_id,super_sid,password,oauth_status,mobile,username) 
+		values(#{sid},#{token},#{email},#{status},#{userType},#{createDate},#{randomNbr},#{channelId},#{authType},#{authId},#{superSid},#{password},#{oauthStatus},#{mobile},#{userName})
+		]]>
+ 	</insert>
+	<!--更新帐号信息 -->
+	<update id="updateDeveloper">
+		update tb_ucpaas_user 
+		<set>
+			<if test="status!=null">
+				status = #{status},
+			</if>
+			<if test="email!=null">
+				email = #{email},
+			</if>
+			<if test="mobile!=null">
+				mobile = #{mobile},
+			</if>
+			<if test="chatType!=null">
+				chat_type = #{chatType},
+			</if>
+			<if test="chatNbr!=null">
+				chat_nbr = #{chatNbr},
+			</if>
+			<if test="address!=null">
+				address = #{address},
+			</if>
+			<if test="oconType1!=null">
+				o_con_type1 = #{oconType1},
+			</if>
+			<if test="oconNbr1!=null">
+				o_con_nbr1 = #{oconNbr1},
+			</if>
+			<if test="oconType2!=null">
+				o_con_type2 = #{oconType2},
+			</if>
+			<if test="oconNbr2!=null">
+				o_con_nbr2 = #{oconNbr2},
+			</if>
+			<if test="oconType3!=null">
+				o_con_type3 = #{oconType3},
+			</if>
+			<if test="oconNbr3!=null">
+				o_con_nbr3 = #{oconNbr3},
+			</if>
+			<if test="password!=null">
+				password = #{password},
+			</if>
+			<if test="realname!=null">
+				realname = #{realname},
+			</if>
+			<if test="province!=null">
+				province = #{province},
+			</if>
+			<if test="city!=null">
+				city = #{city},
+			</if>
+			<if test="loginTimes!=0">
+				login_times = #{loginTimes},
+			</if>
+			<if test="guide!=0">
+				guide = #{guide},
+			</if>
+			<if test="token!=null">
+				token = #{token},
+			</if>
+			<if test="idType!=null">
+				id_type = #{idType},
+			</if>
+			<if test="idNbr!=null">
+				id_nbr = #{idNbr},
+			</if>
+			<if test="orgId!=null">
+				org_id = #{orgId},
+			</if>
+			<if test="userType!=null">
+				user_type = #{userType},
+			</if>
+			<if test="updateDate!=null">
+				update_date = #{updateDate},
+			</if>
+			<if test="oauthStatus!=null">
+				oauth_status = #{oauthStatus},
+			</if>
+			<if test="legalPerson!=null">
+				legal_person = #{legalPerson},
+			</if>
+			<if test="companyNbr!=null">
+				company_nbr = #{companyNbr},
+			</if>
+			<if test="webSite!=null">
+				web_site = #{webSite},
+			</if>
+			<if test="userName!=null">
+				userName = #{userName},
+			</if>
+			<if test="revisability!=null">
+				revisability = #{revisability},
+			</if>
+			<if test="oauthDate!=null">
+				oauth_date = #{oauthDate},
+			</if>
+			<if test="isContract!=null">
+				is_contract = #{isContract},
+			</if>
+			<if test="authType!=null and authId!=null">
+				auth_type = #{authType},
+				auth_id = #{authId}
+			</if>
+		</set>
+		where sid=#{sid}
+ 	</update> 	
+ 	
+ 	<insert id="addTestWhilte">
+		insert into tb_ucpaas_test_whitelist(sid,mobile,type,status,create_date)
+		values(#{sid},#{mobile},#{type},#{status},#{createDate})
+	</insert>
+	
+	<insert id="addResetPwdLog" parameterType="map">
+		insert into tb_ucpaas_resetpwd_log(sid,email,ip,create_date) values(#{sid},#{email},#{ip},#{createDate});
+	</insert>
 </mapper> 

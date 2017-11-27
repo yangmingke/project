@@ -31,7 +31,7 @@ public class MD5Util {
 		return sBuffer.toString();
 	}
 
-	static String getMD5Code(String strObj) {
+	public static String getMD5Code(String strObj) {
 		String resultString = null;
 		try {
 			resultString = new String(strObj);

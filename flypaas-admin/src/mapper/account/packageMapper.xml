@@ -325,4 +325,11 @@
 			p.package_id = #{package_id}
 	</select>
 	
+	<select id="getDefaultPck" resultType="map">
+		SELECT * FROM  tb_bill_package where is_default='1'
+	</select>
+	
+	<insert id="addDefaultPck">
+		insert into tb_bill_acct_package_rel(sid,package_id,create_date,update_date) values(#{sid},#{packageId},#{createDate},#{updateDate});
+	</insert>
 </mapper> 

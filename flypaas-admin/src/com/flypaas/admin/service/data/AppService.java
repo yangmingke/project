@@ -1,5 +1,6 @@
 package com.flypaas.admin.service.data;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
 
@@ -44,8 +45,12 @@ public interface AppService {
 	 * @param formData
 	 * @return
 	 */
-	Map<String, Object> saveBrand(Map<String, String> formData);
+	Map<String, Object> saveBrand(Map<String, String> params);
 
 	void update(Map para);
+
+	Map<String, Object> createView(Map<String, String> params) throws UnsupportedEncodingException;
+
+	Map<String, Object> create(Map params);
 
 }

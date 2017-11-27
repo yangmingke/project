@@ -1,11 +1,15 @@
 package com.flypaas.admin.service.data;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +24,12 @@ import com.flypaas.admin.dao.MasterDao;
 import com.flypaas.admin.model.PageContainer;
 import com.flypaas.admin.service.LogService;
 import com.flypaas.admin.util.ConfigUtils;
+import com.flypaas.admin.util.JsonUtils;
+import com.flypaas.admin.util.MD5;
+import com.flypaas.admin.util.StrUtils;
+import com.flypaas.admin.util.api.RestUtils;
 import com.flypaas.admin.util.cache.RedisUtils;
+import com.flypaas.admin.util.encrypt.MD5Util;
 import com.flypaas.admin.util.web.HttpClientUtils;
 
 /**
@@ -37,6 +46,8 @@ public class DeveloperServiceImpl implements DeveloperService {
 	private LogService logService;
 	@Autowired
 	private MsgService msgService;
+	
+	private static final Logger log = LoggerFactory.getLogger(AdminServiceImpl.class);
 
 	@Override
 	public PageContainer query(Map<String, String> params) {
@@ -287,4 +298,166 @@ public class DeveloperServiceImpl implements DeveloperService {
 		return data;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public Map<String, Object> create(Map params) {
+		log.debug("创建开发者：" + params);
+		Map<String, Object> data = new HashMap<String, Object>();
+		
+		Map<String,String> developer = dao.getOneInfo("developer.findeUserByEmail", params);
+		if (developer != null&&!developer.get("status").equals(String.valueOf(UserConstant.STATUS_0))) {
+			data.put("result", "fail");
+			data.put("msg", "邮箱已经被占用");
+			return data;
+		}
+		String sid = null;
+		String token = null;
+		if(developer != null&&!StrUtils.isEmpty(developer.get("sid"))){
+			sid = developer.get("sid");
+		}else{
+			sid = StrUtils.toHMACSHA(UserConstant.sidBaseString + StrUtils.getUUID(), UserConstant.KEY);
+		}
+		if(developer != null&&!StrUtils.isEmpty(developer.get("token"))){
+			token = developer.get("token");
+		}else{
+			token = StrUtils.toHMACSHA(UserConstant.tokenBaseString + StrUtils.getUUID(), UserConstant.KEY);
+		}
+		params.put("sid",sid);
+		params.put("token",token);
+		params.put("status",UserConstant.STATUS_1);
+		params.put("createDate",new Date());
+		params.put("updateDate",new Date());
+		params.put("userType",UserConstant.USER_TYPE_2);
+		params.put("randomNbr",StrUtils.getRandom4()+"");
+		params.put("channelId",UserConstant.CHANNEL_ID);
+		params.put("password",MD5.md5(MD5Util.getMD5Code(UserConstant.DEFUALT_PASSWORD)));
+		params.put("oauthStatus",UserConstant.OAUTH_STATUS_3);
+		if(developer != null&&developer.get("status").equals(String.valueOf(UserConstant.STATUS_0))){
+			dao.update("developer.updateDeveloper", params);
+		}else{
+			dao.insert("developer.insertDeveloper", params);
+		}
+		dao.insert("developer.addResetPwdLog", params);//添加密码日志
+		activaUser(params);
+		log.info("------------------激活成功----------------------------");
+		data.put("result", "success");
+		data.put("msg", "创建成功");
+		return data;
+	}
+
+	private void activaUser(Map<String,Object> params) {
+		String sid = (String) params.get("sid");
+		//生成测试应用
+		String appSid = StrUtils.getUUID();
+		addApp(appSid,sid);
+		String appSidNew = StrUtils.getUUID();
+		addApp(appSidNew,sid);
+		
+		//赠送余额
+		addAcctBalance(sid);
+		
+		//生成套餐信息
+		addPackage(sid);
+		
+		updateUser(params);
+		
+		//生成测试client
+		addClient(sid, params.get("token").toString(), appSid);
+		//生成测试client
+		addClient(sid, params.get("token").toString(), appSidNew);
+	}
+
+	private void addApp(String appSid, String sid) {
+		Map<String,Object> appParam = new HashMap<String,Object>();
+		Date d = new Date() ;
+		appParam.put("appType", AppConstant.APP_TYPE_TEST);
+		appParam.put("createDate", d);
+		appParam.put("auditDate", d);
+		appParam.put("appSid", appSid);
+		appParam.put("appName", "测试DEMO");
+		appParam.put("status", AppConstant.STATUS_1);
+		appParam.put("sid", sid);
+		appParam.put("industry", 14);
+		appParam.put("isShowNbr", "1");
+		appParam.put("ckNum", 0);
+		appParam.put("callFr", 0);
+		appParam.put("brand", "yzxvip");
+		
+		long s = Math.abs(UUID.randomUUID().getMostSignificantBits());
+		String sms_msg_nbr = String.valueOf(s);
+		if(sms_msg_nbr.length()>11){
+			sms_msg_nbr = sms_msg_nbr.substring(0,11);
+		}
+		appParam.put("smsMsgNbr", sms_msg_nbr);
+		dao.insert("app.add", appParam);
+		log.info("------------------生成测试应用成功----------------------------");
+	}
+
+	private void addClient(final String sid, final String token, final String appSid) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				for(int i=0;i<UserConstant.cNum;i++){
+					int temp = i+1;
+					Map<String, Object> content = new HashMap<String, Object>();
+					Map<String, Object> client = new HashMap<String, Object>();
+					client.put("appId", appSid);
+					client.put("friendlyName", "test"+temp);
+					client.put("clientType", AppConstant.CHARGETYPE);
+					client.put("charge", AppConstant.CHARGE);
+					client.put("mobile", "");
+					client.put("cType", "0");
+					content.put("client", client);
+					RestUtils.post("/Clients", JsonUtils.toJson(content),sid,token);
+				}
+			}
+		}).start();
+	}
+	
+	private void addAcctBalance(String sid) {
+		addPayMentOrder(sid);
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("balance", UserConstant.persent*UserConstant.RATE);
+		param.put("createTime", new Date());
+		param.put("enableFlag", UserConstant.ENABLEFLAG_1);
+		param.put("sid", sid);
+		dao.insert("developerAccount.addAcctBalance", param);
+		log.info("------------------赠送余额成功----------------------------");
+	}
+	
+	//生成充值订单
+	private void addPayMentOrder(String sid){
+		Map<String,Object> param = new HashMap<String,Object>();
+		param.put("sid", sid);
+		param.put("charge", UserConstant.persent*UserConstant.RATE);
+		param.put("chargeType", UserConstant.CHARGETYPE_3);
+		param.put("createDate", new Date());
+		param.put("payDate", new Date());
+		param.put("status", UserConstant.CHARGERESULT_2);
+		dao.insert("billdtl.addPayOrder", param);
+	}
+	
+	private void addPackage(String sid) {
+        Map<String, Object> p= dao.getOneInfo("package.getDefaultPck",new HashMap<String, Object>());
+        Map<String, Object> param = new HashMap<String, Object>();
+		param.put("packageId",p.get("packageId"));
+		param.put("sid", sid);
+		param.put("createDate", new Date());
+		param.put("updateDate", new Date());
+		dao.insert("package.addDefaultPck", param);
+		log.info("------------------生成套餐成功----------------------------");
+	}
+	
+	private void updateUser(Map<String, Object> user) {
+		//修改默认测试号码
+		Date date = new Date();
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("sid", user.get("sid"));
+		param.put("mobile", user.get("mobile"));
+		param.put("updateDate", date);
+		param.put("status", AppConstant.TEST_NBR_STATUS_1);;
+		param.put("type", AppConstant.TEST_NBR_TYPE_1);;
+		param.put("createDate", date);;
+		dao.insert("developer.addTestWhilte", param);
+	}
 }

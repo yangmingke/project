@@ -206,10 +206,10 @@ public class AgentServiceImpl implements AgentService {
 		String msg = isProxy == 0 ? "取消为代理商" : "设置为代理商";
 		if(isProxy == 0){
 			dao.delete("agent.deleteAgentRole", params);
-			params.put("user_type", UserConstant.USER_TYOE_2);
+			params.put("user_type", UserConstant.USER_TYPE_2);
 		}else{
 			dao.insert("agent.addAgentRole", params);
-			params.put("user_type", UserConstant.USER_TYOE_3);
+			params.put("user_type", UserConstant.USER_TYPE_3);
 		}		
 		int i = dao.update("agent.setProxy", params);// 修改代理商标识
 		if (i > 0) {

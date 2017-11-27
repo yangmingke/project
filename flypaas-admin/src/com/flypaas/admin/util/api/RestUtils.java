@@ -16,6 +16,8 @@ import org.apache.http.util.EntityUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
+import org.springframework.web.context.support.StandardServletEnvironment;
 
 import com.flypaas.admin.constant.SysConstant;
 import com.flypaas.admin.util.ConfigUtils;
@@ -67,26 +69,32 @@ public class RestUtils {
 	 * @return 接口的JSON响应字符串
 	 */
 	public static String post(String operate, String content) {
+		return post(operate, content, SysConstant.super_admin_sid, SysConstant.super_admin_token);
+	}
+	
+	public static String post(String operate, String content, String sid, String token) {
 		String result = null;
 		String contentType = ContentType.APPLICATION_JSON.getMimeType();
 		String timestamp = DateTime.now().toString("yyyyMMddHHmmss");// 时间戳
 		// url签名：md5(主账户Id+主账户授权令牌+时间戳)
 		String signature = EncryptUtils.encodeMd5(
-				SysConstant.super_admin_sid + SysConstant.super_admin_token + timestamp).toUpperCase();
+				sid + token + timestamp).toUpperCase();
 
 		StringBuilder url = new StringBuilder();// 构造请求的url
 		url.append(ConfigUtils.rest_domain);
 		url.append("/");
 		url.append(ConfigUtils.rest_version);
 		url.append("/Accounts/");
-		url.append(SysConstant.super_admin_sid);
+		url.append(sid);
 		url.append(operate);
 		url.append("?sig=");
 		url.append(signature);
-		String auth = EncryptUtils.encodeBase64(SysConstant.super_admin_sid + ":" + timestamp);// base64(主账户Id+冒号+时间戳)
+		String auth = EncryptUtils.encodeBase64(sid + ":" + timestamp);// base64(主账户Id+冒号+时间戳)
 		logger.debug("使用post方式调用rest接口【开始】：url={}, content={}", url, content);
 
-		if (ConfigUtils.rest_domain.equals("https://api.flypaas.com")) {
+		Environment environment = new StandardServletEnvironment();
+		String spring_profiles_active = environment.getProperty("spring.profiles.active");
+		if (spring_profiles_active.equals("production")) {
 			result = postForProduction(contentType, url.toString(), auth, content);
 		} else {
 			result = postForOther(contentType, url.toString(), auth, content);
@@ -132,7 +140,7 @@ public class RestUtils {
 		String result = null;
 
 		DefaultHttpClient httpClient = null;
-		String tmp = url.replace("https://", "");
+		String tmp = url.replace("http://", "");
 		String ip = tmp.substring(0, tmp.indexOf(":"));
 		int port = Integer.parseInt(tmp.substring(tmp.indexOf(":") + 1, tmp.indexOf("/")));
 		try {
@@ -207,4 +215,5 @@ public class RestUtils {
 		ConfigUtils.rest_version = "2014-06-30";
 		sendTemplateSMS(SmsTemplateId.verify_code, "15989498802", "1122");
 	}
+
 }

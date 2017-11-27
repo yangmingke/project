@@ -89,4 +89,11 @@ public interface DeveloperService {
 	 * @return
 	 */
 	Map<String, Object> saveSale(Map<String, String> params);
+
+	/**
+	 * 创建开发者
+	 * @param formData
+	 * @return
+	 */
+	Map<String, Object> create(Map formData);
 }

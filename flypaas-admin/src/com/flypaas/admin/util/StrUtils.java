@@ -1,6 +1,9 @@
 package com.flypaas.admin.util;
 
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,4 +37,42 @@ public class StrUtils {
 		}
 		return data;
 	}
+
+	public static boolean isEmpty(Object o){
+		if(o instanceof String){
+			if(o==null || o.toString().trim().equals("")){
+				return true;
+			}
+		}else{
+			if(o==null){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	//获取4位随机数
+    public static int getRandom4(){
+    	return (int) (Math.random()*9000+1000);
+    }
+
+    public static String getUUID() {  
+        UUID uuid = UUID.randomUUID();  
+        String str = uuid.toString();  
+        String temp = str.substring(0, 8) + str.substring(9, 13) + str.substring(14, 18) + str.substring(19, 23) + str.substring(24);  
+        return temp;  
+    }
+
+  //加密sid token
+  	public static String toHMACSHA(String baseStr,String key){
+  		String temp=null;
+  		try {
+  			temp = HMACSHAUtil.getSignature(baseStr,key);
+  		} catch (InvalidKeyException e) {
+  			e.printStackTrace();
+  		} catch (NoSuchAlgorithmException e) {
+  			e.printStackTrace();
+  		}
+  		return temp ;
+  	} 
 }

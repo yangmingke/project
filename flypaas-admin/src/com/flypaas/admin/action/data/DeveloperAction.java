@@ -24,6 +24,7 @@ import com.flypaas.admin.util.web.StrutsUtils;
 		@Result(name = "view", location = "/WEB-INF/content/data/developer/view.jsp"),
 		@Result(name = "edit", location = "/WEB-INF/content/data/developer/edit.jsp"),
 		@Result(name = "mainAccount", location = "/WEB-INF/content/data/developer/mainAccount.jsp"),
+		@Result(name = "createDeveloperView", location = "/WEB-INF/content/data/developer/create.jsp"),
 		@Result(name = "notice", location = "/WEB-INF/content/data/developer/notice.jsp") })
 public class DeveloperAction extends BaseAction {
 	private static final long serialVersionUID = -6398668354512197029L;
@@ -99,6 +100,8 @@ public class DeveloperAction extends BaseAction {
 		}
 		return "mainAccount";
 	}
+	
+	
 
 	/**
 	 * 修改开发者状态：关闭、重新激活
@@ -177,4 +180,26 @@ public class DeveloperAction extends BaseAction {
 		data = developerService.saveSale(StrutsUtils.getFormData());
 		StrutsUtils.renderJson(data);
 	}
+	
+	/**
+	 * 创建开发者界面
+	 * 
+	 * @return
+	 */
+	@Action("/developer/createView")
+	public String createView() {
+		return "createDeveloperView";
+	}
+	
+	/**
+	 * 创建开发者
+	 * 
+	 * @return
+	 */
+	@Action("/developer/create")
+	public void create() {
+		data = developerService.create(StrutsUtils.getFormData());
+		StrutsUtils.renderJson(data);
+	}
+	
 }
