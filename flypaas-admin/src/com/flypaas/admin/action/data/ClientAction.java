@@ -2,20 +2,17 @@ package com.flypaas.admin.action.data;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import com.flypaas.admin.util.file.BizException;
-import com.flypaas.admin.util.web.AuthorityUtils;
-import com.flypaas.admin.util.web.StrutsUtils;
+
 import com.flypaas.admin.action.BaseAction;
 import com.flypaas.admin.service.data.ClientService;
+import com.flypaas.admin.util.web.AuthorityUtils;
+import com.flypaas.admin.util.web.StrutsUtils;
 
 
 
@@ -31,6 +28,7 @@ import com.flypaas.admin.service.data.ClientService;
 
 @Results({ 
 @Result(name = "query", location = "/WEB-INF/content/data/clientTestNum/query1.jsp"),
+@Result(name = "createView", location = "/WEB-INF/content/data/clientTestNum/create.jsp"),
 @Result(name = "query2", location = "/WEB-INF/content/data/clientTestNum/query2.jsp"),
 @Result(name = "query3", location = "/WEB-INF/content/data/clientTestNum/query3.jsp"),
 @Result(name = "query4", location = "/WEB-INF/content/data/clientTestNum/query4.jsp"),
@@ -55,8 +53,29 @@ public class ClientAction extends BaseAction {
 	public String query() {
 		System.out.println("进入1----------------------------");
 		page = clientservice.query(StrutsUtils.getFormData());
-		System.out.println(page);
 		return "query";	
+	}
+	
+	/**
+	 * 
+	 *  client创建页面
+	 * @author yangmingke
+	 */
+	@Action("/client/createView")
+	public String createView() {
+		data = new HashMap<>();
+		data.putAll(StrutsUtils.getFormDataEncode());
+		return "createView";	
+	}
+	/**
+	 * 
+	 *  client创建
+	 * @author yangmingke
+	 */
+	@Action("/client/create")
+	public void create() {
+		data = clientservice.create(StrutsUtils.getFormData());
+		StrutsUtils.renderJson(data);
 	}
 	
 	/**

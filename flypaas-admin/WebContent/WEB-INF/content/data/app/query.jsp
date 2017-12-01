@@ -77,8 +77,11 @@
 					    <%-- </s:if> --%>
 					    <s:if test="status==1">
 				      		<%-- <s:if test="menuId_47"> --%>
-								<a href="javascript:;" onclick="updateStatus(this, '${app_sid}', 5)">强制下线</a>
+							   | <a href="javascript:;" onclick="updateStatus(this, '${app_sid}', 5)">强制下线</a>
 						   <%--  </s:if> --%>
+						   <s:if test="app_type!=0">
+						   	   | <a href="javascript:;" onclick="createClient('${sid}','${username}','${app_sid}','${app_name}','${token}')">创建client</a>
+						   </s:if>
 					    </s:if>
 					</td>
 			      </tr>
@@ -90,6 +93,10 @@
       </div>
 
 <script type="text/javascript">
+//创建Client
+function createClient(sid,username,app_sid,app_name,token){
+	location.href="${ctx}/client/createView?sid=" +sid+"&username="+encodeURI(encodeURI(username))+"&app_sid="+app_sid+"&app_name="+encodeURI(encodeURI(app_name))+"&token="+token;
+}
 //查看
 function view(app_sid){
 	location.href="${ctx}/app/view?view=1&app_sid=" + app_sid;

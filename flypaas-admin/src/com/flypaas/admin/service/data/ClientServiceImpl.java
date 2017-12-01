@@ -1,7 +1,9 @@
 package com.flypaas.admin.service.data;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.flypaas.admin.dao.MasterDao;
 import com.flypaas.admin.model.PageContainer;
+import com.flypaas.admin.util.JsonUtils;
+import com.flypaas.admin.util.api.RestUtils;
 /**
  * 列表查询 client
  * 
@@ -18,7 +22,6 @@ import com.flypaas.admin.model.PageContainer;
 @Service
 @Transactional
 public class ClientServiceImpl  implements ClientService{
-	private Logger logger = LoggerFactory.getLogger(getClass());
 	@Autowired
 	private MasterDao dao;
 	@Override
@@ -61,6 +64,37 @@ public class ClientServiceImpl  implements ClientService{
 	public Map<String, Object> getChargeview(Map<String, String> params) {
 		// TODO Auto-generated method stub
 		return dao.getOneInfo("test.test1", params);
+	}
+	@Override
+	public Map<String, Object> create(Map<String, String> param) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		final String sid = param.get("sid");
+		final String token = param.get("token");
+		String appId = param.get("app_sid");
+		int clientCount = Integer.parseInt(param.get("clientCount"));
+		if(StringUtils.isAnyEmpty(sid,token,appId)){
+			data.put("result", "fail");
+			data.put("msg", "创建失败，请联系管理员");
+			return data;
+		}
+		
+		final Map<String,Object> content = new HashMap<String, Object>();
+		Map<String,String> client = new HashMap<String, String>();
+		client.put("appId", appId);
+		client.put("clientType", "0");//0 开发者计费。默认为0. 注意：1 云平台计费(已作废)
+		content.put("client", client);
+		for(int i = 0;i < clientCount; i++){
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					RestUtils.post("/Clients", JsonUtils.toJson(content),sid,token);//调用rest创建client
+				}
+			}).start();;
+		}
+		
+		data.put("result", "success");
+		data.put("msg", "创建成功");
+		return data;
 	}
 	
 

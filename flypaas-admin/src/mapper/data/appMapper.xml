@@ -10,7 +10,11 @@
 		SELECT
 			app.app_sid,
 			app.app_name,
+			app.app_type,
 			u.email,
+			u.sid,
+			u.token,
+			u.username,
 			date_format(
 				app.create_date,
 				'%Y-%m-%d %H:%i:%S'

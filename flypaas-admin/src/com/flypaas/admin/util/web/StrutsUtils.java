@@ -1,6 +1,8 @@
 package com.flypaas.admin.util.web;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -120,6 +122,29 @@ public class StrutsUtils {
 		String value;
 		for (Map.Entry<String, String[]> map : getRequest().getParameterMap().entrySet()) {
 			value = StringUtils.join(map.getValue(), ",");
+			if (StringUtils.isNotBlank(value)) {
+				formData.put(map.getKey(), value.trim());
+			}
+		}
+
+		LOGGER.debug("\n\nformData-------------------------" + formData + "\n");
+		return formData;
+	}
+	
+	/**
+	 * 获取提交的表单数据，多个值用,分割,utf8转码
+	 * 
+	 * @return
+	 */
+	public static Map<String, String> getFormDataEncode() {
+		Map<String, String> formData = new HashMap<String, String>();
+		String value = null;
+		for (Map.Entry<String, String[]> map : getRequest().getParameterMap().entrySet()) {
+			try {
+				value = URLDecoder.decode(StringUtils.join(map.getValue(), ","),"utf-8");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 			if (StringUtils.isNotBlank(value)) {
 				formData.put(map.getKey(), value.trim());
 			}

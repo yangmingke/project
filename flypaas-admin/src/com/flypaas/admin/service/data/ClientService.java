@@ -20,5 +20,6 @@ public interface ClientService {
 	Map<String, Object> getClientbill(Map<String, String> params);
 	Map<String, Object> getChargebill(Map<String, String> params);
 	Map<String, Object> getChargeview(Map<String, String> params);
+	Map<String, Object> create(Map<String, String> formData);
 	
 }

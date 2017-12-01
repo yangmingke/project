@@ -203,7 +203,9 @@
 
 	<select id="findClients" resultType="map">
 		SELECT
+		u.username,
 		u.sid,
+		app.app_sid,
 		c.client_number,
 		app.app_name,
 		u.email AS developer_email,
@@ -221,19 +223,46 @@
 		WHERE
 		u.sid = app.sid and app.app_sid = c.app_sid
 
+		<if test="text != null">
+			AND (
+				c.client_number LIKE concat('%',#{text}, '%')
+				OR app.app_name LIKE concat('%',#{text}, '%')
+				OR u.username LIKE concat('%',#{text},'%')
+				OR u.sid LIKE concat('%' ,#{text}, '%')
+				OR app.app_sid LIKE concat('%' ,#{text}, '%')
+			)
+		</if>
+		<if test="start_date != null">
+			AND u.create_date >= #{start_date}
+		</if>
+		<if test="end_date !=null">
+			<![CDATA[ AND u.create_date<= #{end_date} ]]>
+		</if>
+		<if test="industry != null">
+			and app.industry = #{industry}
+		</if>
+		ORDER BY
+		c.create_date DESC
+		${limit}
+	</select>
+	<!--查询分页 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_user u,
+			tb_ucpaas_application app,
+			tb_ucpaas_client c
+		WHERE
+			u.sid = app.sid and app.app_sid = c.app_sid
 
 		<if test="text != null">
 			AND (
-			c.client_number LIKE concat(#{text}, '%')
-			OR
-			app.app_name LIKE concat(#{text}, '%')
-			OR u.email LIKE concat(#{text},
-			'%')
-			OR app.industry LIKE concat('%',#{text}, '%')
-			OR c.`status` LIKE
-			concat('%',#{text}, '%')
-			Or c.mobile LIKE concat('%',#{text}, '%')
-
+				c.client_number LIKE concat('%',#{text}, '%')
+				OR app.app_name LIKE concat('%',#{text}, '%')
+				OR u.username LIKE concat('%',#{text},'%')
+				OR u.sid LIKE concat('%' ,#{text}, '%')
+				OR app.app_sid LIKE concat('%' ,#{text}, '%')
 			)
 		</if>
 		<if test="start_date != null">
@@ -262,17 +291,6 @@
 		<if test="industry != null">
 			and app.industry = #{industry}
 		</if>
-		ORDER BY
-		u.create_date DESC
-		${limit}
-	</select>
-	<!--查询分页 -->
-	<select id="queryCount" resultType="map">
-		SELECT
-		count(0) AS totalCount
-		FROM
-		tb_ucpaas_client u
-		where u.client_type IN (0, 1)
 	</select>
 
 	<select id="queryCount1" resultType="map">

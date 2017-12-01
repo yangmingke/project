@@ -25,12 +25,12 @@
   <ul  style="display:block">
     <li><a href="${ctx}/jsp/admin/administratorInfo.jsp" target="right"><span class="icon-caret-right"></span>管理员信息</a></li>
     <li><a href="${ctx}/jsp/admin/editPwd.jsp" target="right"><span class="icon-caret-right"></span>修改密码</a></li>
+  	<li><a href="${ctx}/systemContrller/sysConfigList" target="right"><span class="icon-caret-right"></span>系统配置</a></li>
   </ul> 
   <h2><span class="icon-male"></span>资源方管理</h2>
   <ul>
     <li><a href="/account/queryAccount" target="right"><span class="icon-caret-right"></span>资源方列表</a></li>
     <li><a href="${ctx}/jsp/account/open/openAccont.jsp" target="right"><span class="icon-caret-right"></span>资源方开户</a></li>  
-  	<li><a href="${ctx}/systemContrller/sysConfigList" target="right"><span class="icon-caret-right"></span>系统配置</a></li>
   </ul>
   <h2><span class="icon-rocket"></span>资源管理</h2>
   <ul>

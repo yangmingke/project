@@ -510,8 +510,10 @@ public class RouteServiceImpl implements RouteService {
 		}
 		for (String key : keySet) {
 			String[] str = key.split("_");
-			String strategy = str[3];// 会话策略
-			String sessionKey = str[6]+"_"+str[7];// 会话key
+//			String strategy = str[3];// 会话策略 由于C后台无法找出BUG 故将此注释
+//			String sessionKey = str[6]+"_"+str[7];// 会话key
+			String strategy = str[3].substring(0, 1);// 会话策略
+			String sessionKey = str[str.length-2]+"_"+str[str.length-1];// 会话key
 			Map session = RedisService.getInstance().hgetall(key);// 获取一条会话路径信息
 			String path = (String)session.get("path");
 			path.replaceAll(":", "->");
