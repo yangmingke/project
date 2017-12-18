@@ -17,6 +17,10 @@ $(function(){
 function view(sid){
 	location.href=ctx +"/developerAccount/view?sid=" + sid;
 }
+//查看
+function trafficView(sid){
+	location.href=ctx +"/developerAccount/trafficView?sid=" + sid;
+}
 //初始化弹层(冻结,解冻,注销) 
 function enableFlagBox(dataSelector,mngType,enableFlag){
 	var boxId = "enable_flag_box";

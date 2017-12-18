@@ -16,7 +16,7 @@
 	<context:component-scan base-package="com.ucpaas" />
 	<!-- 根据不同的运行环境加载配置文件 -->
 	<context:property-placeholder location="classpath:config/config_${spring.profiles.active}.properties" />
-
+	
 	
 	<import resource="classpath:spring/spring-mybatis.xml" />
 	<import resource="classpath:spring/spring-redis.xml" />

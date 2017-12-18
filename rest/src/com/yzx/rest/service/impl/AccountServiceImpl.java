@@ -20,6 +20,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.JsonArray;
@@ -35,6 +36,7 @@ import com.yzx.rest.resp.ListRespt;
 import com.yzx.rest.service.AccountService;
 import com.yzx.rest.service.BaseService;
 import com.yzx.rest.service.DBCommService;
+import com.yzx.rest.service.MailService;
 import com.yzx.rest.service.RedisService;
 import com.yzx.rest.util.Consts;
 import com.yzx.rest.util.DateConvert;
@@ -53,7 +55,8 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 	private static Logger logger = Logger.getLogger(AccountService.class);
 	@Context
 	public MessageContext messgeContext;
-	
+	@Autowired
+	MailService mailService;
 	
 	@Override
 	public ListResp AccountInfo(String version, String accountSid, String Authorization, String sig) {
@@ -326,7 +329,7 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public ListResp createSession(String version, String accountSid, String Authorization,String sig, SessionInfo sessionInfo) {
+	public ListResp createSession(String version, String accountSid, String Authorization,String sig, SessionInfo sessionInfo, HttpServletRequest request) {
 		ListResp listResp = new ListResp();
 		long time1 = new Date().getTime();
 		String appId = sessionInfo.getAppId();
@@ -439,6 +442,9 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 			String routerRtppUrl = SysConfig.getInstance().getProperty("router_rtpp");
 			String srcinfo = new String();
 			String dstinfo = new String();
+			String interfaceUrl = null;//用于出现系统错误时，发送邮件
+			String interfaceBody = null;//用于出现系统错误时，发送邮件
+			String interfaceResult = null;//用于出现系统错误时，发送邮件
 			try {
 				if(srcApList == null || srcApList.size() == 0){
 					//获取源IP信息
@@ -449,6 +455,9 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 					if (entity != null) {
 						String result = EntityUtils.toString(entity, "UTF-8");
 						logger.info(routerRtppUrl + "获取resultInfo:"+result);
+						interfaceUrl = routerRtppUrl;
+						interfaceBody = "ip="+srcIp+"&area="+routeArea;
+						interfaceResult = result;
 						Map map = JsonUtils.toObject(result, Map.class);
 						List rtppList = (List) map.get("rtpp");
 						srcinfo = createIpInfo(srcIp,srcPort,rtppList);
@@ -473,6 +482,9 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 					if (entity != null) {
 						String result = EntityUtils.toString(entity, "UTF-8");
 						logger.info(routerRtppUrl + "获取resultInfo:"+result);
+						interfaceUrl = routerRtppUrl;
+						interfaceBody = "ip="+dstIp+"&area="+routeArea;
+						interfaceResult = result;
 						Map map = JsonUtils.toObject(result, Map.class);
 						List rtppList = (List) map.get("rtpp");
 						dstinfo = createIpInfo(dstIp,dstPort,rtppList);
@@ -556,6 +568,10 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 				if (entity != null) {
 					String result = EntityUtils.toString(entity, "UTF-8");
 					logger.info(sessionCreateUrl + "获取resultInfo:"+result);
+					interfaceUrl = sessionCreateUrl;
+					interfaceBody = para.toString();
+					interfaceResult = result;
+
 					Map map = JsonUtils.toObject(result, Map.class);
 					String respCode = (String) map.get("result");
 					if(respCode !=null && !Consts.C000000.equals(respCode)){
@@ -594,10 +610,12 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 					EntityUtils.consume(entity);
 					long apptime2 = new Date().getTime();
 					logger.info("申请"+appId+"路由成功,请求时长:"+(apptime2 - apptime1));
+					mailService.sendErrorEmail(Consts.C100699, request.getContextPath(), JsonUtils.toJson(sessionInfo), interfaceUrl, interfaceBody, interfaceResult);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				listResp.setRespCode(Consts.C100699, Consts.applyRoute, appId, "");
+				mailService.sendErrorEmail(Consts.C100699, request.getRequestURI(), JsonUtils.toJson(sessionInfo), interfaceUrl, interfaceBody, interfaceResult);
 				return listResp;
 			}
 		}else{

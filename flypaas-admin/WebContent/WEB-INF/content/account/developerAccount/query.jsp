@@ -104,6 +104,7 @@
 								<%-- 
 								| <a href="javascript:;" onclick="enableFlagBox('#tr_${rownum} td','注销',3)">注销</a>
 								 --%>
+								  | <a href="javascript:;" onclick="trafficView('${sid}')">流量消耗</a>
 	            		</s:if>
 	            		<s:elseif test="wallet_status==0"><%--0：冻结 --%>
 				      		<%-- <s:if test="menuId_49"> --%>
@@ -124,6 +125,7 @@
 								<%-- 
 								| <a href="javascript:;" onclick="enableFlagBox('#tr_${rownum} td','注销',3)">注销</a>
 								 --%>
+								 | <a href="javascript:;" onclick="trafficView('${sid}')">流量消耗</a>
 	            		</s:elseif>
 	            		<s:elseif test="wallet_status==3"><%--3已注销 --%>
 				      		<%-- <s:if test="menuId_49"> --%>

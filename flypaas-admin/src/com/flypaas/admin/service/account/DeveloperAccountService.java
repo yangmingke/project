@@ -65,4 +65,11 @@ public interface DeveloperAccountService {
 	 */
 	Map<String, Object> saveCreditBalance(Map<String, String> params);
 
+	/**
+	 * 查询开发者流量使用情况
+	 * @param formData
+	 * @return
+	 */
+	Map<String, Object> queryTraffic(Map<String, String> formData);
+
 }

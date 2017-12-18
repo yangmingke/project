@@ -1,5 +1,6 @@
 package com.yzx.rest.service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
@@ -8,6 +9,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import com.yzx.rest.models.Account;
@@ -107,7 +109,7 @@ public interface AccountService {
 	@Path("/session/create")
 	@Consumes({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
 	public ListResp createSession(@PathParam("version") String version,@PathParam("accountSid") String accountSid,@HeaderParam("Authorization") String auth,
-			@QueryParam("sig") String sig,SessionInfo route);
+			@QueryParam("sig") String sig,SessionInfo route,@Context HttpServletRequest request);
 	
 	/**
 	 * 路由释放接口（公共接口）

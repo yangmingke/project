@@ -159,5 +159,44 @@
 	</bean>
 	<!-- 使用annotation注解方式配置事务 -->
 	<tx:annotation-driven transaction-manager="cps_transactionManager" />
+	
+	<!-- cdr统计数据库配置 -->
+	<!-- 配置DBCP数据库连接池 -->
+	<bean id="cdr_dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<property name="url" value="${cdr.jdbc.url}" />
+		<property name="username" value="${cdr.jdbc.username}" />
+		<property name="password" value="${cdr.jdbc.password}" />
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="initialSize" value="10" />		<!-- 初始化连接 -->
+		<property name="maxTotal" value="150" />		<!-- 最大活动连接 -->
+		<property name="maxIdle" value="50" />			<!-- 最大空闲连接 -->
+		<property name="minIdle" value="10" />			<!-- 最小空闲连接 -->
+		<property name="maxWaitMillis" value="3000" />	<!-- 从池中取连接的最大等待时间，单位毫秒 -->
+
+		<property name="validationQuery" value="SELECT 1" />			<!-- 验证使用的SQL语句 -->
+		<property name="testWhileIdle" value="true" />					<!-- 指明连接是否被空闲连接回收器(如果有)进行检验.如果检测失败,则连接将被从池中去除 -->
+		<property name="testOnBorrow" value="false" />					<!-- 借出连接时不要测试，否则很影响性能 -->
+		<property name="timeBetweenEvictionRunsMillis" value="30000" />	<!-- 每30秒运行一次空闲连接回收器 -->
+		<property name="minEvictableIdleTimeMillis" value="1800000" />	<!-- 池中的连接空闲30分钟后被回收 -->
+		<property name="numTestsPerEvictionRun" value="3" />			<!-- 在每次空闲连接回收器线程(如果有)运行时检查的连接数量 -->
+		<property name="removeAbandonedOnBorrow" value="true" />		<!-- 连接泄漏回收参数，当可用连接数少于3个时才执行 -->
+		<property name="removeAbandonedTimeout" value="180" />			<!-- 连接泄漏回收参数，180秒，泄露的连接可以被删除的超时值 -->
+	</bean>
+	<!-- 配置mybitasSqlSessionFactoryBean -->
+	<bean id="cdr_sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="cdr_dataSource" />
+		<property name="configLocation" value="classpath:mybatis.xml" />
+		<property name="mapperLocations" value="classpath:mapper/**/*Mapper.xml" />
+	</bean>
+	<!-- 配置SqlSessionTemplate -->
+	<bean id="cdr_sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+		<constructor-arg name="sqlSessionFactory" ref="cdr_sqlSessionFactory" />
+	</bean>
+	<!-- 事务配置 -->
+	<bean id="cdr_transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="cdr_dataSource" />
+	</bean>
+	<!-- 使用annotation注解方式配置事务 -->
+	<tx:annotation-driven transaction-manager="cdr_transactionManager" />
 
 </beans>

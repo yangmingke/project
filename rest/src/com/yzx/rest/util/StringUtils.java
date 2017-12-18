@@ -1,8 +1,14 @@
 package com.yzx.rest.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+
+import org.springframework.core.env.Environment;
+import org.springframework.web.context.support.StandardServletEnvironment;
 
 /**
  * 此类中封装一些常用的字符串操作。 所有方法都是静态方法，不需要生成此类的实例， 
@@ -19,7 +25,6 @@ public class StringUtils {
 	        boolean find=m.find();
 	        return find;
 		} catch (PatternSyntaxException e) {
-			// TODO: handle exception
 			return true;
 		}
 	}
@@ -356,9 +361,5 @@ public class StringUtils {
         src = StringUtils.strReplace(src, "^", "_");
         return src ;
     }
-    public static void main(String args[]) {
-        System.out.println(StringUtils.StringFilter("!12312"));
-        System.out.println(StringUtils.StringFilter("我的"));
-        System.out.println(StringUtils.StringFilter("我的123adfas"));
-    }
+    
 }

@@ -3,6 +3,7 @@ package com.flypaas.admin.service.account;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.math.NumberUtils;
@@ -15,6 +16,7 @@ import com.flypaas.admin.constant.LogConstant.LogType;
 import com.flypaas.admin.constant.MsgConstant.MsgType;
 import com.flypaas.admin.constant.MsgConstant.TemplateId;
 import com.flypaas.admin.constant.SysConstant;
+import com.flypaas.admin.dao.CdrDao;
 import com.flypaas.admin.dao.MasterDao;
 import com.flypaas.admin.model.PageContainer;
 import com.flypaas.admin.service.BillDtlService;
@@ -31,6 +33,8 @@ import com.flypaas.admin.service.data.MsgService;
 public class DeveloperAccountServiceImpl implements DeveloperAccountService {
 	@Autowired
 	private MasterDao dao;
+	@Autowired
+	private CdrDao cdrDao;
 	@Autowired
 	private LogService logService;
 	@Autowired
@@ -180,6 +184,16 @@ public class DeveloperAccountServiceImpl implements DeveloperAccountService {
 			data.put("msg", "账户信息不存在或状态不对,设置失败");
 		}
 		logService.add(LogType.update, "账务管理-开发者账务：设置信用额度" , params, data);
+		return data;
+	}
+
+	@Override
+	public Map<String, Object> queryTraffic(Map<String, String> sqlParams) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		String date = sqlParams.get("date");
+		sqlParams.put("date", date.replaceAll("-", "")); //将data去除“-”
+		List<Map<String, Object>> developerTrafficList = cdrDao.getSearchList("developerAccount.queryTraffic", sqlParams);
+		data.put("developerTrafficList", developerTrafficList);
 		return data;
 	}
 }

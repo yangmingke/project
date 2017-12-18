@@ -206,4 +206,19 @@
 	<insert id="addAcctBalance">
 		insert tb_bill_acct_balance(sid,balance,enable_flag,create_time,valid_date,vip_valid_date) values(#{sid},#{balance},#{enableFlag},#{createTime},#{validDate},#{vipValidDate});
 	</insert>
+	
+	<select id="queryTraffic" resultType="map">
+		SELECT
+			hour(datetime) hour,
+			sum(traffic_out) traffic_out,
+			sum(traffic_in) traffic_in,
+			sum((traffic_out + traffic_in)) total,
+			sum(traffic_fee) fee
+		FROM
+			t_traffic_today_consume_${date}
+		WHERE 
+		 	sid = #{sid}
+	 	GROUP BY hour(datetime)
+	</select>
+	
 </mapper> 

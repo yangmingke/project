@@ -170,6 +170,11 @@ public class DateUtil {
     public static Date getCurrentDate(){
     	return new Date();
     }
+    
+    public static String getStrCurrentDate(){
+    	return dateToStr(new Date(),YMR_SLASH);
+    }
+    
     @SuppressWarnings("static-access")
 	public static String getYstdDate(){
     	Calendar cl = Calendar.getInstance();

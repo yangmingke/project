@@ -14,6 +14,7 @@ import org.springframework.stereotype.Controller;
 
 import com.flypaas.admin.action.BaseAction;
 import com.flypaas.admin.service.account.DeveloperAccountService;
+import com.flypaas.admin.util.rest.utils.DateUtil;
 import com.flypaas.admin.util.web.AuthorityUtils;
 import com.flypaas.admin.util.web.StrutsUtils;
 
@@ -25,6 +26,7 @@ import com.flypaas.admin.util.web.StrutsUtils;
 @Controller
 @Scope("prototype")
 @Results({ @Result(name = "query", location = "/WEB-INF/content/account/developerAccount/query.jsp"),
+		@Result(name = "trafficView", location = "/WEB-INF/content/account/developerAccount/trafficView.jsp"),
 		@Result(name = "view", location = "/WEB-INF/content/account/developerAccount/view.jsp") })
 public class DeveloperAccountAction extends BaseAction {
 	private static final long serialVersionUID = -7384429858714304552L;
@@ -70,6 +72,32 @@ public class DeveloperAccountAction extends BaseAction {
 			data = developerAccountService.view(sid, rechargeParams, consumptionParams);
 		}
 		return "view";
+	}
+	
+	/**
+	 * 开发者流量页面
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Action("/developerAccount/trafficView")
+	public String trafficView() {
+		Map form = StrutsUtils.getFormData();
+		data = new HashMap<>(form);
+		data.put("today", DateUtil.getStrCurrentDate());
+		return "trafficView";
+	}
+	
+	/**
+	 * 开发者流量页面
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Action("/developerAccount/queryTraffic")
+	public void queryTraffic() {
+		data = developerAccountService.queryTraffic(StrutsUtils.getFormData());
+		StrutsUtils.renderJson(data);
 	}
 
 	@Action("/developerAccount/updateEnableFlag")

@@ -67,8 +67,8 @@ public class Consts{
     
     //设备
     public static final String pc="1";
-    public static final String Android="2";
-    public static final String IOS="4";
+    public static final String IOS="2";
+    public static final String Android="4";
     public static final String webRTC="5";
     
     //state cilen状态

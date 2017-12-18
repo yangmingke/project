@@ -12,8 +12,8 @@
 			<property name="password" value="flypaas.com" />
 		</driver-properties>
 		<house-keeping-sleep-time>30000</house-keeping-sleep-time>
-		<maximum-connection-count>50</maximum-connection-count>
-		<minimum-connection-count>10</minimum-connection-count>
+		<maximum-connection-count>300</maximum-connection-count>
+		<minimum-connection-count>50</minimum-connection-count>
 		<maximum-active-time>60000</maximum-active-time>
 		<maximum-connection-lifetime>600000</maximum-connection-lifetime>
 		<simultaneous-build-throttle>100</simultaneous-build-throttle>
