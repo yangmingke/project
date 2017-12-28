@@ -72,4 +72,11 @@ public interface DeveloperAccountService {
 	 */
 	Map<String, Object> queryTraffic(Map<String, String> formData);
 
+	/**
+	 * 查询开发者时长计费
+	 * @param formData
+	 * @return
+	 */
+	PageContainer queryFeeTime(Map<String, String> formData);
+
 }

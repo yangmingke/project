@@ -93,7 +93,7 @@ public interface AccountService {
 	@Path("/session/getaplist")
 	@Consumes({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
 	public ListResp getAplist(@PathParam("version") String version,@PathParam("accountSid") String accountSid,@HeaderParam("Authorization") String auth,
-			@QueryParam("sig") String sig,SessionInfo sessionInfo);
+			@QueryParam("sig") String sig,SessionInfo sessionInfo,@Context HttpServletRequest request);
 	
 	
 	/**
@@ -109,7 +109,7 @@ public interface AccountService {
 	@Path("/session/create")
 	@Consumes({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
 	public ListResp createSession(@PathParam("version") String version,@PathParam("accountSid") String accountSid,@HeaderParam("Authorization") String auth,
-			@QueryParam("sig") String sig,SessionInfo route,@Context HttpServletRequest request);
+			@QueryParam("sig") String sig,SessionInfo sessionInfo,@Context HttpServletRequest request);
 	
 	/**
 	 * 路由释放接口（公共接口）
@@ -124,7 +124,7 @@ public interface AccountService {
 	@Path("/session/release")
 	@Consumes({MediaType.APPLICATION_JSON,MediaType.APPLICATION_XML})
 	public ListResp releaseSession(@PathParam("version") String version,@PathParam("accountSid") String accountSid,@HeaderParam("Authorization") String auth,
-			@QueryParam("sig") String sig,SessionInfo route);
+			@QueryParam("sig") String sig,SessionInfo route, @Context HttpServletRequest request);
 	
 	
 	/**

@@ -58,12 +58,12 @@
           <tbody>
             <tr>
               <th width="50px">序号</th>
-              <th>钱包编号</th>
+              <!-- <th>钱包编号</th> -->
               <th>用户名</th>
               <th>认证名称</th>
               <th>手机号码</th>
               <th>钱包余额（元）</th>
-              <th>信用额度（元）</th>
+              <!-- <th>信用额度（元）</th> -->
               <th>资费套餐</th>
               <th>钱包状态</th>
               <th>最后一次充值时间</th>
@@ -72,12 +72,12 @@
             <s:iterator value="page.list">
 	            <tr id="tr_${rownum}">
 	            	<td tit="v_rownum">${rownum}</td>
-	            	<td tit="v_acct_id">${acct_id}</td>
+	            	<%-- <td tit="v_acct_id">${acct_id}</td> --%>
 	            	<td tit="v_email">${email}</td>
 	            	<td tit="v_realname">${realname}</td>
 	            	<td tit="v_mobile">${mobile}</td>
 	            	<td tit="v_balance">${balance}</td>
-	            	<td tit="v_credit_balance">${credit_balance_fmt}</td>
+	            	<%-- <td tit="v_credit_balance">${credit_balance_fmt}</td> --%>
 	            	<td tit="v_package_name">${package_name}</td>
 	            	<td tit="v_wallet_status_name"><u:ucparams key="${wallet_status}" type="wallet_status"/></td>
 	            	<td tit="v_last_recharge_date">${last_recharge_date}</td>
@@ -104,7 +104,8 @@
 								<%-- 
 								| <a href="javascript:;" onclick="enableFlagBox('#tr_${rownum} td','注销',3)">注销</a>
 								 --%>
-								  | <a href="javascript:;" onclick="trafficView('${sid}')">流量消耗</a>
+								 | <a href="javascript:;" onclick="trafficView('${sid}','${realname}')">流量消耗</a>
+								 | <a href="javascript:;" onclick="feeTimeView('${sid}','${realname}')">时长计费</a>
 	            		</s:if>
 	            		<s:elseif test="wallet_status==0"><%--0：冻结 --%>
 				      		<%-- <s:if test="menuId_49"> --%>
@@ -125,7 +126,8 @@
 								<%-- 
 								| <a href="javascript:;" onclick="enableFlagBox('#tr_${rownum} td','注销',3)">注销</a>
 								 --%>
-								 | <a href="javascript:;" onclick="trafficView('${sid}')">流量消耗</a>
+								 | <a href="javascript:;" onclick="trafficView('${sid}','${realname}')">流量消耗</a>
+								 | <a href="javascript:;" onclick="feeTimeView('${sid}','${realname}')">时长计费</a>
 	            		</s:elseif>
 	            		<s:elseif test="wallet_status==3"><%--3已注销 --%>
 				      		<%-- <s:if test="menuId_49"> --%>

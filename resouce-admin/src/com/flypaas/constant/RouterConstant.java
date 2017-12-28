@@ -18,7 +18,7 @@ public class RouterConstant {
 	public static final String upd = "3";
 	
 	/**
-	 * redis内路由域key值列表
+	 * redis路由域key值列表
 	 */
 	public static final String ROUTE_KEYS = "RTPP_CONCURR_ZSET*";
 	/**
@@ -26,16 +26,16 @@ public class RouterConstant {
 	 */
 	public static final String INFO_KEYS = "RTPP_INFO_*";
 	/**
-	 * redis内路由域默认查询值
+	 * redis路由域默认查询值
 	 */
 	public static final String ROUTE_DEFAULT_KEY = "RTPP_CONCURR_ZSET_cn";
 	/**
-	 * redis内路由域默认查询值
+	 * redis路由域默认查询值
 	 */
 	public static final String ROUTE_DEFAULT_KEY_CN = "cn";
 	
 	/**
-	 * redis内路由域默认查询值
+	 * redis路由域默认查询值
 	 */
 	public static final String PRE_ROUTE_KEY = "RTPP_CONCURR_ZSET_";
 	/**

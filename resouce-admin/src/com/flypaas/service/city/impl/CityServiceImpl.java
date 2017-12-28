@@ -94,6 +94,9 @@ public class CityServiceImpl implements CityService {
 				cityInfo.put("latitude", coordinatesList.get(0).get("lat"));
 				cityInfo.put("longitude", coordinatesList.get(0).get("lng"));
 			}
+		}else{
+			cityInfo.put("latitude", tbRsCity.getLatitude() );
+			cityInfo.put("longitude", tbRsCity.getLongitude() );
 		}
 		return cityInfo;
 	}

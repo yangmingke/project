@@ -230,6 +230,23 @@ public class RedisService {
 			jedisPool.returnResource(jedis);
 		}
 	}
+	
+	public String hget(String key,String field){
+		Jedis jedis=null;
+		try {
+			jedis=getJedis();
+			String val= jedis.hget(key,field);
+			logger.info("hget key "+key + " field " + field);
+			return val;
+		}catch (Exception e) {  
+			logger.error(e);
+			jedisPool.returnBrokenResource(jedis);
+			return null;
+        } finally{
+			jedisPool.returnResource(jedis);
+		}
+	}
+	
 	public String hmset(String key,Map<String,String> hash,int seconds){
 		Jedis jedis=null;
 		try {

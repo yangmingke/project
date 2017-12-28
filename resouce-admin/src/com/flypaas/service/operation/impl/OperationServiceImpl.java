@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,11 @@ import org.springframework.stereotype.Service;
 
 import com.flypaas.cdr.dao.LostRateMapper;
 import com.flypaas.cdr.dao.NodeConcurrenceMapper;
+import com.flypaas.constant.RouterConstant;
 import com.flypaas.dao.TbRsRTPPMapper;
 import com.flypaas.model.TbRsNodeConcurrence;
 import com.flypaas.model.TbRsSessRealtimeLost;
+import com.flypaas.service.impl.RedisService;
 import com.flypaas.service.operation.OperationService;
 import com.flypaas.util.JsonUtil;
 import com.flypaas.util.StrUtil;
@@ -176,6 +179,36 @@ public class OperationServiceImpl implements OperationService{
 		result.put("nodeData", nodesData);
 		result.put("time", timeList);
 		return result;
+	}
+	
+	@Override
+	public Set<String> getDomainList() {
+		return RedisService.getInstance().getKeys(RouterConstant.ROUTE_KEYS);
+	}
+
+	@Override
+	public Map<String, Object> querySessionSpeed(String routeDoamin, String routePolicy, String routeId,String routeType ,String sessionID) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		if(!sessionID.contains("_")){
+			sessionID = sessionID + "_0";
+		}
+		String sessionKey = RouterConstant.PRE_SESSION_KEYS+routeDoamin+"_"+routePolicy+"_"+routeId+"_*_" +sessionID;
+		Set<String> sessionPathKeys = RedisService.getInstance().getKeys(sessionKey);
+		for(String key :sessionPathKeys){
+			String path = RedisService.getInstance().hget(key, "path");
+			data.put("path", path.replaceAll(":", " -> "));
+			break;
+		}
+		
+		Map<String,List<String>> nodeSpeedListMap = new HashMap<String,List<String>>();
+		sessionID = sessionID.substring(0, sessionID.length()-2);
+		Set<String> nodeSpeedKeys = RedisService.getInstance().getKeys(sessionID + "_*_" + routeType);
+		for(String nodeSpeedKey :nodeSpeedKeys){
+			List<String> nodeSpeedList = RedisService.getInstance().lrange(nodeSpeedKey, 0, -1);
+			nodeSpeedListMap.put(nodeSpeedKey.split("_")[1], nodeSpeedList);//以ip为key
+		}
+		data.put("nodeSpeedList", nodeSpeedListMap);
+		return data;
 	}
 	
 	

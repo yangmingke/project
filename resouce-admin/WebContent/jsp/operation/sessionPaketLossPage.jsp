@@ -77,7 +77,7 @@
 			return false;
 		}
 		if(sessionID == ""){
-			$('#error').text('请至输入会话ID');
+			$('#error').text('请输入会话ID');
 			$('#error').show();
 			return false;
 		}

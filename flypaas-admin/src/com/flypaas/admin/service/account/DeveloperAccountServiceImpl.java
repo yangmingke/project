@@ -18,10 +18,12 @@ import com.flypaas.admin.constant.MsgConstant.TemplateId;
 import com.flypaas.admin.constant.SysConstant;
 import com.flypaas.admin.dao.CdrDao;
 import com.flypaas.admin.dao.MasterDao;
+import com.flypaas.admin.dao.StatDao;
 import com.flypaas.admin.model.PageContainer;
 import com.flypaas.admin.service.BillDtlService;
 import com.flypaas.admin.service.LogService;
 import com.flypaas.admin.service.data.MsgService;
+import com.flypaas.admin.util.rest.utils.DateUtil;
 
 /**
  * 账务管理-开发者账务
@@ -195,5 +197,17 @@ public class DeveloperAccountServiceImpl implements DeveloperAccountService {
 		List<Map<String, Object>> developerTrafficList = cdrDao.getSearchList("developerAccount.queryTraffic", sqlParams);
 		data.put("developerTrafficList", developerTrafficList);
 		return data;
+	}
+
+	@Override
+	public PageContainer queryFeeTime(Map<String, String> params) {
+		String date = params.get("date");
+		if(date == null || "".equals(date)){
+			date = DateUtil.getStrCurrentDate();
+		}
+		date = date.replaceAll("-", "");
+		params.put("date", date);
+		PageContainer page = cdrDao.getSearchPage("developerAccount.queryFeeTime", "developerAccount.queryFeeTimeCount", params);
+		return page;
 	}
 }

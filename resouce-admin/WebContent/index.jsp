@@ -41,6 +41,7 @@
   <ul>
   	<li><a href="${ctx}/jsp/operation/nodeConcurrenceMonitoring.jsp" target="right"><span class="icon-caret-right"></span>RTPC并发量监控</a></li>
   	<li><a href="${ctx}/jsp/operation/sessionPaketLossPage.jsp" target="right"><span class="icon-caret-right"></span>会话丢包查询</a></li>
+  	<li><a href="/operation/sessionSpeedPage" target="right"><span class="icon-caret-right"></span>会话传输速率查询</a></li>
     <li><a href="${ctx}/jsp/operation/packetLoss.jsp" target="right"><span class="icon-caret-right"></span>业务丢包监控</a></li>
     <li><a href="${ctx}/jsp/operation/packetLossSource.jsp" target="right"><span class="icon-caret-right"></span>丢包来源分布</a></li>
   </ul>

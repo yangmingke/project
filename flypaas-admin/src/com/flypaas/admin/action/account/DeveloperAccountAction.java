@@ -27,6 +27,7 @@ import com.flypaas.admin.util.web.StrutsUtils;
 @Scope("prototype")
 @Results({ @Result(name = "query", location = "/WEB-INF/content/account/developerAccount/query.jsp"),
 		@Result(name = "trafficView", location = "/WEB-INF/content/account/developerAccount/trafficView.jsp"),
+		@Result(name = "feeTimeView", location = "/WEB-INF/content/account/developerAccount/feeTimeView.jsp"),
 		@Result(name = "view", location = "/WEB-INF/content/account/developerAccount/view.jsp") })
 public class DeveloperAccountAction extends BaseAction {
 	private static final long serialVersionUID = -7384429858714304552L;
@@ -75,6 +76,18 @@ public class DeveloperAccountAction extends BaseAction {
 	}
 	
 	/**
+	 * 时长计费页面
+	 * 
+	 * @return
+	 */
+	@Action("/developerAccount/feeTimeView")
+	public String feeTimeView() {
+		page = developerAccountService.queryFeeTime(StrutsUtils.getFormData());
+		return "feeTimeView";
+	}
+	
+	
+	/**
 	 * 开发者流量页面
 	 * 
 	 * @return
@@ -93,7 +106,6 @@ public class DeveloperAccountAction extends BaseAction {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Action("/developerAccount/queryTraffic")
 	public void queryTraffic() {
 		data = developerAccountService.queryTraffic(StrutsUtils.getFormData());

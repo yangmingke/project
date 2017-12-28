@@ -29,11 +29,11 @@ public class MailService {
 	/**
 	 * 程序发生错误时，发送邮件
 	 * @param errorCode 错误码
-	 * @param errorContext 错误内容
 	 * @param requestPath  rest请求路径
 	 * @param requestBody  rest请求body
-	 * @param interfaceUrl 访问失败的接口
-	 * @param interfaceUrl 请求接口body
+	 * @param interfaceUrl 访问失败的底层接口
+	 * @param interfaceBody 请求底层接口body
+	 * @papam interfaceResult 请求底层接口返回内容
 	 */
 	public void sendErrorEmail(String errorCode, String requestPath, String requestBody, String interfaceUrl, String interfaceBody,String interfaceResult) {
 		Properties properties = getProperties();

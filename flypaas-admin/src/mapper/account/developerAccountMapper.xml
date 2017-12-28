@@ -221,4 +221,29 @@
 	 	GROUP BY hour(datetime)
 	</select>
 	
+	<select id="queryFeeTime" resultType="map">
+		select 
+			starttime,
+			endtime,
+			userfee,
+			userfeerate,
+			feetime,
+			total_traffic_in,
+			total_traffic_out 
+		from 
+			t_traffic_cdr_${date}
+		where 
+			sid = #{sid}
+		${limit}
+	</select>
+	
+	<select id="queryFeeTimeCount" resultType="map">
+		select 
+			count(*) totalCount
+		from 
+			t_traffic_cdr_${date}
+		where 
+			sid = #{sid}
+	</select>
+	
 </mapper> 

@@ -54,7 +54,7 @@
 						    <span>
 						    	<input type="text" name="fee_${event_id}_${is_show_nbr}_${fee_id}_${fee}" value="${fee}" class="txt_227" onfocus="inputControl.setNumber(this, 6, 4, false)" data-rule-required="true" data-msg-required="请输入金额"/>
 						    </span>
-					    </s:else>元
+					    </s:else>分
 				    </li>
 			    </s:iterator>
 		    </ul>

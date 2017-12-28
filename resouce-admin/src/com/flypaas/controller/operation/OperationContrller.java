@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.flypaas.constant.RouterConstant;
 import com.flypaas.service.operation.OperationService;
 import com.flypaas.util.DateUtil;
 import com.flypaas.util.StrUtil;
@@ -123,5 +125,21 @@ public class OperationContrller{
 		return new ModelAndView("jsp/operation/analysisResult",model);
 	}
 	
+	@RequestMapping("/sessionSpeedPage")
+	public ModelAndView sessionSpeedPage(){
+		Map<String,Object> model = new HashMap<String,Object>();
+		//redis获取所有域名
+		Set<String> routeKeyList = operationServiceImpl.getDomainList();
+		model.put("routeKeyList", routeKeyList);
+		model.put("routeDefaultKey", RouterConstant.ROUTE_DEFAULT_KEY);
+		return new ModelAndView("jsp/operation/sessionSpeedPage",model);
+	}
+	
+	@RequestMapping("/querySessionSpeed")
+	@ResponseBody
+	public Map<String,Object> querySessionSpeed(String routeDoamin, String routePolicy, String routeId,String routeType, String sessionID){
+		Map<String,Object> model = operationServiceImpl.querySessionSpeed(routeDoamin,routePolicy, routeId, routeType,sessionID.trim());
+		return model;
+	}
 	
 }

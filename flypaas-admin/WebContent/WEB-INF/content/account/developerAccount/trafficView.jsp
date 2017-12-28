@@ -19,8 +19,8 @@
         </ul>
     </div>
     <div class="clear"></div>
-    <span style="font-size:16px;" id="totalDayTraffic">日总流量:1000M</span>
-    <span style="font-size:16px; padding-left: 5%;" id="totalDayFee">日总费用:1000元</span>
+    <span style="font-size:16px;" id="totalDayTraffic">日总流量:</span>
+    <span style="font-size:16px; padding-left: 5%;" id="totalDayFee">日总费用:</span>
     <div id="main" style="height:480px;"></div>
 
 <script type="text/javascript">
