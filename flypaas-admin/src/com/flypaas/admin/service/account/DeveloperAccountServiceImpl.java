@@ -210,4 +210,20 @@ public class DeveloperAccountServiceImpl implements DeveloperAccountService {
 		PageContainer page = cdrDao.getSearchPage("developerAccount.queryFeeTime", "developerAccount.queryFeeTimeCount", params);
 		return page;
 	}
+	
+	@Override
+	public Map<String, Object> changeFeeType(Map<String, String> params) {
+		Map<String, Object> data = new HashMap<String, Object>();
+		int tmp = -1;
+		tmp = dao.update("developerAccount.changeFeeType", params);
+		if (tmp > 0) {
+			data.put("result", "success");
+			data.put("msg", "设置成功");
+
+		} else {
+			data.put("result", "fail");
+			data.put("msg", "账户信息不存在或状态不对,设置失败");
+		}
+		return data;
+	}
 }

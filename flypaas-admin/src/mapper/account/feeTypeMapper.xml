@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 计费类型 -->
+<mapper namespace="feeType">
+
+	<!-- 分页查询计费类型 -->
+	<select id="query" resultType="map">
+		SELECT
+			t.*, 
+			u.count
+		FROM
+			tb_ucpaas_fee_type t
+		LEFT JOIN (
+			SELECT
+				count(*) count,
+				fee_type
+			FROM
+				tb_ucpaas_user
+			GROUP BY
+				fee_type
+		) u ON t.fee_type_id = u.fee_type
+		WHERE
+		<if test="feeTypeId != null">
+			t.super_id = #{feeTypeId}
+		</if>
+		<if test="feeTypeId == null">
+			t.super_id is null
+		</if>
+		<if test="text != null">
+			AND t.fee_type_name LIKE concat('%', #{text}, '%')
+		</if>
+		${limit}
+	</select>
+	
+	<!-- 分页查询计费类型 记录总数 -->
+	<select id="queryCount" resultType="map">
+		SELECT
+			count(0) AS totalCount
+		FROM
+			tb_ucpaas_fee_type
+		WHERE
+		<if test="feeTypeId != null">
+			super_id = #{feeTypeId}
+		</if>
+		<if test="feeTypeId == null">
+			super_id is null
+		</if>
+		<if test="text != null">
+			AND fee_type_name LIKE concat('%', #{text}, '%')
+		</if>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO tb_ucpaas_fee_type (
+			fee_type_id,
+			fee_rate,
+			fee_type_name,
+			super_id,
+			create_time,
+			update_time
+		)
+		VALUES
+			(
+				#{feeTypeId},
+				#{feeRate},
+				#{feeTypeName},
+				#{superId},
+				now(),
+				now()
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE tb_ucpaas_fee_type
+		SET 
+			fee_type_id = #{feeTypeId},
+			fee_rate = #{feeRate},
+			fee_type_name = #{feeTypeName},
+			super_id = #{superId},
+			update_time = now()
+		WHERE 
+			fee_type_id = #{preFeeTypeId}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM tb_ucpaas_fee_type 
+		WHERE
+			fee_type_id = #{feeTypeId}
+	</delete>
+</mapper> 

@@ -30,7 +30,9 @@ public class NewConsumeDaoImpl extends CdrMyBatisDao implements NewConsumeDao {
 	private static final String APPCSMDATA="newAppCsmData";
 	private static final String LYDETAIL="lyDetail";
 	private static final String LYDETAILCOUNT="lyDetailCount";
-	
+	private static final String APPFEE="appFee";
+	private static final String DAYTOTALlFEE="dayTotalFee";
+	private static final String APPFEECOUNT="appFeeCount";
 	
 	private static final Map<String, String> SQL_KEY_MAP = new HashMap<String, String>();
 	static {
@@ -126,5 +128,15 @@ public class NewConsumeDaoImpl extends CdrMyBatisDao implements NewConsumeDao {
 
 	public PageContainer lyDetail(PageContainer page) {
 		return getSearchPage(LYDETAIL, LYDETAILCOUNT, page);
+	}
+
+	@Override
+	public PageContainer getAppFee(PageContainer page) {
+		return getSearchPage(APPFEE, APPFEECOUNT, page);
+	}
+
+	@Override
+	public String getDayTotalFee(Map<String, Object> param) {
+		return sqlSessionTemplate.selectOne(DAYTOTALlFEE, param);
 	}
 }

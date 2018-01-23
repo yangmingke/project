@@ -47,6 +47,7 @@
 		<result property="superSid" column="super_sid"/>
 		<result property="agentUrl" column="agent_url"/>
 		<result property="agentLogo" column="agent_logo"/>
+		<result property="feeType" column="fee_type"/>
 	</resultMap>
 	<resultMap id="sidResult" type="com.flypaas.entity.TbFlypaasUser">
 		<id property="sid" column="sid" />

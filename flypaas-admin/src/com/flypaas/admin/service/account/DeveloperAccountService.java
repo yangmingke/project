@@ -79,4 +79,6 @@ public interface DeveloperAccountService {
 	 */
 	PageContainer queryFeeTime(Map<String, String> formData);
 
+	Map<String, Object> changeFeeType(Map<String, String> params);
+
 }

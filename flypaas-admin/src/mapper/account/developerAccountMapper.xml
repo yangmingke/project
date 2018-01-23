@@ -15,7 +15,8 @@
 					b.acct_id,
 					b.sid,
 					u.email,
-					u.realname,
+					u.fee_type,
+					u.username,
 					u.mobile,
 					b.balance / ${money_rate} AS balance,
 					b.credit_balance /${money_rate} AS credit_balance_fmt,
@@ -46,7 +47,7 @@
 			AND (
 				b.acct_id LIKE concat(#{text}, '%')
 				OR u.email LIKE concat(#{text}, '%')
-				OR u.realname LIKE concat('%',#{text}, '%')
+				OR u.username LIKE concat('%',#{text}, '%')
 			)
 		</if>
 		<if test="start_balance != null">
@@ -82,7 +83,7 @@
 					b.acct_id,
 					b.sid,
 					u.email,
-					u.realname,
+					u.username,
 					u.mobile,
 					b.balance / ${money_rate} AS balance,
 					b.credit_balance /${money_rate} AS credit_balance_fmt,
@@ -113,7 +114,7 @@
 			AND (
 				b.acct_id LIKE concat(#{text}, '%')
 				OR u.email LIKE concat(#{text}, '%')
-				OR u.realname LIKE concat('%',#{text}, '%')
+				OR u.username LIKE concat('%',#{text}, '%')
 			)
 		</if>
 		<if test="start_balance != null">
@@ -223,8 +224,8 @@
 	
 	<select id="queryFeeTime" resultType="map">
 		select 
-			starttime,
-			endtime,
+			date_format(starttime,'%T') starttime,
+			date_format(endtime,'%T') endtime,
 			userfee,
 			userfeerate,
 			feetime,
@@ -245,5 +246,11 @@
 		where 
 			sid = #{sid}
 	</select>
+	
+	<!-- 设置计费类型-->
+	<update id="changeFeeType">
+		update tb_ucpaas_user set fee_type=#{feeType} 
+		where sid=#{sid} 
+	</update>
 	
 </mapper> 

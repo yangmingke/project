@@ -29,7 +29,26 @@ function createMap(data){
 		var rtpp = data.effectScatter[id];
 		cityNode.push(rtpp);
 	}
-	
+	var paths = "";
+	for(var i = 0; i <data.routeList.length; i++){
+		var routeName=""; 
+		var route = data.routeList[i];
+		for(var j in route){
+			if(j != 0){
+				routeName = routeName + " -> ";
+			}
+			if(route[j].indexOf(",") > 0){
+				routeName = routeName + route[j].split(",")[0] + "（"+ data.effectScatter[route[j].split(",")[0]].cityName +"）";
+				routeName = routeName + ","
+				routeName = routeName + route[j].split(",")[1] + "（"+ data.effectScatter[route[j].split(",")[1]].cityName +"）";
+			}else{
+				routeName = routeName + route[j] + "（"+ data.effectScatter[route[j]].cityName +"）";
+			}
+		}
+		var index = Number(i) + 1;
+		paths = paths + "<span>route"+index+"："+routeName+"</span></br>";
+	}
+	$('#paths').html(paths);
 	/**
 	 * 返回[出发地，目的地，[出发坐标，目的坐标]]List
 	 */

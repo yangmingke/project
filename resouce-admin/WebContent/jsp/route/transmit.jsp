@@ -39,6 +39,8 @@
 	        <a href="javascript:void(0)" class="button border-main icon-search" onclick="getData()" title="查询"> </a>
 	        <font color="red"><span id="error" hidden="hidden"></span></font>
         </li>
+	    <li id="paths">
+	    </li>    
       </ul>
     </div>
 	<div id="main" style="height:720px;"></div>

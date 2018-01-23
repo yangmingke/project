@@ -228,7 +228,8 @@ public class ClientServiceImpl extends RedisBaseService<String,ClientInfo> imple
 	public int updateByClientNumberCache(ClientInfo clientInfo) throws Exception {
 		int rows = this.updateByClientNumber(clientInfo);
 		Map<String, String> dbMap = DBShardingUtil.getMapDBNodeByClientNumber(clientInfo.getClientNumber());
-		this.deleteClientCache(dbMap.get("uin"));
+		/**调用第三方client缓存删除接口，例如IM（刘晓健提供）*/
+//		this.deleteClientCache(dbMap.get("uin"));//del by yangmingke  
 		return rows;
 	}
 

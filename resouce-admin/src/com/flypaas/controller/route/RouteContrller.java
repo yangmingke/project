@@ -208,7 +208,7 @@ public class RouteContrller{
 	}
 	
 	/**
-	 * 以节点为单位
+	 * 路由查找
 	 * @return
 	 */
 	@RequestMapping("/transmit")

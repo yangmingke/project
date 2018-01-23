@@ -3,7 +3,6 @@ package com.yzx.rest.service;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -751,6 +750,7 @@ public class ServiceManager {
 				fee *= -1;
 			}
 			try {
+				//ucpaas_statistics
 				List<Object[]> pList = new ArrayList<Object[]>();
 				pList.add(new Object[]{"string", clientNumber});
 				// long
@@ -776,17 +776,24 @@ public class ServiceManager {
 				}
 				pList2.add(new Object[]{"string", appId});
 				pList2.add(new Object[]{"number", 1});
-				DBLogService.getInstance().update(sql1, pList2);
-				/*  增加统一扣费中心， 后面所有的余额 扣费都从统一扣费中心获取， 所以此段代码废弃
-				String sql2 = "update tb_bill_client_balance set balance=balance-? where client_number=?";
-				List<Object[]> pList3 = new ArrayList<Object[]>();
-				pList3.add(new Object[]{"number", fee});
-				pList3.add(new Object[]{"string", clientNumber});
-				DBCommService.getInstance().update(sql2, pList3);
-				*/
+				int orderId = DBLogService.getInstance().updateAndGetKey(sql1, pList2);
+				
+				//ucpaas库
+				try{
+					String sql2 = "update tb_bill_client_balance set balance=balance+? where client_number=?";
+					List<Object[]> pList3 = new ArrayList<Object[]>();
+					pList3.add(new Object[]{"number", fee});
+					pList3.add(new Object[]{"string", clientNumber});
+					DBCommService.getInstance().update(sql2, pList3);
+				} catch (Exception e) {
+					//回滚ucpaas_statistics数据库
+					deleteOrder(orderId);
+					logger.error("子账号充值,异常：{}",e);
+					return "{resultcode:1,result:[]}";
+				}
 				
 				//获取ubs配置
-				String ubsServer = SysConfig.getInstance().getProperty("ubs_server");
+				/*String ubsServer = SysConfig.getInstance().getProperty("ubs_server");
 				String ubsPort = SysConfig.getInstance().getProperty("ubs_port");
 				//请求ubs应用充值接口
 				String url =new StringBuffer().append("http://").append(ubsServer).append(":")
@@ -807,8 +814,8 @@ public class ServiceManager {
 				if (StringUtils.isBlank(resultCode) || !resultCode.equalsIgnoreCase("true") ) {
 					logger.info("client充值失败：appSid="+appId+",金额："+fee+",原因："+obj.get("desc").getAsString());
 					return "{resultcode:1,result:[]}";
-				}
-				/*	由于tb_client_balance 不迁到分表分库故改接口废弃
+				}*/
+				//ucpaas_client
 				try {
 					ClientBalanceInfo balanceInfo = new ClientBalanceInfo();
 					balanceInfo.setBalance(clientBalance - fee);
@@ -817,8 +824,17 @@ public class ServiceManager {
 					//client接口 直接传页面参数即可
 					clientAsyncFacade.chargeClientBalanceByClientNumber(clientNumber, chargeType, Math.abs(fee));
 				} catch (Exception e) {
+					//回滚ucpaas_statistics数据库
+					deleteOrder(orderId);
+					//回滚ucpaas数据库
+					String sql2 = "update tb_bill_client_balance set balance=balance-? where client_number=?";
+					List<Object[]> pList3 = new ArrayList<Object[]>();
+					pList3.add(new Object[]{"number", fee});
+					pList3.add(new Object[]{"string", clientNumber});
+					DBCommService.getInstance().update(sql2, pList3);
 					logger.error("调用dubbo组件失败：" + e.getMessage());
-				}*/
+					return "{resultcode:1,result:[]}";
+				}
 				return "{resultcode:0,result:[]}";
 			} catch (Exception e) {
 				logger.error("子账号充值,异常：{}",e);
@@ -1357,5 +1373,16 @@ public class ServiceManager {
 		memInfo.setType(type);
 		memInfo.setExpries(expries);
 		return memInfo;
+	}
+	
+	private void deleteOrder(int orderId){
+		//ucpaas_statistics
+		String sql = "delete from ucpaas_statistics.tb_srv_client_fee_[DATE] where order_id=?";
+		SimpleDateFormat sdFormat = new SimpleDateFormat("yyyyMM");
+		String now = sdFormat.format(new Date());
+		sql = sql.replace("[DATE]", now);
+		List<Object[]> pList = new ArrayList<Object[]>();
+		pList.add(new Object[]{"string", orderId});
+		DBLogService.getInstance().update(sql, pList);
 	}
 }

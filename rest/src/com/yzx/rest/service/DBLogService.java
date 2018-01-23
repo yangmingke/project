@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import com.mysql.jdbc.Statement;
 import com.tools.DBUtil;
 import com.yzx.rest.util.Consts;
 public class DBLogService {
@@ -48,6 +49,41 @@ public class DBLogService {
 			DBUtil.closeConn(conn);
 		}
     }
+    
+    public int updateAndGetKey(String sql,List<Object[]> paramList){
+    	Connection conn = null;
+        PreparedStatement pstmt = null;
+        try {
+        	conn = DBUtil.getInstance().getConnection(Consts.CON_LOG);
+        	logger.debug(sql);
+            pstmt = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+            if (paramList!=null&&paramList.size()>0) {
+            	for (int i = 1; i <=paramList.size(); i++) {
+            		Object[] objects=paramList.get(i-1);
+            		if (objects[0].equals("number")) {
+						pstmt.setLong(i, Long.parseLong(objects[1].toString()));
+					}else if (objects[0].equals("string")) {
+						pstmt.setString(i, objects[1].toString());
+					}
+    			}
+			}
+            pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            int id=0;//保存生成的ID  
+            if (rs != null&&rs.next()) {  
+                id=rs.getInt(1);
+            } 
+            return id;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			logger.error("执行异常sqlCode="+sql,e);
+			return 0;
+		}finally{
+			DBUtil.closePStmt(pstmt);
+			DBUtil.closeConn(conn);
+		}
+    }
+    
 
     public int queryForInt(String sql,List<Object[]> paramList){
 		Connection conn = null;

@@ -46,7 +46,8 @@
 					<dl style="display:none;">
 						<dd id="m-031"><a href="<%=path %>/finance/index"><i class="i31">&nbsp;</i>财务总览</a></dd>
 						<dd id="m-032"><a href="<%=path %>/bill/chargeList"><i class="i32">&nbsp;</i>账户充值</a></dd>
-						<dd id="m-033"><a href="<%=path %>/bill/bill"><i class="i33">&nbsp;</i>消费账单</a></dd>
+						<%-- <dd id="m-033"><a href="<%=path %>/bill/bill"><i class="i33">&nbsp;</i>消费账单</a></dd> --%>
+						<dd id="m-033"><a href="<%=path %>/bill/feeTime"><i class="i33">&nbsp;</i>消费记录</a></dd>
 						<dd id="m-034"><a href="<%=path %>/bill/invoice"><i class="i34">&nbsp;</i>发票管理</a></dd>
 					</dl>
 					<dl style="display:none;">

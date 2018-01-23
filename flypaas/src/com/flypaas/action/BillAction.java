@@ -47,6 +47,7 @@ import com.flypaas.utils.SysConfig;
 	@Result(name="chargeListSuc",location="/page/bill/charge_list.jsp"),
 	@Result(name="extChargeListSuc",location="/page/bill/ext_charge_list.jsp"),
 	@Result(name="billSuc",location="/page/bill/bill.jsp"),
+	@Result(name="feeTime",location="/page/bill/feeTime.jsp"),
 	@Result(name="billMonthSuc",location="/page/bill/bills_monthly.jsp"),
 	@Result(name="appCsmReportSuc",location="/page/bill/bill_csm.jsp"),
 	@Result(name="invoiceSuc",location="/page/bill/invoice_manage.jsp"),
@@ -69,6 +70,7 @@ public class BillAction extends BaseAction {
 	private String type;
 	private String beginDate;
 	private String endDate;
+	private String datetime;
 	private String appSid;
 	private String monthCsm;
 	private String month;
@@ -81,11 +83,13 @@ public class BillAction extends BaseAction {
 	private Province province;
 	private InvoiceAddresslist addr;
 	private long invoiceMoney ; 
+	private String dayTotalFee;
 	private TbFlypaasUser user;
 	private File identificationimg;
 	private String identificationimgFileName;
 	private String title;
 	private String invoiceId;
+	private Map<String,String> appMap;
 	//充值列表
 	@Action("/bill/chargeList")
 	public String chargeList() {
@@ -192,6 +196,44 @@ public class BillAction extends BaseAction {
 		page.setParams(param);
 		page = consumeService.getApp45Csm(page);
 		return "appCsmReportSuc";
+	}
+	//app消费
+	@Action("/bill/feeTime")
+	public String feeTime() {
+		if (null == page) {
+			page = new PageContainer();
+		}
+		page.setPageRowCount(10);
+		
+		appList = appService.getAllAppBySid(getSessionUser().getSid());
+		if(null == appList){
+			return "feeTime";
+		}
+		
+		//查询APP名称
+		appMap = new HashMap<String,String>();
+		for (Application app : appList) {
+			appMap.put(app.getAppSid(), app.getAppName());
+		}
+		
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("sid", getSessionUser().getSid());
+		if (StringUtils.isEmpty(datetime)) {
+			datetime = DateUtil.dateToStr(new Date(), "yyyy-MM-dd");
+		}
+		param.put("datetime", datetime.replaceAll("-", ""));
+		if(StringUtils.isNotEmpty(appSid)){
+			param.put("appSid", appSid);
+		}
+		page.setParams(param);
+		page = consumeService.getAppFee(page);
+		List<Map<String, Object>> feeList = page.getList();
+		for(Map<String, Object> feeMap : feeList){
+			String appid = (String) feeMap.get("appid");
+			feeMap.put("appName", appMap.get(appid));
+		}
+		dayTotalFee = consumeService.getDayTotalFee(param);
+		return "feeTime";
 	}
 	//月账单
 	@Action("/bill/billMonth")
@@ -726,6 +768,24 @@ public class BillAction extends BaseAction {
 	}
 	public void setIdentificationimgFileName(String identificationimgFileName) {
 		this.identificationimgFileName = identificationimgFileName;
+	}
+	public String getDatetime() {
+		return datetime;
+	}
+	public void setDatetime(String datetime) {
+		this.datetime = datetime;
+	}
+	public Map<String,String> getAppMap() {
+		return appMap;
+	}
+	public void setAppMap(Map<String,String> appMap) {
+		this.appMap = appMap;
+	}
+	public String getDayTotalFee() {
+		return dayTotalFee;
+	}
+	public void setDayTotalFee(String dayTotalFee) {
+		this.dayTotalFee = dayTotalFee;
 	}
 	
 }

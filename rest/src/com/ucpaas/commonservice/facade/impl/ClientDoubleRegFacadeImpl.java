@@ -108,8 +108,10 @@ public class ClientDoubleRegFacadeImpl implements ClientDoubleRegFacade {
 			}
 			// 写110数据库
 			clientInfo.setUserid(clientNumber);
-			ResultInfo<ClientInfo> resultInfo = insertClientReg2015(clientInfo);
-
+//			ResultInfo<ClientInfo> resultInfo = insertClientReg2015(clientInfo);//edit by yangmingke
+			
+			ResultInfo<ClientInfo> resultInfo = insertClientReg2015(clientInfo,clientBalanceInfo);
+			
 			if (resultInfo.getErrorCode() != ErrorCode.C100000.getCode()) {
 
 				throw new Exception("【rest2014 double注册子账号】入库110库失败，（手动throw异常）errorInfo:"+resultInfo.getErrorInfo());
@@ -136,6 +138,89 @@ public class ClientDoubleRegFacadeImpl implements ClientDoubleRegFacade {
 		return resultMap;
 	}
 
+	/**
+	 * 134已经入库成功 110一定要入库成功 否则回滚134数据，保证134 、110数据一致性
+	 * 
+	 * @param clientInfo
+	 * @param clientBalanceInfo 
+	 * @return
+	 */
+	public ResultInfo<ClientInfo> insertClientReg2015(ClientInfo clientInfo, ClientBalanceInfo clientBalanceInfo) {
+		ResultInfo<ClientInfo> resultInfo = new ResultInfo<ClientInfo>(ErrorCode.C100000);
+		
+		int i = 0;
+		log.info(
+				"【rest2014 double注册子账号】入库110开始,client_number = {},mobile = {},userId = {},appSid = {},clientType = {}",
+				clientInfo.getClientNumber(), clientInfo.getMobile(), clientInfo.getUserid(), clientInfo.getAppSid(),
+				clientInfo.getClientType());
+		try {
+
+			if (StringUtils.isEmpty(clientInfo.getAppSid())) {
+				resultInfo.setResultFail(ErrorCode.C121001);
+			} else if (StringUtils.isEmpty(clientInfo.getUserid())) {
+				resultInfo.setResultFail(ErrorCode.C131003);
+			} else if (StringUtils.isEmpty(clientInfo.getClientNumber())) {
+				resultInfo.setResultFail(ErrorCode.C131001);
+			} else if (null == clientInfo.getUin()) {
+				resultInfo.setResultFail(ErrorCode.C131004);
+			} else {
+				// 判断mobile_appid是否存在反向表
+				if (StringUtils.isNotBlank(clientInfo.getMobile())) {
+					String mobile_appid = clientInfo.getMobile() + "_" + clientInfo.getAppSid();
+					Attr2uinInfo attr_mobile = this.attr2uinInfoService.getByAttr(mobile_appid,
+							Constants.ATTR2UIN_TYPE_102);
+					if (attr_mobile != null) {
+						// 应用下存在该手机号码，返回错误码
+						resultInfo.setResultFail(ErrorCode.C121003);
+						log.info("【rest2014 double注册子账号】入库110结束,【失败：手机号码重复】timeCount={}", resultInfo.getTimeCount());
+						return resultInfo;
+					}
+				}
+
+				// 判断userid_appid是否存在反向表 对于2014userid
+				if (StringUtils.isNotBlank(clientInfo.getUserid())) {
+					String userid_appid = clientInfo.getUserid() + "_" + clientInfo.getAppSid();
+					Attr2uinInfo attr_userid = this.attr2uinInfoService.getByAttr(userid_appid,
+							Constants.ATTR2UIN_TYPE_101);
+					if (attr_userid != null) {
+						// 应用下存在该userid，返回错误码
+						resultInfo.setResultFail(ErrorCode.C121004);
+						log.info("【rest2014 double注册子账号】入库110结束,【失败：userid重复】,timeCount={}", resultInfo.getTimeCount());
+						return resultInfo;
+					}
+				}
+
+				//获取userToken生成新的token ----------------
+				UserInfo userInfo = userService.getBySid(clientInfo.getSid(), null, null);
+				String userToken = userInfo ==null?"":userInfo.getToken();
+				String clientToken = TokenClient.getToken(clientInfo.getSid(), userToken, clientInfo.getAppSid(), clientInfo.getUserid());	
+				clientInfo.setClientToken(clientToken);
+				//------------------end----------------------------
+				i = this.clientRegService.regClientAndAttrAndBalance(clientInfo, clientBalanceInfo);
+				resultInfo.setAffectedRows(i);
+				// 插入测试client
+				if ("0".equals(clientInfo.getClientType())) {
+					testClientService.insert(new TestClientInfo(clientInfo));
+				}
+			}
+
+		} catch (Exception e) {
+			resultInfo.setResultFail(ErrorCode.C131009);
+			log.error("【rest2014 double注册子账号】入库110错误,clientInfo={}，resultInfo = {}，e= {}", clientInfo, resultInfo, e);
+			// 回滚脏数据
+			try {
+				this.clientRegService.rollbackClient(clientInfo, null);
+			} catch (Exception e1) {
+				log.error("【rest2014 double注册子账号】回滚错误！！！！！！e= {}", e1);
+			}
+		}
+
+		log.info("【rest2014 double注册子账号】入库110结束,i={},client_number = {},errorCode={},errorMsg={},timeCount={}", i,
+				clientInfo.getClientNumber(), resultInfo.getErrorCode(), resultInfo.getErrorInfo(),
+				resultInfo.getTimeCount());
+		return resultInfo;
+	}
+	
 	/**
 	 * 134已经入库成功 110一定要入库成功 否则回滚134数据，保证134 、110数据一致性
 	 * 

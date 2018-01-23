@@ -149,4 +149,45 @@
 	<select id="lyDetailCount" parameterType="map" resultType="map">
 		select count(0) as totalCount from flypaas_statistics.tb_record_log_${date} where sid=#{sid} and app_sid=#{appSid}
 	</select>
+	
+	<select id="appFee" parameterType="map" resultType="map">
+		select 
+			date_format(starttime,'%T') starttime,
+			date_format(endtime,'%T') endtime,
+			appid,
+			CONVERT(userfee,char) userfee,
+			userfeerate,
+			feetime,
+			CONVERT(round(total_traffic_in/(1024*1024)),char) total_traffic_in,
+			CONVERT(round(total_traffic_out/(1024*1024)),char) total_traffic_out 
+		from 
+			t_traffic_cdr_${datetime}
+		where 
+			sid = #{sid}
+		<if test="appSid!=null"> 
+		and
+			appid = #{appSid}
+		</if>
+		${limit}
+	</select>
+	<select id="appFeeCount" parameterType="map" resultType="map">
+		select 
+			count(*) totalCount
+		from 
+			t_traffic_cdr_${datetime}
+		where 
+			sid = #{sid}
+		<if test="appSid!=null">
+		and 
+			appid = #{appSid}
+		</if>
+	</select>
+	<select id="dayTotalFee" parameterType="map" resultType="String">
+		select 
+			CONVERT(round(sum(userfee)/100,4),char)
+		from 
+			t_traffic_cdr_${datetime}
+		where 
+			sid = #{sid}
+	</select>
 </mapper>

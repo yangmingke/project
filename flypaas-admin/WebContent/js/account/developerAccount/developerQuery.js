@@ -23,8 +23,8 @@ function trafficView(sid,realname){
 }
 
 //查看使用时长计费情况
-function feeTimeView(sid,realname){
-	location.href=ctx +"/developerAccount/feeTimeView?sid=" + sid + "&realname=" + encodeURI(encodeURI(realname));
+function feeTimeView(sid,realname,fee_type){
+	location.href=ctx +"/developerAccount/feeTimeView?sid=" + sid + "&fee_type=" + fee_type + "&realname=" + encodeURI(encodeURI(realname));
 }
 
 //初始化弹层(冻结,解冻,注销) 
@@ -310,4 +310,30 @@ function saveCreditBalance(sid,acct_id){
 		}else{
 			alert("请正确填写信用额度,纯数字格式,最多十位整数四位小数.");
 		}
+}
+/**
+ * 转化计费类型
+ * @param sid
+ * @param feeType
+ */
+function changeFeeType(sid,feeType){
+	var confirmText='';
+	var change2="";
+	if(feeType==101){
+		confirmText = "确定转化为时间计费吗？";
+		change2 = 102;
+	}else if(feeType==102){
+		confirmText = "确定转化为流量计费吗？";
+		change2 = 101;
+	}
+	if(confirm(confirmText)){
+		$.post("/developerAccount/changeFeeType",{"sid":sid,"feeType":change2},function(data){
+			if(data.result == "success"){
+				alert(data.msg);
+				document.location.reload();//当前页面 
+			}else{
+				alert(data.msg);
+			}
+		});
+	}
 }

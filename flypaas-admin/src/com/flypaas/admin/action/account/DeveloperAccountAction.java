@@ -133,4 +133,11 @@ public class DeveloperAccountAction extends BaseAction {
 		data = developerAccountService.saveCreditBalance(StrutsUtils.getFormData());
 		StrutsUtils.renderJson(data);
 	}
+	
+	@Action("/developerAccount/changeFeeType")
+	public void changeFeeType() {
+		data = developerAccountService.changeFeeType(StrutsUtils.getFormData());
+		StrutsUtils.renderJson(data);
+	}
+	
 }

@@ -26,4 +26,8 @@ public interface ConsumeService {
 	public List<Map<String, Object>> appCsmDataByMonth(Map<String, String> map);
 	
 	public PageContainer lyDetail(PageContainer page);
+
+	public PageContainer getAppFee(PageContainer page);
+
+	public String getDayTotalFee(Map<String, Object> param);
 }

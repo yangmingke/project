@@ -29,4 +29,8 @@ public interface NewConsumeDao {
 	public PageContainer lyDetail(PageContainer page);
 
 	public List<Map<String, Object>> getCurrentTrafficCsm(Map<String, Object> map);
+
+	public PageContainer getAppFee(PageContainer page);
+
+	public String getDayTotalFee(Map<String, Object> param);
 }

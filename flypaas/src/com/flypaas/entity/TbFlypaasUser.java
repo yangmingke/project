@@ -57,6 +57,7 @@ public class TbFlypaasUser implements Serializable {
 	private String superSid;
 	private String agentUrl;
 	private String agentLogo;
+	private String feeType;
 	public String getSid() {
 		return sid;
 	}
@@ -329,6 +330,12 @@ public class TbFlypaasUser implements Serializable {
 	}
 	public void setAgentLogo(String agentLogo) {
 		this.agentLogo = agentLogo;
+	}
+	public String getFeeType() {
+		return feeType;
+	}
+	public void setFeeType(String feeType) {
+		this.feeType = feeType;
 	}
 	
 }

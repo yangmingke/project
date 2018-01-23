@@ -59,12 +59,13 @@
             <tr>
               <th width="50px">序号</th>
               <!-- <th>钱包编号</th> -->
+              <th>邮箱</th>
               <th>用户名</th>
-              <th>认证名称</th>
               <th>手机号码</th>
               <th>钱包余额（元）</th>
               <!-- <th>信用额度（元）</th> -->
-              <th>资费套餐</th>
+             <!--  <th>资费套餐</th> -->
+              <th>计费类型</th>
               <th>钱包状态</th>
               <th>最后一次充值时间</th>
               <th>操作</th>
@@ -74,11 +75,12 @@
 	            	<td tit="v_rownum">${rownum}</td>
 	            	<%-- <td tit="v_acct_id">${acct_id}</td> --%>
 	            	<td tit="v_email">${email}</td>
-	            	<td tit="v_realname">${realname}</td>
+	            	<td tit="v_realname">${username}</td>
 	            	<td tit="v_mobile">${mobile}</td>
 	            	<td tit="v_balance">${balance}</td>
 	            	<%-- <td tit="v_credit_balance">${credit_balance_fmt}</td> --%>
-	            	<td tit="v_package_name">${package_name}</td>
+	            	<%-- <td tit="v_package_name">${package_name}</td> --%>
+	            	<td tit="v_fee_type_name"><u:ucparams key="${fee_type}" type="fee_type"/></td>
 	            	<td tit="v_wallet_status_name"><u:ucparams key="${wallet_status}" type="wallet_status"/></td>
 	            	<td tit="v_last_recharge_date">${last_recharge_date}</td>
 	            	<td>
@@ -100,12 +102,18 @@
 							<%-- </s:if>
 							<s:if test="menuId_54"> --%>
 								| <a href="javascript:;" onclick="createInvoice('${sid}')">开票</a>
+							<s:if test="fee_type==101">
+								| <a href="javascript:;" onclick="changeFeeType('${sid}','${fee_type }')">转换为时间计费</a>
+							</s:if>
+							<s:elseif test="fee_type==102">
+								| <a href="javascript:;" onclick="changeFeeType('${sid}','${fee_type }')">转换为流量计费</a>
+							</s:elseif>
 							<%-- </s:if> --%>
 								<%-- 
 								| <a href="javascript:;" onclick="enableFlagBox('#tr_${rownum} td','注销',3)">注销</a>
 								 --%>
 								 | <a href="javascript:;" onclick="trafficView('${sid}','${realname}')">流量消耗</a>
-								 | <a href="javascript:;" onclick="feeTimeView('${sid}','${realname}')">时长计费</a>
+								 | <a href="javascript:;" onclick="feeTimeView('${sid}','${realname}','${fee_type}')">消费记录</a>
 	            		</s:if>
 	            		<s:elseif test="wallet_status==0"><%--0：冻结 --%>
 				      		<%-- <s:if test="menuId_49"> --%>
@@ -122,12 +130,18 @@
 							<%-- </s:if>
 				      		<s:if test="menuId_54"> --%>
 								| <a href="javascript:;" onclick="balanceBox('#tr_${rownum} td','扣费')">扣费</a>
+							<s:if test="fee_type==101">
+								| <a href="javascript:;" onclick="changeFeeType('${sid}','${fee_type }')">转换为时间计费</a>
+							</s:if>
+							<s:elseif test="fee_type==102">
+								| <a href="javascript:;" onclick="changeFeeType('${sid}','${fee_type }')">转换为流量计费</a>
+							</s:elseif>
 							<%-- </s:if> --%>
 								<%-- 
 								| <a href="javascript:;" onclick="enableFlagBox('#tr_${rownum} td','注销',3)">注销</a>
 								 --%>
 								 | <a href="javascript:;" onclick="trafficView('${sid}','${realname}')">流量消耗</a>
-								 | <a href="javascript:;" onclick="feeTimeView('${sid}','${realname}')">时长计费</a>
+								 | <a href="javascript:;" onclick="feeTimeView('${sid}','${realname}','${fee_type}')">消费记录</a>
 	            		</s:elseif>
 	            		<s:elseif test="wallet_status==3"><%--3已注销 --%>
 				      		<%-- <s:if test="menuId_49"> --%>

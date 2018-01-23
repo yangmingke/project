@@ -26,6 +26,10 @@ public class ConsumeServiceImpl extends DaoCenter implements ConsumeService {
 	public PageContainer getApp45Csm(PageContainer page) {
 		return consumeDao.getApp45Csm(page);
 	}
+	
+	public PageContainer getAppFee(PageContainer page) {
+		return newConsumeDao.getAppFee(page);
+	}
 
 	public List<Map<String, Object>> getBillMonth(Map<String, Object> param) {
 		return consumeDao.getBillMonth(param);
@@ -57,6 +61,11 @@ public class ConsumeServiceImpl extends DaoCenter implements ConsumeService {
 
 	public PageContainer lyDetail(PageContainer page) {
 		return consumeDao.lyDetail(page);
+	}
+
+	@Override
+	public String getDayTotalFee(Map<String, Object> param) {
+		return newConsumeDao.getDayTotalFee(param);
 	}
 
 }
