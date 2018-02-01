@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ include file="/common/taglibs.jsp"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%> 
 
 <html>
 <head>
@@ -11,7 +12,7 @@
         <form method="post" id="mainForm" action="${ctx}/feeType/feeTypeConfig" >
           <ul>
             <li>
-           		<a href="javascript:;" onclick="add('${super_id}')">添加资费项目</a>
+           		<a href="javascript:;" onclick="add('${super_id}')">添加计费项目</a>
             </li>
             <li>
            		<a href="javascript:;" onclick="back()">返回</a>
@@ -27,7 +28,7 @@
               <th width="50px">序号</th>
               <th>计费编号</th>
               <th>类型名称</th>
-              <th>资费价格(分)</th>
+              <th>计费价格(分)</th>
               <th>计费类型</th>
               <th>创建时间</th>
               <th>修改时间</th>
@@ -44,7 +45,7 @@
 	            	<td>${update_time}</td>
 	            	<td>
 						<a href="javascript:;" onclick="show('${rownum}','edit')">编辑</a>
-				   	 |  <a href="javascript:;" onclick="del('${fee_type_id}','${fee_type_name}')">删除</a>
+				   	 |  <a href="javascript:;" onclick="del('${fee_type_id}','${fee_type_name}','${fn:length(page.list)}')">删除</a>
 					</td>
 	            </tr>
 	            <tr id="tr_${rownum}_edit" style="display: none;" class="unhover">
@@ -105,14 +106,14 @@
 		var fee_type_name = $('#fee_type_name').val().trim;
 		var fee_rate = $('#fee_rate').val();
 		if(fee_type_id == "" || fee_type_name == "" || fee_rate == ""){
-			alert("请完善扣费项目内容");
+			alert("请完善计费项目内容");
 			return false;
 		}
 		$.post("${ctx}/feeType/addFeeTypeItem",{feeTypeId:fee_type_id,superId:super_id,feeRate:fee_rate,feeTypeName:fee_type_name},function(data){
 			if(data.result =="success"){
 				window.location.reload();
 			}else{
-				alert('收费项目添加失败');
+				alert('计费项目添加失败');
 			}
 		});
 	}
@@ -125,7 +126,7 @@
 		var fee_type_name = $('#fee_type_name_'+pre_fee_type_id).val().trim();
 		var fee_rate = $('#fee_rate_'+pre_fee_type_id).val();
 		if(fee_type_id == "" || fee_type_name == "" || fee_rate == ""){
-			alert("请完善扣费项目内容");
+			alert("请完善计费项目内容");
 			return false;
 		}
 		$.post("${ctx}/feeType/updateFeeTypeItem",{feeTypeId:fee_type_id,superId:super_id,feeRate:fee_rate,feeTypeName:fee_type_name,preFeeTypeId:pre_fee_type_id},function(data){
@@ -137,7 +138,11 @@
 		});
 	}
 	
-	function del(fee_type_id,fee_type_name){
+	function del(fee_type_id,fee_type_name,length){
+		if(Number(length) <= 1){
+			alert('该计费项目不能删除，至少保留一个计费项目');
+			return false;
+		}
 		if(confirm("确定要删除“"+fee_type_name+"”计费项目吗？")){
 			$.post("${ctx}/feeType/delFeeTypeItem",{feeTypeId:fee_type_id},function(data){
 				if(data.result =="success"){
