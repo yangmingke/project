@@ -1,6 +1,7 @@
 package com.yzx.rest.service.impl;
 
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -340,7 +341,7 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 		ListResp listResp = new ListResp();
 		long time1 = new Date().getTime();
 		String appId = sessionInfo.getAppId();
-//		String cookie = sessionInfo.getSessionId();
+		String cookie = sessionInfo.getSessionId();
 		String udpPortNum = sessionInfo.getUdpPortNum();
 		String vflag = sessionInfo.getVflag();
 		String policy = sessionInfo.getPolicy();
@@ -589,6 +590,10 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 					if(map.get("sessionid") != null){
 						String sessionId = (String) map.get("sessionid");
 						listResp.setSessionId(sessionId);
+						//保存客户端会话cookie映射
+						if(StringUtils.isNotEmpty(cookie)){
+							addAliasSessionId(sessionId,accountSid,appId,cookie);
+						}
 					}
 					if(map.get("direct") != null){
 						String direct = String.valueOf(map.get("direct")).split("[.]")[0];
@@ -2070,5 +2075,18 @@ public class AccountServiceImpl extends BaseService implements AccountService {
 		paramList.add(new Object[]{"string", appId});
 		List<Map<String, Object>> list = DBCommService.getInstance().queryForList(SqlCode.QUERY_APP_BY_ID, paramList,Consts.CON_MASTER);
 		return list.get(0);
+	}
+	
+	private void addAliasSessionId(String sessionId, String accountSid, String appId, String cookie) {
+		SimpleDateFormat sFormat = new SimpleDateFormat("yyyyMM");
+		String now = sFormat.format(new Date());
+		String sql = SqlCode.ADD_ALIAS_SESSION_ID;
+		sql = sql.replace("[DATE]", now);
+		List<Object[]> paramList =new ArrayList<Object[]>();
+		paramList.add(new Object[]{"string", sessionId});
+		paramList.add(new Object[]{"string", accountSid});
+		paramList.add(new Object[]{"string", appId});
+		paramList.add(new Object[]{"string", cookie});
+		DBCommService.getInstance().update(sql, paramList);
 	}
 }

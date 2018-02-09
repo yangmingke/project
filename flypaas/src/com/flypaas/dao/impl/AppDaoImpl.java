@@ -31,7 +31,8 @@ public class AppDaoImpl extends MyBatisDao implements AppDao {
 	private static final String GETALLAPPBYSID="getAllAppBySid";
 	private static final String GETAPPSNOTCONTAINSTESTAPPBYSID="getAppsNotContainsTestAppBySid";
 	private static final String GETAPPBYSIDAPPSID="getAppBySidAppSid";
-
+	private static final String GETSESSIONIDALIAS="getSessionIdAlias";
+	
 	private StatisticsMyBatisDao statisticsMyBatisDao;
 	
 	@Resource(name="statisticsMyBatisDao")
@@ -99,5 +100,10 @@ public class AppDaoImpl extends MyBatisDao implements AppDao {
 
 	public Application getAppBySidAppSid(Application app) {
 		return sqlSessionTemplate.selectOne(GETAPPBYSIDAPPSID, app);
+	}
+
+	@Override
+	public List<Map<String, String>> getSessionIdAlias(Map<String, Object> param) {
+		return sqlSessionTemplate.selectList(GETSESSIONIDALIAS, param);
 	}
 }

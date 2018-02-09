@@ -117,7 +117,7 @@ public class RouteServiceImpl implements RouteService {
 			String cityName = StrUtil.isEmpty(tbRsCity.getCity()) ? tbRsCity.getCountry() : tbRsCity.getCity();
 			String operatorName = tbRsIspMapper.queryById(operator);
 			List<Map> coordinatesList = (List) GooleMapUtil.getCoordinate(cityName).get("result");
-			if(coordinatesList == null && coordinatesList.size() != 1){
+			if(coordinatesList == null){
 				resource.put("latitude", tbRsCity.getLatitude());
 				resource.put("longitude", tbRsCity.getLongitude());
 			}else{

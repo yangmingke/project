@@ -91,4 +91,6 @@ public interface AppDao {
 	
 	public Application getAppBySidAppSid(Application app);
 
+	public List<Map<String, String>> getSessionIdAlias(Map<String, Object> param);
+
 }

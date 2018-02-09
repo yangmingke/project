@@ -155,18 +155,31 @@
 			date_format(starttime,'%T') starttime,
 			date_format(endtime,'%T') endtime,
 			appid,
+			cookie,
 			CONVERT(userfee,char) userfee,
 			userfeerate,
 			feetime,
-			CONVERT(round(total_traffic_in/(1024*1024)),char) total_traffic_in,
-			CONVERT(round(total_traffic_out/(1024*1024)),char) total_traffic_out 
+			CONVERT(round((total_traffic_in+total_traffic_out)/(1024*1024)),char) total_traffic
 		from 
 			t_traffic_cdr_${datetime}
 		where 
 			sid = #{sid}
 		<if test="appSid!=null"> 
-		and
-			appid = #{appSid}
+			and appid = #{appSid}
+		</if>
+		<if test="keyword != null"> 
+			and (
+				cookie like concat('%',#{keyword},'%')
+				<if test="cookieList != null">
+					or cookie in 
+						<foreach collection="cookieList" index="index" item="cookie" open="(" separator="," close=")">
+			                 #{cookie}       
+			            </foreach>
+	            </if>
+			)
+		</if>
+		<if test="timePre != null">
+			and DATE_FORMAT(starttime,'%H:%i') between #{timePre} and #{timeTail}
 		</if>
 		${limit}
 	</select>
@@ -180,6 +193,21 @@
 		<if test="appSid!=null">
 		and 
 			appid = #{appSid}
+		</if>
+		<if test="keyword != null"> 
+		and (
+			cookie like concat('%',#{keyword},'%')
+			<if test="cookieList != null">
+				or
+				cookie in 
+				<foreach collection="cookieList" index="index" item="cookie" open="(" separator="," close=")">
+	                 #{cookie}       
+	            </foreach>
+            </if>
+		)
+		</if>
+		<if test="timePre != null">
+			and DATE_FORMAT(starttime,'%H:%i') between #{timePre} and #{timeTail}
 		</if>
 	</select>
 	<select id="dayTotalFee" parameterType="map" resultType="String">

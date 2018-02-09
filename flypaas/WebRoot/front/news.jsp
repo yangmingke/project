@@ -44,7 +44,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
       <div class="display_ctn news_list">
         <ul>
          <s:if test="page.list!=null">
-              	<s:iterator value="page.list" id="r">
+              	<s:iterator value="page.list" var="r">
               			 <li>
 				            <h3><a href="<%=path %>/about/newsInfo?newsId=${r.news_id}"><s:property value="#r.title"/></a></h3>
 				            <p><s:property value="#r.summary"/>...</p>

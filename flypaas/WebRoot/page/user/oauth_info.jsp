@@ -136,7 +136,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 							</div>
 
 							
-							<s:set id="p1" value="1"></s:set>
+							<s:set var="p1" value="1"></s:set>
 				            <s:if test="userPicList!=null">
 				              	<s:iterator value="userPicList" var="p">
 				              		<s:if test="#p.idType==3">
@@ -158,14 +158,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 												<dd><span class="img"><img src="<%=path%>/file/view?FileName=<u:des3 value='${p.imgUrl}'/>" /></span></dd>
 											</dl>
 										</div>
-						                <s:set id="p1" value="2"></s:set>
+						                <s:set var="p1" value="2"></s:set>
 				              		</s:if>
 				              	</s:iterator>
 				            </s:if>
 				            
 				            
 				            
-							 <s:set id="p2" value="1"></s:set>
+							 <s:set var="p2" value="1"></s:set>
 				             <s:if test="userPicList!=null">
 				              	<s:iterator value="userPicList" var="p">
 				              		<s:if test="#p.idType==4">
@@ -187,14 +187,14 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 												<dd><span class="img"><img src="<%=path%>/file/view?FileName=<u:des3 value='${p.imgUrl}'/>" /></span></dd>
 											</dl>
 										</div>
-						              <s:set id="p2" value="2"></s:set>
+						              <s:set var="p2" value="2"></s:set>
 				              		</s:if>
 				              	</s:iterator>
 				              </s:if>
 				              
 				              
 							
-							 <s:set id="p3" value="1"></s:set>
+							 <s:set var="p3" value="1"></s:set>
 							 <s:if test="userPicList!=null">
 				              	<s:iterator value="userPicList" var="p">
 				              		<s:if test="#p.idType==5">
@@ -216,7 +216,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 												<dd><span class="img"><img src="<%=path%>/file/view?FileName=<u:des3 value='${p.imgUrl}'/>" /></span></dd>
 											</dl>
 										</div>
-						               <s:set id="p3" value="2"></s:set>
+						               <s:set var="p3" value="2"></s:set>
 				              		</s:if>
 				              	</s:iterator>
 				              </s:if>

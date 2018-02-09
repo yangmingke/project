@@ -272,4 +272,8 @@ public class AppServiceImpl extends DaoCenter implements AppService {
 		sessionPacketLoss.put("resultJson", JsonUtil.toJsonStr(analysisResultList));//用于画曲线图
 		return sessionPacketLoss;
 	}
+	@Override
+	public List<Map<String, String>> getSessionIdAlias(Map<String, Object> param) {
+		return appDao.getSessionIdAlias(param);
+	}
 }

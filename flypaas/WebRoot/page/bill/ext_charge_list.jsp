@@ -62,7 +62,7 @@ input { cursor:pointer; outline:none;}
 					<tbody>
 						<tr><th>订单号</th><th>金额</th><th>状态</th><th>订单时间</th></tr>
 						 <s:if test="page.list.size()>0">
-      						<s:iterator value="page.list" id="pay">
+      						<s:iterator value="page.list" var="pay">
 								<tr>
 								<td>${pay.order_id }</td>
 								<td>¥${pay.charge }</td>

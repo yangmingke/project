@@ -36,7 +36,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 			<div class="msg_box">
 				<s:if test="page.list.size()>0">
-       	     		<s:iterator value="page.list" id="u">
+       	     		<s:iterator value="page.list" var="u">
 						<div id="${u.msg_id}" <s:if test="#u.hasread==1">class="msg_list read"</s:if><s:else>class="msg_list"</s:else>>
 							<h1><s:if test="#u.msg_title.length()>50"><s:property value="#u.msg_title.substring(0,50)+'...'"/></s:if><s:else>${u.msg_title }</s:else></h1>
 							${u.msg_desc }

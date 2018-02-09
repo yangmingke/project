@@ -89,6 +89,8 @@ public class BillAction extends BaseAction {
 	private String identificationimgFileName;
 	private String title;
 	private String invoiceId;
+	private String keyword;
+	private String time;
 	private Map<String,String> appMap;
 	//充值列表
 	@Action("/bill/chargeList")
@@ -225,12 +227,41 @@ public class BillAction extends BaseAction {
 		if(StringUtils.isNotEmpty(appSid)){
 			param.put("appSid", appSid);
 		}
+		if(StringUtils.isNotEmpty(time)){
+			param.put("timePre", time.split("-")[0]);
+			param.put("timeTail", time.split("-")[1]);
+		}
+		param.put("month", datetime.replaceAll("-", "").substring(0, 6));
+		
+		//用于映射 会话ID-自定义会话ID
+		Map<String, String> aliasMap = new HashMap<String, String>();
+		List<Map<String, String>> cookieAndAliasList = appService.getSessionIdAlias(param);
+		for (Map<String, String> alias : cookieAndAliasList) {
+			aliasMap.put(alias.get("cookie_id"), alias.get("alias_session_id"));
+		}
+		
+		//用于过滤自定义会话ID关键字模糊查询
+		List<String> cookieList = new ArrayList<String>();
+		if(StringUtils.isNotEmpty(keyword)){
+			param.put("keyword", keyword);
+			List<Map<String, String>> keywordCookieAndAliasList = appService.getSessionIdAlias(param);
+			for (Map<String, String> alias : keywordCookieAndAliasList) {
+				cookieList.add(alias.get("cookie_id"));
+			}
+		}
+		if(!cookieList.isEmpty()){
+			param.put("cookieList", cookieList);
+		}
+		
+		//查询消费记录
 		page.setParams(param);
 		page = consumeService.getAppFee(page);
 		List<Map<String, Object>> feeList = page.getList();
 		for(Map<String, Object> feeMap : feeList){
 			String appid = (String) feeMap.get("appid");
+			String cookie = (String) feeMap.get("cookie");
 			feeMap.put("appName", appMap.get(appid));
+			feeMap.put("aliasSessionId", aliasMap.get(cookie));
 		}
 		dayTotalFee = consumeService.getDayTotalFee(param);
 		return "feeTime";
@@ -786,6 +817,18 @@ public class BillAction extends BaseAction {
 	}
 	public void setDayTotalFee(String dayTotalFee) {
 		this.dayTotalFee = dayTotalFee;
+	}
+	public String getKeyword() {
+		return keyword;
+	}
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+	public String getTime() {
+		return time;
+	}
+	public void setTime(String time) {
+		this.time = time;
 	}
 	
 }

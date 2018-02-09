@@ -81,7 +81,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
                 <th>快传标准资费</th>
               </tr>
               <s:if test="page.list!=null">
-              	<s:iterator value="page.list" id="r">
+              	<s:iterator value="page.list" var="r">
               			<tr>
               			<td><s:property value="#r.prefix"/></td>
               			<td><s:property value="#r.areaName"/></td>

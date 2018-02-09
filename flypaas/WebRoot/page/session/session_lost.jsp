@@ -123,27 +123,34 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
       <s:form theme="simple" namespace="/user" action="querySessionPacketLoss" method="post" name="form" id="form">
         <ul>
           <li>
-            <label>日期：</label>
-            <input type="text" name="datetime" id="datetime" value="${datetime}"/><span>
-            <div class="select_box select_app">
-				<label>选择应用：</label>
-				<div input="appSid" tabindex="2" class="select"
-					defaultValue="${appSid}">
-					<span>请选择应用<i>&nbsp;</i></span>
-					<ul>
-						<s:if test="appList!=null">
-							<s:iterator value="appList" var="app">
-								<li val="${app.appSid}">${app.appName}</li>
-							</s:iterator>
-						</s:if>
-					</ul>
-				</div>
-			</div> 
-			<label>会话ID：</label>
-            <input type="text" name="cookieId" id="cookieId" placeholder="会话ID" value="${cookieId}"/>
-            <input type="button" value="查询" onclick="query()"/>
+	            <label>日期：</label>
+	            <input type="text" name="datetime" id="datetime" value="${datetime}"/>
+	            <div class="select_box select_app">
+					<label>选择应用：</label>
+					<div input="appSid" tabindex="2" class="select"
+						defaultValue="${appSid}">
+						<span>请选择应用<i>&nbsp;</i></span>
+						<ul>
+							<s:if test="appList!=null">
+								<s:iterator value="appList" var="app">
+									<li val="${app.appSid}">${app.appName}</li>
+								</s:iterator>
+							</s:if>
+						</ul>
+					</div>
+				</div> 
+				<label>会话ID：</label>
+	            <input type="text" name="cookieId" id="cookieId"  value="${cookieId}" />
+            <s:if test="isJump == 'true'">
+	            <label>自定义会话ID：</label>
+	            <input type="text" name="cookieId" id="cookieId"  value="${aliasSessionId}" />
+	            <input type="button" value="返回" onclick="history.go(-1)" style="float: right"/>
+            </s:if>
+            <s:else>
+	            <input type="button" value="查询" onclick="query()"/>
+            </s:else>
             <span ><font color="red" id="error" style="display: none;"></font></span>
-            <span style="float:right;margin-top:2px;">
+            <span style="float:right">
             	<s:if test="sessionLoss.resultList!=null&&sessionLoss.resultList.size()>0">
  	    			<input id="showPicture" type="button" onclick="show('showPicture')" value="统计图" />
  	    		</s:if>
@@ -237,6 +244,15 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
     	var modal = document.getElementById('modal');  
         modal.style.display = "block";  
     }
+	
+	//按ESC关闭弹框
+	$(document).keyup(function(e){
+        var key =  e.which;
+        if(key == 27){
+        	var modal = document.getElementById('modal');  
+	        modal.style.display = "none";  
+        }
+    });
 	
 	function query(){
 		var datetime= $('#datetime').val();

@@ -33,6 +33,7 @@ public class SqlCode {
 	public final static String UPDATE_CLIENT_VERIFY="update tb_ucpaas_client set is_verify=?,update_date=now() where client_number=?";
 	public final static String UPDATE_CLIENT_PWD="update tb_ucpaas_client set client_pwd=? where client_number=? and app_sid=?";
 	public final static String ROAM_OPEN="UPDATE tb_ucpaas_client SET is_call_fr=?,update_date=NOW() WHERE client_number=?";
+	public final static String ADD_ALIAS_SESSION_ID="INSERT INTO tb_ucpaas_alias_session_id_[DATE](cookie_id,sid,app_sid,alias_session_id,start_time)VALUES(?,?,?,?,now())";
 	public final static String MONITOR="select now()";
 //	public final static String QUERY_SQL_CODE="select sql_code,sql_desc from tb_srv_sql ";
 //	public final static String ADD_CLIENT="INSERT into tb_ucpaas_client (client_sid,app_sid,friendly_name,client_number,client_pwd,client_token,status,create_date,update_date,sid,charge,charge_type,mobile,client_type) VALUES(?,?,?,?,?,?,?,now(),now(),?,?,?,?,?)";

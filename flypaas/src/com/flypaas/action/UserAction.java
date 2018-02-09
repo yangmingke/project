@@ -144,6 +144,8 @@ public class UserAction extends BaseAction {
 	
 	private String cookieId;
 	
+	private String aliasSessionId;
+	
 	private List<Application> appList;
 	
 	private String appSid;
@@ -151,6 +153,8 @@ public class UserAction extends BaseAction {
 	private Map<String, Object> sessionLoss;
 	
 	private String packetLossTime;
+	
+	private String isJump ;
 	
 	private String resultJson;
 	
@@ -1831,5 +1835,17 @@ public class UserAction extends BaseAction {
 	}
 	public void setResultJson(String resultJson) {
 		this.resultJson = resultJson;
+	}
+	public String getIsJump() {
+		return isJump;
+	}
+	public void setIsJump(String isJump) {
+		this.isJump = isJump;
+	}
+	public String getAliasSessionId() {
+		return aliasSessionId;
+	}
+	public void setAliasSessionId(String aliasSessionId) {
+		this.aliasSessionId = aliasSessionId;
 	}
 }

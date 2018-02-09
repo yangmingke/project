@@ -143,4 +143,11 @@ public interface AppService {
 	 * @return
 	 */
 	public Map<String, Object> getSessionPacketLoss(String sid, String appSid, String cookieId, String datetime);
+
+	/**
+	 * 获取客户指定会话ID别名
+	 * @param param
+	 * @return
+	 */
+	public List<Map<String, String>> getSessionIdAlias(Map<String, Object> param);
 }

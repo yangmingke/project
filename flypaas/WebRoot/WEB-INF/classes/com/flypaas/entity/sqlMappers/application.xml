@@ -217,6 +217,23 @@
 		select * from tb_ucpaas_application where app_sid=#{appSid} and sid=#{sid}  and app_type='1' and status!='3';
 	</select>
 	
+	<select id="getSessionIdAlias"  parameterType="map" resultType="map">
+		SELECT
+			cookie_id,
+			alias_session_id
+		FROM
+			tb_ucpaas_alias_session_id_${month}
+		WHERE
+			sid = #{sid}
+		AND date_format(start_time,'%Y%m%d') = #{datetime}
+		<if test="appSid != null" >
+			AND app_sid = #{appSid}
+		</if>
+		<if test="keyword != null">
+			AND alias_session_id like concat('%',#{keyword},'%')
+		</if>
+	</select>
+	
 	<select id="getSessionPacketLoss" resultType="Map" parameterType="Map" >
 	SELECT *
 	FROM t_rs_sess_snapshoot_${dateTime}

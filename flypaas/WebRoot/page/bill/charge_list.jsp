@@ -73,8 +73,8 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
             </tr>
           </thead>
           <tbody>
-          	 <s:if test="page.list.size()>0">
-      		<s:iterator value="page.list" id="pay">
+          	<s:if test="page.list.size()>0">
+      		<s:iterator value="page.list" var="pay">
 	          	  <tr><td>${pay.order_id }</td>
 			      <td><s:date name="#pay.create_date" format="yyyy/MM/dd HH:mm:ss"/> </td>
 			      <td>
